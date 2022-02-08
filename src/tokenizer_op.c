@@ -6,14 +6,14 @@
 /*   By: csteenvo <csteenvo@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 15:09:37 by csteenvo      #+#    #+#                 */
-/*   Updated: 2022/02/07 15:28:36 by csteenvo      ########   odam.nl         */
+/*   Updated: 2022/02/08 09:43:09 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 static t_token_id
-	tk_op2(t_tokenizer *tk, char ch, t_token_id one, t_token_id two)
+	tk_op2(t_tokenizer *tk, int ch, t_token_id one, t_token_id two)
 {
 	if (tk_assume(tk, ch))
 		return (two);

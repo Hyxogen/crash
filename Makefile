@@ -4,7 +4,7 @@ FILE_NAMES		:= main.c readchar.c readline.c
 
 CC				:= clang
 LINK_CMD		:= clang
-CFLAGS			:=
+CFLAGS			:= -Wall -Wextra -Werror -pedantic
 LFLAGS			:= -Wall -Wextra -Werror
 
 SRC_DIR			:= src

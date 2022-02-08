@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/08 09:19:47 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/08 11:36:38 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,14 @@ and_or separator_op and_or (separator_op and_or (separator_op and_or))
 
 #define SH_DEF_CHILD_SIZE 100
 
+t_snode	*pr_pipeline(t_parser *pr);
+
 t_snode
 	*node_create_empty(void)
 {
 	t_snode	*node;
 
+	node = sh_safe_malloc(sizeof(*node));
 	node->type = sx_none;
 	node->root = NULL;
 	node->childs = NULL;
@@ -65,10 +68,11 @@ t_snode
 void
 	node_resize_childs(t_snode *node, size_t newsize)
 {
-	node->childs = sh_reallloc(
+	node->childs = sh_safe_reallloc(
 			node->childs,
 			sizeof(t_snode*) * node->childs_capacity,
 			sizeof(t_snode) * newsize);
+	node->childs_capacity = newsize;
 }
 
 void
@@ -81,13 +85,19 @@ void
 	node->childs_size++;
 }
 
+void
+	node_destroy(t_snode *node)
+{
+	free(node->childs);
+	free(node);
+}
 
 int
 	pr_next_token(t_parser *pr)
 {
 	free(pr->current);
-	pr->current = malloc(sizeof(t_token));
-	sh_assert(pr->current);
+	pr->current = sh_safe_malloc(sizeof(t_token));
+	sh_assert(pr->current != NULL);
 	pr->current_ret = tk_tokenize(pr->tokenizer, pr->current);
 	return (pr->current_ret);
 }
@@ -104,7 +114,7 @@ int
 		return (0);
 	node_add_child(root, expected_node);
 	pr_next_token(pr);
-	return (0);
+	return (1);
 }
 
 t_snode
@@ -173,6 +183,7 @@ t_snode
 t_snode
 	*pr_cmd_suffix(t_parser *pr)
 {
+	(void)pr;
 	return (NULL);
 }
 
@@ -198,6 +209,7 @@ t_snode
 t_snode
 	*pr_cmd_prefix(t_parser *pr)
 {
+	(void)pr;
 	return (NULL);
 }
 

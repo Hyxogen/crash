@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:15:38 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/07 16:34:49 by csteenvo      ########   odam.nl         */
+/*   Updated: 2022/02/08 10:21:06 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,15 @@
 #include <libft.h>
 
 static int
-	tk_isquote(t_tokenizer *tk)
-{
-	return (0);
-}
-
-static int
-	tk_isoper(t_tokenizer *tk)
+	tk_isword(int ch)
 {
 	return (0);
 }
 
 static void
-	tk_quote(t_tokenizer *tk)
+	tk_subst(t_tokenizer *tk, int ch)
 {
-}
-
-static void
-	tk_subst(t_tokenizer *tk)
-{
+	sh_assert(0 && "tk_subst not implemented");
 }
 
 int
@@ -45,26 +35,20 @@ int
 		return (1);
 	if (tk->ch == '#')
 		while (tk->ch != '\n')
-			tk->ch = tk_readchar_raw(tk);
+			tk->ch = sh_readchar(&tk->in);
 	while (1)
 	{
-		if (!tk_isquote(tk, tk->ch))
+		if (tk_isquote(tk, tk->ch) || tk_isword(tk->ch))
+			tk_advance(tk);
+		else if (tk->ch == '\\' || tk->ch == '\'' || tk->ch == '\"')
+			tk_quote(tk, tk->ch);
+		else if (tk->ch == '$' || tk->ch == '`')
+			tk_subst(tk, tk->ch);
+		else if (isspace(tk->ch))
 		{
-			if (tk->ch == '\\' || tk->ch == '\'' || tk->ch == '\"')
-			{
-				tk_quote(tk, tk->ch);
-				continue ;
-			}
-			if (tk->ch == '$' || tk->ch == '`')
-			{
-				tk_subst(tk, tk->ch);
-				continue ;
-			}
-			if (ft_isspace(tk->ch) && tk->ch != '\n')
+			if (tk->ch != '\n')
 				tk->ch = tk_readchar(tk);
-			if (ft_isspace(tk->ch) || tk_isoper(tk->ch))
-				return (1);
+			return (1);
 		}
-		tk_advance(tk);
 	}
 }

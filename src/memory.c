@@ -6,11 +6,12 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/08 09:17:46 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/08 09:20:07 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/08 10:35:33 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include <libft.h>
 #include <stdlib.h>
 
 void
@@ -18,12 +19,12 @@ void
 	void	*ptr;
 
 	ptr = malloc(size);
-	sh_assert(ptr);
+	sh_assert(ptr != NULL);
 	return (ptr);
 }
 
 void
-	*sh_reallloc(void *ptr, size_t old_size, size_t new_size) {
+	*sh_safe_reallloc(void *ptr, size_t old_size, size_t new_size) {
 	unsigned char	*ret;
 
 	ret = sh_safe_malloc(new_size);
