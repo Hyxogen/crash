@@ -6,14 +6,22 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 10:50:42 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/08 11:20:47 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/08 15:54:44 by csteenvo      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
+/* https://pubs.opengroup.org/onlinepubs/009656399/toc.pdf */
+
 # include <stddef.h>
+
+# ifdef SH_DEBUG
+#  define sh_assert(test) sh_assert2(test, #test, __FILE__, __LINE__)
+# else
+#  define sh_assert sh_assert1
+# endif
 
 typedef struct s_readline	t_readline;
 typedef struct s_input		t_input;
@@ -22,12 +30,6 @@ typedef struct s_token		t_token;
 typedef struct s_tokenizer	t_tokenizer;
 typedef struct s_parser		t_parser;
 typedef struct s_snode		t_snode;
-
-enum e_token_type
-{
-	type_word,
-	type_oper
-};
 
 enum e_token_id
 {
@@ -76,6 +78,8 @@ enum e_syntax_id
 {
 	sx_none,
 	sx_and,
+	sx_cmd_name,
+	sx_cmd_word,
 	sx_semicolon,
 	sx_separator_op,
 	sx_separator,
@@ -95,7 +99,6 @@ enum e_syntax_id
 	sx_bang
 };
 
-typedef enum e_token_type	t_token_type;
 typedef enum e_token_id		t_token_id;
 typedef enum e_syntax_id	t_syntax_id;
 
@@ -114,9 +117,9 @@ struct s_input
 
 struct s_token
 {
-	t_token_type	type;
-	t_token_id		id;
-	const char		*str;
+	t_token_id	id;
+	char		*str;
+	size_t		len;
 };
 
 struct s_tokenizer
@@ -124,7 +127,7 @@ struct s_tokenizer
 	t_token	*tok;
 	t_input	*in;
 	int		ch;
-	int		next_ch;
+	int		ch2;
 	int		bslash;
 	int		quote;
 };
@@ -152,15 +155,19 @@ struct s_snode
 	struct s_snode	**childs;
 };
 
-char	*sh_readline(t_readline *rl, const char *prompt);
-int		sh_readchar(t_input *in);
+char		*sh_readline(t_readline *rl, const char *prompt);
+int			sh_readchar(t_input *in);
 
 void		*sh_safe_malloc(size_t size);
-void		*sh_safe_reallloc(void *ptr, size_t old_size, size_t new_size);
+void		*sh_safe_realloc(void *ptr, size_t old_size, size_t new_size);
 
+int			tk_quoted(t_tokenizer *tk);
+void		tk_readchar(t_tokenizer *tk);
+void		tk_append(t_tokenizer *tk);
 t_token_id	tk_op(t_tokenizer *tk);
-int			tk_tokenize(t_tokenizer *tk, t_token *token);
+int			tk_tokenize(t_tokenizer *tk);
 
-void		sh_assert(int condition);
+void		sh_assert1(int test);
+void		sh_assert2(int test, const char *str, const char *file, int line);
 
 #endif

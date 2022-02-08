@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/08 09:17:46 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/08 10:35:33 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/08 15:08:17 by csteenvo      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void
 }
 
 void
-	*sh_safe_reallloc(void *ptr, size_t old_size, size_t new_size) {
+	*sh_safe_realloc(void *ptr, size_t old_size, size_t new_size) {
 	unsigned char	*ret;
 
 	ret = sh_safe_malloc(new_size);

@@ -9,10 +9,16 @@ extern "C" {
 	t_snode	*pr_pipe(t_parser *pr);
 	t_snode	*pr_and_if(t_parser *pr);
 	t_snode	*pr_or_if(t_parser *pr);
+	t_snode	*pr_cmd_name(t_parser *pr);
+	t_snode	*pr_cmd_word(t_parser *pr);
+	t_snode	*pr_and(t_parser *pr);
+	t_snode	*pr_semicolon(t_parser *pr);
 
 	t_snode *pr_newline_list(t_parser *pr);
 	t_snode	*pr_linebreak(t_parser *pr);
-	
+	t_snode *pr_separator_op(t_parser *pr);
+	t_snode *pr_separator(t_parser *pr);
+
 	int	pr_expect_node(t_parser *pr, t_snode *root, t_snode *(*func)(t_parser*));
 	int	pr_next_token(t_parser *pr);
 
@@ -24,20 +30,25 @@ extern "C" {
 }
 
 void add_token(t_token token);
-void add_token(t_token_type type, t_token_id id, const char *str);
+void add_token(t_token_id id, char *str);
 void clear_tokens();
 
-void clear_parser(t_parser &parser) {
+void parser_setup(t_parser &parser) {
 	std::memset(&parser, 0, sizeof(t_parser));
+	parser.tokenizer = (t_tokenizer *) std::malloc(sizeof(t_tokenizer));
+}
+
+void parser_destroy(t_parser &parser) {
+	std::free(parser.tokenizer);
 }
 
 SIMPLE_TEST(next_token) {
 	t_parser parser;
 
 	clear_tokens();
-	clear_parser(parser);
+	parser_setup(parser);
 	for (int i = word; i <= op_semi; i++)
-		add_token((t_token_type) 0, (t_token_id) i, (const char *) 0);
+		add_token((t_token_id) i, (char *) 0);
 	
 	for (int i = word; i <= op_semi; i++) {
 		pr_next_token(&parser);
@@ -55,9 +66,9 @@ SIMPLE_TEST(bang_symbol) {
 	t_snode	*node;
 
 	clear_tokens();
-	clear_parser(parser);
-	add_token(type_oper, bang, "!");
-	add_token(type_word, newline, "\n");
+	parser_setup(parser);
+	add_token(bang, "!");
+	add_token(newline, "\n");
 	pr_next_token(&parser);
 	node = pr_bang(&parser);
 	ASSERT_TRUE(node != NULL);
@@ -65,6 +76,7 @@ SIMPLE_TEST(bang_symbol) {
 	pr_next_token(&parser);
 	node = pr_bang(&parser);
 	ASSERT_TRUE(node == NULL);
+	parser_destroy(parser);
 }
 
 SIMPLE_TEST(newline_symbol) {
@@ -72,9 +84,9 @@ SIMPLE_TEST(newline_symbol) {
 	t_snode	*node;
 
 	clear_tokens();
-	clear_parser(parser);
-	add_token(type_word, newline, "\n");
-	add_token(type_oper, op_lessand, "<&");
+	parser_setup(parser);
+	add_token(newline, "\n");
+	add_token(op_lessand, "<&");
 	pr_next_token(&parser);
 	node = pr_newline(&parser);
 	ASSERT_TRUE(node != NULL);
@@ -82,6 +94,7 @@ SIMPLE_TEST(newline_symbol) {
 	pr_next_token(&parser);
 	node = pr_newline(&parser);
 	ASSERT_TRUE(node == NULL);
+	parser_destroy(parser);
 }
 
 SIMPLE_TEST(pipe_symbol) {
@@ -89,9 +102,9 @@ SIMPLE_TEST(pipe_symbol) {
 	t_snode	*node;
 
 	clear_tokens();
-	clear_parser(parser);
-	add_token(type_oper, op_pipe, "|");
-	add_token(type_oper, op_or_if, "||");
+	parser_setup(parser);
+	add_token(op_pipe, "|");
+	add_token(op_or_if, "||");
 	pr_next_token(&parser);
 	node = pr_pipe(&parser);
 	ASSERT_TRUE(node != NULL);
@@ -106,9 +119,9 @@ SIMPLE_TEST(or_if_symbol) {
 	t_snode	*node;
 
 	clear_tokens();
-	clear_parser(parser);
-	add_token(type_oper, op_or_if, "||");
-	add_token(type_oper, op_rparen, "}");
+	parser_setup(parser);
+	add_token(op_or_if, "||");
+	add_token(op_rparen, "}");
 	pr_next_token(&parser);
 	node = pr_or_if(&parser);
 	ASSERT_TRUE(node != NULL);
@@ -123,9 +136,9 @@ SIMPLE_TEST(and_if_symbol) {
 	t_snode	*node;
 
 	clear_tokens();
-	clear_parser(parser);
-	add_token(type_oper, op_and_if, "&&");
-	add_token(type_oper, op_clobber, ">|");
+	parser_setup(parser);
+	add_token(op_and_if, "&&");
+	add_token(op_clobber, ">|");
 	pr_next_token(&parser);
 	node = pr_and_if(&parser);
 	ASSERT_TRUE(node != NULL);
@@ -133,6 +146,7 @@ SIMPLE_TEST(and_if_symbol) {
 	pr_next_token(&parser);
 	node = pr_and_if(&parser);
 	ASSERT_TRUE(node == NULL);
+	parser_destroy(parser);
 }
 
 SIMPLE_TEST(node_create_empty) {
@@ -170,6 +184,7 @@ SIMPLE_TEST(node_add_child) {
 	ASSERT_EQUAL(sx_pipe_sequence, root->childs[1]->type);
 	ASSERT_EQUAL((size_t) 0, root->childs[0]->childs_capacity)
 	ASSERT_EQUAL((size_t) 0, root->childs[1]->childs_capacity)
+	node_destroy(root);
 }
 
 SIMPLE_TEST(expect_node) {
@@ -177,11 +192,11 @@ SIMPLE_TEST(expect_node) {
 	t_snode *root;
 
 	clear_tokens();
-	clear_parser(parser);
+	parser_setup(parser);
 	root = node_create_empty();
 
-	add_token(type_oper, bang, "!");
-	add_token(type_oper, op_and_if, "&&");
+	add_token(bang, "!");
+	add_token(op_and_if, "&&");
 	pr_next_token(&parser);
 	ASSERT_EQUAL(1, pr_expect_node(&parser, root, pr_bang));
 	ASSERT_EQUAL((size_t) 1, root->childs_size);
@@ -195,6 +210,7 @@ SIMPLE_TEST(expect_node) {
 	ASSERT_EQUAL(sx_bang, root->childs[0]->type);
 	ASSERT_EQUAL(sx_and_if, root->childs[1]->type);
 	node_destroy(root);
+	parser_destroy(parser);
 }
 
 SIMPLE_TEST(newline_list) {
@@ -202,11 +218,11 @@ SIMPLE_TEST(newline_list) {
 	t_snode	*node;
 
 	clear_tokens();
-	clear_parser(parser);
+	parser_setup(parser);
 
-	add_token(type_word, newline, "\n");
-	add_token(type_word, newline, "\n");
-	add_token(type_word, newline, "\n");
+	add_token(newline, "\n");
+	add_token(newline, "\n");
+	add_token(newline, "\n");
 
 	pr_next_token(&parser);
 
@@ -225,6 +241,7 @@ SIMPLE_TEST(newline_list) {
 	ASSERT_EQUAL(sx_newline_list, node->childs[1]->childs[1]->type);
 	ASSERT_EQUAL(sx_newline, node->childs[1]->childs[1]->childs[0]->type);
 	node_destroy(node);
+	parser_destroy(parser);
 }
 
 SIMPLE_TEST(linebreak) {
@@ -232,15 +249,15 @@ SIMPLE_TEST(linebreak) {
 	t_snode *node;
 
 	clear_tokens();
-	clear_parser(parser);
+	parser_setup(parser);
 
 	node = pr_linebreak(&parser);
 	ASSERT_TRUE(node != NULL);
 
 
-	add_token(type_word, newline, "\n");
-	add_token(type_word, newline, "\n");
-	add_token(type_word, newline, "\n");
+	add_token(newline, "\n");
+	add_token(newline, "\n");
+	add_token(newline, "\n");
 	pr_next_token(&parser);
 
 
@@ -262,6 +279,224 @@ SIMPLE_TEST(linebreak) {
 	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs[1]->childs[1]->childs_size);
 	ASSERT_EQUAL(sx_newline_list, node->childs[0]->childs[1]->childs[1]->type);
 	ASSERT_EQUAL(sx_newline, node->childs[0]->childs[1]->childs[1]->childs[0]->type);
+	node_destroy(node);
+	parser_destroy(parser);
+}
+
+SIMPLE_TEST(cmd_name) {
+	t_parser parser;
+	t_snode *node;
+
+	clear_tokens();
+	parser_setup(parser);
+
+	add_token(word, "echo");
+	add_token(word, "ls");
+	add_token(word, "hcf");
+	add_token(kw_while, "while");
+
+	pr_next_token(&parser);
+	node = pr_cmd_name(&parser);
+	ASSERT_EQUAL(sx_cmd_name, node->type);
+	node_destroy(node);
+
+	pr_next_token(&parser);
+	node = pr_cmd_name(&parser);
+	ASSERT_EQUAL(sx_cmd_name, node->type);
+	node_destroy(node);
+	
+	pr_next_token(&parser);
+	node = pr_cmd_name(&parser);
+	ASSERT_EQUAL(sx_cmd_name, node->type);
+	node_destroy(node);
+
+	pr_next_token(&parser);
+	node = pr_cmd_name(&parser);
+	ASSERT_TRUE(node == NULL);
+
+	parser_destroy(parser);
+}
+
+SIMPLE_TEST(cmd_word) {
+	t_parser parser;
+	t_snode *node;
+
+	clear_tokens();
+	parser_setup(parser);
+
+	add_token(word, "echo");
+	add_token(word, "ls");
+	add_token(word, "hcf");
+	add_token(kw_while, "while");
+
+	pr_next_token(&parser);
+	node = pr_cmd_word(&parser);
+	ASSERT_EQUAL(sx_cmd_word, node->type);
+	node_destroy(node);
+
+	pr_next_token(&parser);
+	node = pr_cmd_word(&parser);
+	ASSERT_EQUAL(sx_cmd_word, node->type);
+	node_destroy(node);
+	
+	pr_next_token(&parser);
+	node = pr_cmd_word(&parser);
+	ASSERT_EQUAL(sx_cmd_word, node->type);
+	node_destroy(node);
+
+	pr_next_token(&parser);
+	node = pr_cmd_word(&parser);
+	ASSERT_TRUE(node == NULL);
+
+	parser_destroy(parser);
+}
+
+SIMPLE_TEST(and) {
+	t_parser parser;
+	t_snode *node;
+
+	clear_tokens();
+	parser_setup(parser);
+
+	add_token(op_and, "&");
+	add_token(word, "ls");
+	add_token(op_and, "&");
+	add_token(kw_while, "while");
+
+	pr_next_token(&parser);
+	node = pr_and(&parser);
+	ASSERT_EQUAL(sx_and, node->type);
+	node_destroy(node);
+
+	pr_next_token(&parser);
+	node = pr_and(&parser);
+	ASSERT_TRUE(node == NULL);
+
+	pr_next_token(&parser);
+	node = pr_and(&parser);
+	ASSERT_EQUAL(sx_and, node->type);
+	node_destroy(node);
+	
+	pr_next_token(&parser);
+	node = pr_and(&parser);
+	ASSERT_TRUE(node == NULL);
+
+	parser_destroy(parser);
+}
+
+SIMPLE_TEST(semicolon) {
+	t_parser parser;
+	t_snode *node;
+
+	clear_tokens();
+	parser_setup(parser);
+
+	add_token(op_semi, ";");
+	add_token(word, "ls");
+	add_token(op_semi, ";");
+	add_token(kw_while, "while");
+
+	pr_next_token(&parser);
+	node = pr_semicolon(&parser);
+	ASSERT_EQUAL(sx_semicolon, node->type);
+	node_destroy(node);
+
+	pr_next_token(&parser);
+	node = pr_semicolon(&parser);
+	ASSERT_TRUE(node == NULL);
+
+	pr_next_token(&parser);
+	node = pr_semicolon(&parser);
+	ASSERT_EQUAL(sx_semicolon, node->type);
+	node_destroy(node);
+	
+	pr_next_token(&parser);
+	node = pr_semicolon(&parser);
+	ASSERT_TRUE(node == NULL);
+
+	parser_destroy(parser);
+}
+
+SIMPLE_TEST(separator_op) {
+	t_parser parser;
+	t_snode *node;
+
+	clear_tokens();
+	parser_setup(parser);
+
+	node = pr_separator_op(&parser);
+	ASSERT_TRUE(node == NULL);
+
+	add_token(op_semi, ";");
+	add_token(word, "ls");
+	add_token(op_and, "&");
+	add_token(kw_while, "while");
+
+	pr_next_token(&parser);
+	node = pr_separator_op(&parser);
+	ASSERT_TRUE(node != NULL);
+	ASSERT_EQUAL(sx_separator_op, node->type);
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_semicolon, node->childs[0]->type);
+	node_destroy(node);
+
+	node = pr_separator_op(&parser);
+	ASSERT_TRUE(node == NULL);
+
+	pr_next_token(&parser);
+	node = pr_separator_op(&parser);
+	ASSERT_TRUE(node != NULL);
+	ASSERT_EQUAL(sx_separator_op, node->type);
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_and, node->childs[0]->type);
+	node_destroy(node);
+
+	node = pr_separator_op(&parser);
+	ASSERT_TRUE(node == NULL);
+
+	parser_destroy(parser);
+}
+
+SIMPLE_TEST(separator) {
+	t_parser parser;
+	t_snode *node;
+
+	clear_tokens();
+	parser_setup(parser);
+
+	node = pr_separator(&parser);
+	ASSERT_TRUE(node == NULL);
+
+	add_token(op_semi, ";");
+	pr_next_token(&parser);
+	node = pr_separator(&parser);
+
+	clear_tokens();
+	add_token(op_semi, ";");
+	add_token(newline, "\n"); 
+	pr_next_token(&parser);
+	node = pr_separator(&parser);
+	ASSERT_TRUE(node != NULL); /*TODO this test fails and it shouldn't*/
+	ASSERT_EQUAL(sx_separator, node->type);
+	ASSERT_EQUAL((size_t) 2, node->childs_size);
+	ASSERT_EQUAL(sx_semicolon, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 0, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_newline_list, node->childs[1]->type);
+	ASSERT_EQUAL((size_t) 0, node->childs[1]->childs_size);
+	node_destroy(node);
+
+	clear_tokens();
+	add_token(op_and, "&");
+	add_token(newline, "\n");
+	pr_next_token(&parser);
+	node = pr_separator(&parser);
+	ASSERT_TRUE(node != NULL);
+	ASSERT_EQUAL(sx_separator, node->type);
+	ASSERT_EQUAL((size_t) 2, node->childs_size);
+	ASSERT_EQUAL(sx_and, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 0, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_newline_list, node->childs[1]->type);
+	ASSERT_EQUAL((size_t) 0, node->childs[1]->childs_size);
 	node_destroy(node);
 }
 

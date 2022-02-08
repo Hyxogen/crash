@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/08 11:36:38 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/08 16:32:07 by csteenvo      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ t_snode
 void
 	node_resize_childs(t_snode *node, size_t newsize)
 {
-	node->childs = sh_safe_reallloc(
+	node->childs = sh_safe_realloc(
 			node->childs,
 			sizeof(t_snode*) * node->childs_capacity,
 			sizeof(t_snode) * newsize);
@@ -98,7 +98,8 @@ int
 	free(pr->current);
 	pr->current = sh_safe_malloc(sizeof(t_token));
 	sh_assert(pr->current != NULL);
-	pr->current_ret = tk_tokenize(pr->tokenizer, pr->current);
+	pr->tokenizer->tok = pr->current;
+	pr->current_ret = tk_tokenize(pr->tokenizer);
 	return (pr->current_ret);
 }
 
@@ -193,7 +194,7 @@ t_snode
 {
 	if (pr->current->id != word)
 		return (NULL);
-	return (node_create_id(sx_word));
+	return (node_create_id(sx_cmd_name));
 }
 
 /*TODO apply rule 7b*/
@@ -202,7 +203,7 @@ t_snode
 {
 	if (pr->current->id != word)
 		return (NULL);
-	return (node_create_id(sx_word));
+	return (node_create_id(sx_cmd_word));
 }
 
 /*TODO implement*/
@@ -249,10 +250,12 @@ t_snode
 	separator_node = node_create_id(sx_separator);
 	if (pr_expect_node(pr, separator_node, pr_separator_op))
 	{
+		printf("a\n");
 		if (!pr_expect_node(pr, separator_node, pr_linebreak))
 			return (NULL);
 		return (separator_node);
 	}
+	printf("b\n");
 	if (!pr_expect_node(pr, separator_node, pr_newline_list))
 		return (NULL);
 	return (separator_node);

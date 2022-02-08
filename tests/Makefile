@@ -3,8 +3,8 @@ TARGET				:= crash_test
 CC					:= clang
 CXX					:= clang++
 LINK_CMD			:= clang++
-CFLAGS				:= -std=c89 -Wall -Wextra -pedantic -fsanitize=address -g3 -Og
-CXXFLAGS			:= -std=c++17 -Wall -Wextra -pedantic -fsanitize=address -g3 -Og
+CFLAGS				:= -std=c89 -Wall -Wextra -pedantic -fsanitize=address -g3 -O0
+CXXFLAGS			:= -std=c++17 -Wall -Wextra -pedantic -fsanitize=address -g3 -O0
 LFLAGS				:= -fsanitize=address
 
 SRC_DIR				:= ../src

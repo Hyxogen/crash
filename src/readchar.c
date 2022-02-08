@@ -6,7 +6,7 @@
 /*   By: csteenvo <csteenvo@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 12:11:24 by csteenvo      #+#    #+#                 */
-/*   Updated: 2022/02/07 15:28:01 by csteenvo      ########   odam.nl         */
+/*   Updated: 2022/02/08 12:42:51 by csteenvo      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int
 		in->line = sh_readline(&in->rl, "$ ");
 	if (in->line == NULL)
 		return (-1);
-	c = in->line[in->index];
+	c = (unsigned char) in->line[in->index];
 	in->index += 1;
 	in->more = 1;
 	if (c == '\0')

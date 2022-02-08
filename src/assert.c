@@ -6,20 +6,30 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/08 09:20:23 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/08 09:24:05 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/08 15:55:41 by csteenvo      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include <stdlib.h>
-#ifdef SH_DEBUG
-# include <stdio.h>
-# include <signal.h>
-# define sh_assert(condition) if (condition) { } else { printf("assertion failed %s:%d\n", __FILE__, __LINE__); raise(SIGTRAP); }
-#else
+#include <stdio.h>
+#include <signal.h>
+
 void
-	sh_assert(int condition) {
-	if (!condition)
+	sh_assert1(int test)
+{
+	if (!test)
+	{
 		exit(EXIT_FAILURE);
+	}
 }
-#endif
+
+void
+	sh_assert2(int test, const char *str, const char *file, int line)
+{
+	if (!test)
+	{
+		fprintf(stderr, "assertion failed %s:%d: %s\n", file, line, str);
+		raise(SIGTRAP);
+	}
+}

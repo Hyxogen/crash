@@ -1,15 +1,15 @@
 NAME			:= minishell
 
-FILE_NAMES		:= main.c readchar.c readline.c
+FILE_NAMES		:= main.c readchar.c readline.c tokenize.c tokenize_op.c tokenize_util.c assert.c memory.c
 
-CC				:= clang
-LINK_CMD		:= clang
-CFLAGS			:= -Wall -Wextra -Werror -pedantic
-LFLAGS			:= -Wall -Wextra -Werror
+CC				:= cc
+LINK_CMD		:= cc
+CFLAGS			:= -Wall -Wextra -pedantic
+LFLAGS			:= -Wall -Wextra
 
 SRC_DIR			:= src
 LIB_DIR			:= dependencies
-INC_DIR			:= include $(LIB_DIR)/libft/include
+INC_DIR			:= include $(LIB_DIR)/libft
 OBJ_DIR			:= build
 DEP_DIR			:= build
 
@@ -22,25 +22,26 @@ ifndef config
 endif
 
 ifeq ($(config), debug)
-	CFLAGS		+= -fsanitize=address,undefined -g3 -Og
-	LFLAGS		+= -fsanitize=address,undefined
+	CFLAGS		+= -DSH_DEBUG=1 -fsanitize=address -g3 -Og
+	LFLAGS		+= -DSH_DEBUG=1 -fsanitize=address
 else ifeq ($(config), release)
-	CFLAGS		+= -g3 -O2
-	LFLAGS		+=
+	CFLAGS		+= -Werror -g3 -O2
+	LFLAGS		+= -Werror
 else ifeq ($(config), distr)
-	CFLAGS		+= -g0 -Ofast
-	LFLAGS		+= 
+	CFLAGS		+= -Werror -g0 -Ofast
+	LFLAGS		+= -Werror 
 else
 $(error "invalid config $(config"))
 endif
 
 all: $(NAME)
 
+# TODO compile libft using its own makefile
 $(NAME): $(OBJECTS)
-	$(LINK_CMD) -o $@ $(OBJECTS) $(LFLAGS) -lreadline
+	$(LINK_CMD) -o $@ $(OBJECTS) $(LIB_DIR)/libft/libft.a $(LFLAGS) -lreadline
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) -c -o $@ $< -MMD -I$(INC_DIR)
+	$(CC) $(CFLAGS) -c -o $@ $< -MMD $(patsubst %,-I%,$(INC_DIR))
 
 crash: $(NAME)
 	ln -s $(NAME) $@
