@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/10 15:20:35 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/10 15:40:11 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,7 +179,7 @@ t_snode
 	t_snode	*linebreak_node;
 
 	linebreak_node = node_create_id(sx_linebreak);
-	pr_expect_node(pr, linebreak_node, pr_newline_list, 1);
+	pr_expect_node(pr, linebreak_node, pr_newline_list, 0);
 	return (linebreak_node);
 }
 
