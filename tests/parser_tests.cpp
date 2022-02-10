@@ -787,9 +787,65 @@ SIMPLE_TEST(and_or) {
 	ASSERT_EQUAL(sx_pipeline, node->childs[0]->type);
 	ASSERT_EQUAL(sx_or_if, node->childs[1]->type);
 	ASSERT_EQUAL(sx_linebreak, node->childs[2]->type);
-	ASSERT_EQUAL(sx_pipeline, node->childs[3]->type);
+	ASSERT_EQUAL(sx_and_or, node->childs[3]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[3]->childs_size);
+	node_destroy(node);
+
+	clear_tokens();
+	add_token(bang, "!");
+	add_token(word, "ls");
+	add_token(op_pipe, "|");
+	add_token(word, "pbcopy");
+	add_token(op_and_if, "&");
+	add_token(bang, "!");
+	add_token(word, "ls");
+	add_token(op_pipe, "|");
+	add_token(word, "pbcopy");
+	pr_next_token(&parser);
+	node = pr_and_or(&parser);
+	ASSERT_TRUE(node != NULL);
+	ASSERT_EQUAL(sx_and_or, node->type);
+	ASSERT_EQUAL((size_t) 4, node->childs_size);
+	ASSERT_EQUAL(sx_pipeline, node->childs[0]->type);
+	ASSERT_EQUAL(sx_and_if, node->childs[1]->type);
+	ASSERT_EQUAL(sx_linebreak, node->childs[2]->type);
+	ASSERT_EQUAL(sx_and_or, node->childs[3]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[3]->childs_size);
+	node_destroy(node);
+
+	clear_tokens();
+	add_token(bang, "!");
+	add_token(word, "ls");
+	add_token(op_pipe, "|");
+	add_token(word, "pbcopy");
+	add_token(op_and_if, "&");
+	add_token(bang, "!");
+	add_token(word, "ls");
+	add_token(op_pipe, "|");
+	add_token(word, "pbcopy");
+	add_token(op_and_if, "&");
+	add_token(bang, "!");
+	add_token(word, "ls");
+	add_token(op_pipe, "|");
+	add_token(word, "pbcopy");
+	pr_next_token(&parser);
+	node = pr_and_or(&parser);
+	ASSERT_TRUE(node != NULL);
+	ASSERT_EQUAL(sx_and_or, node->type);
+	ASSERT_EQUAL((size_t) 4, node->childs_size);
+	ASSERT_EQUAL(sx_pipeline, node->childs[0]->type);
+	ASSERT_EQUAL(sx_and_if, node->childs[1]->type);
+	ASSERT_EQUAL(sx_linebreak, node->childs[2]->type);
+	ASSERT_EQUAL(sx_and_or, node->childs[3]->type);
+	ASSERT_EQUAL((size_t) 4, node->childs[3]->childs_size);
+	ASSERT_EQUAL(sx_pipeline, node->childs[3]->childs[0]->type);
+	ASSERT_EQUAL(sx_and_if, node->childs[3]->childs[1]->type);
+	ASSERT_EQUAL(sx_linebreak, node->childs[3]->childs[2]->type);
+	ASSERT_EQUAL(sx_and_or, node->childs[3]->childs[3]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[3]->childs[3]->childs_size);
 	node_destroy(node);
 }
+
 
 int main(int argc, char **argv) {
 	SIMPLE_INIT(argc, argv);
