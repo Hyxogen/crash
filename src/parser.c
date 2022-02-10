@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/10 11:10:33 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/10 12:57:14 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,7 +169,7 @@ t_snode
 	newline_list_node = node_create_id(sx_newline_list);
 	if (!pr_expect_node(pr, newline_list_node, pr_newline, 1))
 		return (NULL);
-	pr_expect_node(pr, newline_list_node, pr_newline_list, 1);
+	pr_expect_node(pr, newline_list_node, pr_newline_list, 0);
 	return (newline_list_node);
 }
 
@@ -179,7 +179,10 @@ t_snode
 	t_snode	*linebreak_node;
 
 	linebreak_node = node_create_id(sx_linebreak);
-	pr_expect_node(pr, linebreak_node, pr_newline_list, 1);
+	if (pr->current_ret == 0)
+		return (linebreak_node);
+	else if (!pr_expect_node(pr, linebreak_node, pr_newline_list, 0))
+		return (NULL);
 	return (linebreak_node);
 }
 
@@ -296,10 +299,9 @@ t_snode
 	pipe_sequence_node = node_create_id(sx_pipe_sequence);
 	if (!pr_expect_node(pr, pipe_sequence_node, pr_command, 0))
 		return (NULL);
-	if (!pr_expect_node(pr, pipe_sequence_node, pr_linebreak, 0))
-		return (pipe_sequence_node);
 	if (!pr_expect_node(pr, pipe_sequence_node, pr_pipe, 1))
-		return (NULL);
+		return (pipe_sequence_node);
+	pr_expect_node(pr, pipe_sequence_node, pr_linebreak, 0);
 	if (!pr_expect_node(pr, pipe_sequence_node, pr_pipe_sequence, 0))
 		return (NULL);
 	return (pipe_sequence_node);
