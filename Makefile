@@ -1,6 +1,6 @@
 NAME			:= minishell
 
-FILE_NAMES		:= main.c readchar.c readline.c tokenize.c tokenize_op.c tokenize_util.c assert.c memory.c
+FILE_NAMES		:= main.c readchar.c readline.c tk.c tk_word.c tk_op.c tk_util.c assert.c memory.c parser.c pr_debug.c
 
 CC				:= cc
 LINK_CMD		:= cc

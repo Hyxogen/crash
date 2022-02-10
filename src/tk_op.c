@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   tokenize_op.c                                      :+:    :+:            */
+/*   tk_op.c                                            :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: csteenvo <csteenvo@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 15:09:37 by csteenvo      #+#    #+#                 */
-/*   Updated: 2022/02/08 15:44:27 by csteenvo      ########   odam.nl         */
+/*   Updated: 2022/02/10 12:45:59 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ static int
 {
 	if (tk->ch == ch && !tk_quoted(tk))
 	{
-		tk_append(tk);
 		tk_readchar(tk);
 		return (1);
 	}

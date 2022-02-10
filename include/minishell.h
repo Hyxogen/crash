@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 10:50:42 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/08 15:54:44 by csteenvo      ########   odam.nl         */
+/*   Updated: 2022/02/10 15:19:09 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,15 +117,16 @@ struct s_input
 
 struct s_token
 {
-	t_token_id	id;
-	char		*str;
-	size_t		len;
+	int		id;
+	char	*str;
+	size_t	len;
 };
 
 struct s_tokenizer
 {
-	t_token	*tok;
 	t_input	*in;
+	char	*str;
+	size_t	len;
 	int		ch;
 	int		ch2;
 	int		bslash;
@@ -161,11 +162,20 @@ int			sh_readchar(t_input *in);
 void		*sh_safe_malloc(size_t size);
 void		*sh_safe_realloc(void *ptr, size_t old_size, size_t new_size);
 
+void		tk_create(t_tokenizer *tk, t_input *in);
+void		tk_destroy(t_tokenizer *tk);
+t_token_id	tk_run(t_tokenizer *tk);
+int			tk_tokenize(t_tokenizer *tk, t_token *token);
+void		tk_debug(void);
 int			tk_quoted(t_tokenizer *tk);
-void		tk_readchar(t_tokenizer *tk);
 void		tk_append(t_tokenizer *tk);
+void		tk_readchar(t_tokenizer *tk);
+void		tk_skip(t_tokenizer *tk);
 t_token_id	tk_op(t_tokenizer *tk);
-int			tk_tokenize(t_tokenizer *tk);
+t_token_id	tk_word(t_tokenizer *tk);
+
+t_snode		*pr_parse(t_parser *pr);
+void		pr_debug(void);
 
 void		sh_assert1(int test);
 void		sh_assert2(int test, const char *str, const char *file, int line);

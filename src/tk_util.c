@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   tokenize_util.c                                    :+:    :+:            */
+/*   tk_util.c                                          :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: csteenvo <csteenvo@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 15:28:40 by csteenvo      #+#    #+#                 */
-/*   Updated: 2022/02/08 16:29:30 by csteenvo      ########   odam.nl         */
+/*   Updated: 2022/02/10 14:12:24 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,24 @@ int
 }
 
 void
+	tk_append(t_tokenizer *tk)
+{
+	if (tk->bslash)
+	{
+		tk->str = sh_safe_realloc(tk->str, tk->len, tk->len + 1);
+		tk->str[tk->len] = '\\';
+		tk->len += 1;
+	}
+	tk->str = sh_safe_realloc(tk->str, tk->len, tk->len + 1);
+	tk->str[tk->len] = tk->ch;
+	tk->len += 1;
+}
+
+void
 	tk_readchar(t_tokenizer *tk)
 {
+	if (tk->ch != -1)
+		tk_append(tk);
 	while (1)
 	{
 		tk->bslash = 0;
@@ -49,9 +65,9 @@ void
 			if (tk->ch2 == '$' || tk->ch2 == '`' || tk->ch2 == '"'
 				|| tk->ch2 == '\\' || tk->ch2 == '\n' || tk->quote != 2)
 			{
+				tk->bslash = 1;
 				tk->ch = tk->ch2;
 				tk->ch2 = -1;
-				tk->bslash = 1;
 			}
 		}
 		if (tk->ch != '\n' || !tk->bslash)
@@ -60,18 +76,13 @@ void
 }
 
 void
-	tk_append(t_tokenizer *tk)
+	tk_skip(t_tokenizer *tk)
 {
-	t_token	*tok;
-
-	tok = tk->tok;
-	if (tk->bslash)
-	{
-		tok->str = sh_safe_realloc(tok->str, tok->len, tok->len + 1);
-		tok->str[tok->len] = '\\';
-		tok->len += 1;
-	}
-	tok->str = sh_safe_realloc(tok->str, tok->len, tok->len + 1);
-	tok->str[tok->len] = tk->ch;
-	tok->len += 1;
+	if (tk->ch == -1)
+		tk_readchar(tk);
+	while ((tk->ch == ' ' || tk->ch == '\t') && !tk_quoted(tk))
+		tk_readchar(tk);
+	if (tk->ch == '#' && !tk_quoted(tk))
+		while (tk->ch != '\n' && tk->ch != -1)
+			tk->ch = sh_readchar(tk->in);
 }

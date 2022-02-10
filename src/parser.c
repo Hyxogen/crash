@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/10 12:57:14 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/10 15:20:35 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,10 +179,7 @@ t_snode
 	t_snode	*linebreak_node;
 
 	linebreak_node = node_create_id(sx_linebreak);
-	if (pr->current_ret == 0)
-		return (linebreak_node);
-	else if (!pr_expect_node(pr, linebreak_node, pr_newline_list, 0))
-		return (NULL);
+	pr_expect_node(pr, linebreak_node, pr_newline_list, 1);
 	return (linebreak_node);
 }
 
@@ -327,10 +324,10 @@ t_snode
 	and_or_node = node_create_id(sx_and_or);
 	if (!pr_expect_node(pr, and_or_node, pr_pipeline, 0))
 		return (NULL);
-	if (!pr_expect_node(pr, and_or_node, pr_linebreak, 1))
-		return (and_or_node);
 	if (!pr_expect_node(pr, and_or_node, pr_and_if, 1)
 		&& !pr_expect_node(pr, and_or_node, pr_or_if, 1))
+		return (and_or_node);
+	if (!pr_expect_node(pr, and_or_node, pr_linebreak, 1))
 		return (NULL);
 	if (!pr_expect_node(pr, and_or_node, pr_and_or, 0))
 		return (NULL);
