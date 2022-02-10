@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/10 15:40:11 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/10 16:03:41 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,7 +253,7 @@ t_snode
 	separator_node = node_create_id(sx_separator);
 	if (pr_expect_node(pr, separator_node, pr_separator_op, 0))
 	{
-		if (!pr_expect_node(pr, separator_node, pr_linebreak, 1))
+		if (!pr_expect_node(pr, separator_node, pr_linebreak, 0))
 			return (NULL);
 		return (separator_node);
 	}
@@ -342,7 +342,7 @@ t_snode
 	list_node = node_create_id(sx_list);
 	if (!pr_expect_node(pr, list_node, pr_and_or, 0))
 		return (NULL);
-	if (!pr_expect_node(pr, list_node, pr_separator, 0))
+	if (!pr_expect_node(pr, list_node, pr_separator_op, 0))
 		return (list_node);
 	if (!pr_expect_node(pr, list_node, pr_list, 0))
 		return (NULL);
