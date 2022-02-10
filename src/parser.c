@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/10 10:38:50 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/10 11:10:33 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -296,11 +296,11 @@ t_snode
 	pipe_sequence_node = node_create_id(sx_pipe_sequence);
 	if (!pr_expect_node(pr, pipe_sequence_node, pr_command, 0))
 		return (NULL);
-	if (!pr_expect_node(pr, pipe_sequence_node, pr_linebreak, 1))
+	if (!pr_expect_node(pr, pipe_sequence_node, pr_linebreak, 0))
 		return (pipe_sequence_node);
 	if (!pr_expect_node(pr, pipe_sequence_node, pr_pipe, 1))
 		return (NULL);
-	if (!pr_expect_node(pr, pipe_sequence_node, pr_pipeline, 0))
+	if (!pr_expect_node(pr, pipe_sequence_node, pr_pipe_sequence, 0))
 		return (NULL);
 	return (pipe_sequence_node);
 }
