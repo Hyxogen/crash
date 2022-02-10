@@ -27,7 +27,7 @@ static const char	*g_pr_names[] = {
 	"sx_bang"
 };
 
-t_snode	*pr_pipeline(t_parser *pr);
+t_snode	*pr_list(t_parser *pr);
 int		pr_next_token(t_parser *pr);
 
 static void
@@ -54,7 +54,7 @@ static void
 t_snode
 	*pr_parse(t_parser *pr)
 {
-	return pr_pipeline(pr);
+	return pr_list(pr);
 }
 
 void

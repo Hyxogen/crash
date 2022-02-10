@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/10 16:03:41 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/10 16:15:06 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -327,7 +327,7 @@ t_snode
 	if (!pr_expect_node(pr, and_or_node, pr_and_if, 1)
 		&& !pr_expect_node(pr, and_or_node, pr_or_if, 1))
 		return (and_or_node);
-	if (!pr_expect_node(pr, and_or_node, pr_linebreak, 1))
+	if (!pr_expect_node(pr, and_or_node, pr_linebreak, 0))
 		return (NULL);
 	if (!pr_expect_node(pr, and_or_node, pr_and_or, 0))
 		return (NULL);
