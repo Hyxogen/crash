@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/08 16:32:07 by csteenvo      ########   odam.nl         */
+/*   Updated: 2022/02/10 10:38:50 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,9 @@ and_or separator_op and_or (separator_op and_or (separator_op and_or))
 */
 
 #define SH_DEF_CHILD_SIZE 100
+
+/*TODO make parse functions like int pr_thing(t_parser *pr, t_snode **out) which returns whether or not the next token
+should be retrieved*/
 
 t_snode	*pr_pipeline(t_parser *pr);
 
@@ -98,13 +101,12 @@ int
 	free(pr->current);
 	pr->current = sh_safe_malloc(sizeof(t_token));
 	sh_assert(pr->current != NULL);
-	pr->tokenizer->tok = pr->current;
-	pr->current_ret = tk_tokenize(pr->tokenizer);
+	pr->current_ret = tk_tokenize(pr->tokenizer, pr->current);
 	return (pr->current_ret);
 }
 
 int
-	pr_expect_node(t_parser *pr, t_snode *root, t_snode *(*func)(t_parser*))
+	pr_expect_node(t_parser *pr, t_snode *root, t_snode *(*func)(t_parser*), int forward)
 {
 	t_snode	*expected_node;
 
@@ -114,7 +116,8 @@ int
 	if (!expected_node)
 		return (0);
 	node_add_child(root, expected_node);
-	pr_next_token(pr);
+	if (forward)
+		pr_next_token(pr);
 	return (1);
 }
 
@@ -164,9 +167,9 @@ t_snode
 	t_snode	*newline_list_node;
 
 	newline_list_node = node_create_id(sx_newline_list);
-	if (!pr_expect_node(pr, newline_list_node, pr_newline))
+	if (!pr_expect_node(pr, newline_list_node, pr_newline, 1))
 		return (NULL);
-	pr_expect_node(pr, newline_list_node, pr_newline_list);
+	pr_expect_node(pr, newline_list_node, pr_newline_list, 1);
 	return (newline_list_node);
 }
 
@@ -176,7 +179,7 @@ t_snode
 	t_snode	*linebreak_node;
 
 	linebreak_node = node_create_id(sx_linebreak);
-	pr_expect_node(pr, linebreak_node, pr_newline_list);
+	pr_expect_node(pr, linebreak_node, pr_newline_list, 1);
 	return (linebreak_node);
 }
 
@@ -236,8 +239,8 @@ t_snode
 	t_snode	*separator_op_node;
 
 	separator_op_node = node_create_id(sx_separator_op);
-	if (!pr_expect_node(pr, separator_op_node, pr_and)
-		&& !pr_expect_node(pr, separator_op_node, pr_semicolon))
+	if (!pr_expect_node(pr, separator_op_node, pr_and, 1)
+		&& !pr_expect_node(pr, separator_op_node, pr_semicolon, 1))
 		return (NULL);
 	return (separator_op_node);
 }
@@ -248,15 +251,13 @@ t_snode
 	t_snode	*separator_node;
 
 	separator_node = node_create_id(sx_separator);
-	if (pr_expect_node(pr, separator_node, pr_separator_op))
+	if (pr_expect_node(pr, separator_node, pr_separator_op, 0))
 	{
-		printf("a\n");
-		if (!pr_expect_node(pr, separator_node, pr_linebreak))
+		if (!pr_expect_node(pr, separator_node, pr_linebreak, 1))
 			return (NULL);
 		return (separator_node);
 	}
-	printf("b\n");
-	if (!pr_expect_node(pr, separator_node, pr_newline_list))
+	if (!pr_expect_node(pr, separator_node, pr_newline_list, 0))
 		return (NULL);
 	return (separator_node);
 }
@@ -267,16 +268,16 @@ t_snode
 	t_snode	*simple_command_node;
 
 	simple_command_node = node_create_id(sx_simple_cmd);
-	if (!pr_expect_node(pr, simple_command_node, pr_cmd_prefix))
+	if (!pr_expect_node(pr, simple_command_node, pr_cmd_prefix, 0))
 	{
-		if (!pr_expect_node(pr, simple_command_node, pr_cmd_name))
+		if (!pr_expect_node(pr, simple_command_node, pr_cmd_name, 1))
 			return (NULL);
-		pr_expect_node(pr, simple_command_node, pr_cmd_suffix);
+		pr_expect_node(pr, simple_command_node, pr_cmd_suffix, 1);
 		return (simple_command_node);
 	}
-	if (!pr_expect_node(pr, simple_command_node, pr_cmd_word))
+	if (!pr_expect_node(pr, simple_command_node, pr_cmd_word, 1))
 		return (simple_command_node);
-	pr_expect_node(pr, simple_command_node, pr_cmd_suffix);
+	pr_expect_node(pr, simple_command_node, pr_cmd_suffix, 0);
 	return (simple_command_node);
 }
 
@@ -293,13 +294,13 @@ t_snode
 	t_snode	*pipe_sequence_node;
 
 	pipe_sequence_node = node_create_id(sx_pipe_sequence);
-	if (!pr_expect_node(pr, pipe_sequence_node, pr_command))
+	if (!pr_expect_node(pr, pipe_sequence_node, pr_command, 0))
 		return (NULL);
-	if (!pr_expect_node(pr, pipe_sequence_node, pr_linebreak))
+	if (!pr_expect_node(pr, pipe_sequence_node, pr_linebreak, 1))
 		return (pipe_sequence_node);
-	if (!pr_expect_node(pr, pipe_sequence_node, pr_pipe))
+	if (!pr_expect_node(pr, pipe_sequence_node, pr_pipe, 1))
 		return (NULL);
-	if (!pr_expect_node(pr, pipe_sequence_node, pr_pipeline))
+	if (!pr_expect_node(pr, pipe_sequence_node, pr_pipeline, 0))
 		return (NULL);
 	return (pipe_sequence_node);
 }
@@ -310,8 +311,8 @@ t_snode
 	t_snode	*pipeline_node;
 
 	pipeline_node = node_create_id(sx_pipeline);
-	pr_expect_node(pr, pipeline_node, pr_bang);
-	if (!pr_expect_node(pr, pipeline_node, pr_pipe_sequence))
+	pr_expect_node(pr, pipeline_node, pr_bang, 1);
+	if (!pr_expect_node(pr, pipeline_node, pr_pipe_sequence, 0))
 		return (NULL);
 	return (pipeline_node);
 }
@@ -322,14 +323,14 @@ t_snode
 	t_snode	*and_or_node;
 
 	and_or_node = node_create_id(sx_and_or);
-	if (!pr_expect_node(pr, and_or_node, pr_pipeline))
+	if (!pr_expect_node(pr, and_or_node, pr_pipeline, 0))
 		return (NULL);
-	if (!pr_expect_node(pr, and_or_node, pr_linebreak))
+	if (!pr_expect_node(pr, and_or_node, pr_linebreak, 1))
 		return (and_or_node);
-	if (!pr_expect_node(pr, and_or_node, pr_and_if)
-		&& !pr_expect_node(pr, and_or_node, pr_or_if))
+	if (!pr_expect_node(pr, and_or_node, pr_and_if, 1)
+		&& !pr_expect_node(pr, and_or_node, pr_or_if, 1))
 		return (NULL);
-	if (!pr_expect_node(pr, and_or_node, pr_and_or))
+	if (!pr_expect_node(pr, and_or_node, pr_and_or, 0))
 		return (NULL);
 	return (and_or_node);
 }
@@ -340,11 +341,11 @@ t_snode
 	t_snode	*list_node;
 
 	list_node = node_create_id(sx_list);
-	if (!pr_expect_node(pr, list_node, pr_and_or))
+	if (!pr_expect_node(pr, list_node, pr_and_or, 0))
 		return (NULL);
-	if (!pr_expect_node(pr, list_node, pr_separator))
+	if (!pr_expect_node(pr, list_node, pr_separator, 0))
 		return (list_node);
-	if (!pr_expect_node(pr, list_node, pr_list))
+	if (!pr_expect_node(pr, list_node, pr_list, 0))
 		return (NULL);
 	return (list_node);
 }
@@ -355,9 +356,9 @@ t_snode
 	t_snode	*complete_cmd_node;
 
 	complete_cmd_node = node_create_id(sx_complete_cmd);
-	if (!pr_expect_node(pr, complete_cmd_node, pr_list))
+	if (!pr_expect_node(pr, complete_cmd_node, pr_list, 0))
 		return (NULL);
-	if (!pr_expect_node(pr, complete_cmd_node, pr_separator))
+	if (!pr_expect_node(pr, complete_cmd_node, pr_separator, 0))
 		return (complete_cmd_node);
 	return (complete_cmd_node);
 }

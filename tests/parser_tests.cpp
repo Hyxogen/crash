@@ -19,7 +19,7 @@ extern "C" {
 	t_snode *pr_separator_op(t_parser *pr);
 	t_snode *pr_separator(t_parser *pr);
 
-	int	pr_expect_node(t_parser *pr, t_snode *root, t_snode *(*func)(t_parser*));
+	int	pr_expect_node(t_parser *pr, t_snode *root, t_snode *(*func)(t_parser*), int forward);
 	int	pr_next_token(t_parser *pr);
 
 	void node_resize_childs(t_snode *node, size_t newsize);
@@ -29,9 +29,12 @@ extern "C" {
 	void node_add_child(t_snode *node, t_snode *child);
 }
 
+#pragma clang diagnostic ignored "-Wwritable-strings"
+
 void add_token(t_token token);
 void add_token(t_token_id id, char *str);
 void clear_tokens();
+size_t get_size();
 
 void parser_setup(t_parser &parser) {
 	std::memset(&parser, 0, sizeof(t_parser));
@@ -198,17 +201,23 @@ SIMPLE_TEST(expect_node) {
 	add_token(bang, "!");
 	add_token(op_and_if, "&&");
 	pr_next_token(&parser);
-	ASSERT_EQUAL(1, pr_expect_node(&parser, root, pr_bang));
+	ASSERT_EQUAL((size_t) 0, root->childs_size);
+	ASSERT_EQUAL(1, pr_expect_node(&parser, root, pr_bang, 0));
 	ASSERT_EQUAL((size_t) 1, root->childs_size);
-	ASSERT_EQUAL(sx_bang, root->childs[0]->type);
-
-	ASSERT_EQUAL(0, pr_expect_node(&parser, root, pr_bang));
-	ASSERT_EQUAL((size_t) 1, root->childs_size);
-
-	ASSERT_EQUAL(1, pr_expect_node(&parser, root, pr_and_if));
+	ASSERT_EQUAL(1, pr_expect_node(&parser, root, pr_bang, 1));
 	ASSERT_EQUAL((size_t) 2, root->childs_size);
 	ASSERT_EQUAL(sx_bang, root->childs[0]->type);
-	ASSERT_EQUAL(sx_and_if, root->childs[1]->type);
+
+	ASSERT_EQUAL(0, pr_expect_node(&parser, root, pr_bang, 0));
+	ASSERT_EQUAL(0, pr_expect_node(&parser, root, pr_bang, 1));
+	ASSERT_EQUAL((size_t) 2, root->childs_size);
+
+	ASSERT_EQUAL(1, pr_expect_node(&parser, root, pr_and_if, 0));
+	ASSERT_EQUAL((size_t) 3, root->childs_size);
+	ASSERT_EQUAL(1, pr_expect_node(&parser, root, pr_and_if, 1));
+	ASSERT_EQUAL((size_t) 4, root->childs_size);
+	ASSERT_EQUAL(sx_bang, root->childs[0]->type);
+	ASSERT_EQUAL(sx_and_if, root->childs[2]->type);
 	node_destroy(root);
 	parser_destroy(parser);
 }
@@ -476,13 +485,11 @@ SIMPLE_TEST(separator) {
 	add_token(newline, "\n"); 
 	pr_next_token(&parser);
 	node = pr_separator(&parser);
-	ASSERT_TRUE(node != NULL); /*TODO this test fails and it shouldn't*/
+	ASSERT_TRUE(node != NULL);
 	ASSERT_EQUAL(sx_separator, node->type);
 	ASSERT_EQUAL((size_t) 2, node->childs_size);
-	ASSERT_EQUAL(sx_semicolon, node->childs[0]->type);
-	ASSERT_EQUAL((size_t) 0, node->childs[0]->childs_size);
-	ASSERT_EQUAL(sx_newline_list, node->childs[1]->type);
-	ASSERT_EQUAL((size_t) 0, node->childs[1]->childs_size);
+	ASSERT_EQUAL(sx_separator_op, node->childs[0]->type);
+	ASSERT_EQUAL(sx_linebreak, node->childs[1]->type);
 	node_destroy(node);
 
 	clear_tokens();
@@ -493,11 +500,16 @@ SIMPLE_TEST(separator) {
 	ASSERT_TRUE(node != NULL);
 	ASSERT_EQUAL(sx_separator, node->type);
 	ASSERT_EQUAL((size_t) 2, node->childs_size);
-	ASSERT_EQUAL(sx_and, node->childs[0]->type);
-	ASSERT_EQUAL((size_t) 0, node->childs[0]->childs_size);
-	ASSERT_EQUAL(sx_newline_list, node->childs[1]->type);
-	ASSERT_EQUAL((size_t) 0, node->childs[1]->childs_size);
-	node_destroy(node);
+	ASSERT_EQUAL(sx_separator_op, node->childs[0]->type);
+	ASSERT_EQUAL(sx_linebreak, node->childs[1]->type);
+
+	clear_tokens();
+	add_token(op_clobber, ">|");
+	add_token(newline, "\n");
+	pr_next_token(&parser);
+	node = pr_separator(&parser);
+	ASSERT_TRUE(node == NULL);
+	ASSERT_EQUAL((int) op_clobber, parser.current->id);
 }
 
 int main(int argc, char **argv) {
