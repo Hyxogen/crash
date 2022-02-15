@@ -1,7 +1,6 @@
 #include "simple_tests.hpp"
 #include <cstring>
 
-
 extern "C" {
 	#include "minishell.h"
 
@@ -24,6 +23,7 @@ extern "C" {
 	t_snode	*pr_pipeline(t_parser *pr);
 	t_snode	*pr_and_or(t_parser *pr);
 	t_snode	*pr_list(t_parser *pr);
+	t_snode	*pr_complete_cmd(t_parser *pr);
 
 	int	pr_expect_node(t_parser *pr, t_snode *root, t_snode *(*func)(t_parser*), int forward);
 	int	pr_next_token(t_parser *pr);
@@ -911,7 +911,7 @@ SIMPLE_TEST(and_or) {
 	node = pr_and_or(&parser);
 	ASSERT_TRUE(node != NULL);
 	ASSERT_EQUAL(sx_and_or, node->type);
-	ASSERT_EQUAL((size_t) 3, node->childs_size);
+	ASSERT_EQUAL((size_t) 4, node->childs_size);
 	node_destroy(node);
 
 	clear_tokens();
@@ -968,6 +968,50 @@ SIMPLE_TEST(list) {
 	ASSERT_EQUAL(sx_separator_op, node->childs[1]->type);
 	ASSERT_EQUAL(sx_list, node->childs[2]->type);
 	ASSERT_EQUAL((size_t) 1, node->childs[2]->childs_size);
+	node_destroy(node);
+}
+
+SIMPLE_TEST(complete_cmd) {
+	t_parser parser;
+	t_snode *node;
+
+	clear_tokens();
+	parser_setup(parser);
+
+	node = pr_complete_cmd(&parser);
+	ASSERT_TRUE(node == NULL);
+
+	clear_tokens();
+	add_token(word, "ls");
+	pr_next_token(&parser);
+	node = pr_complete_cmd(&parser);
+	ASSERT_TRUE(node != NULL);
+	ASSERT_EQUAL(sx_complete_cmd, node->type);
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_list, node->childs[0]->type);
+	node_destroy(node);
+
+	clear_tokens();
+	add_token(bang, "!");
+	add_token(word, "ls");
+	add_token(op_pipe, "|");
+	add_token(word, "pbcopy");
+	add_token(op_or_if, "||");
+	add_token(bang, "!");
+	add_token(word, "ls");
+	add_token(op_pipe, "|");
+	add_token(word, "pbcopy");
+	add_token(op_semi, ";");
+	add_token(word, "exit");
+	add_token(op_semi, ";");
+	pr_next_token(&parser);
+	node = pr_complete_cmd(&parser);
+	ASSERT_TRUE(node != NULL);
+	ASSERT_EQUAL(sx_complete_cmd, node->type);
+	ASSERT_EQUAL((size_t) 2, node->childs_size);
+	ASSERT_EQUAL(sx_list, node->childs[0]->type);
+	ASSERT_EQUAL(sx_separator, node->childs[0]->type);
+	node_destroy(node);
 }
 
 int main(int argc, char **argv) {
