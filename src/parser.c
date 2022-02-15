@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/15 13:05:45 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/15 15:56:22 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ and_or separator_op and_or (separator_op and_or (separator_op and_or))
 #define SH_DEF_CHILD_SIZE 100
 
 void	node_destroy(t_snode *node);
+int		pr_convert_io_number(t_parser *pr, t_token *token);
 
 t_snode
 	*node_init(t_snode *node, t_syntax_id syn_id)
@@ -141,6 +142,64 @@ int
 }
 
 int
+	pr_io_file(t_parser *pr, t_snode *parent)
+{
+	t_snode *node;
+
+	node = snode(sx_io_file);
+	if (pr_token(pr, node, sx_less, op_less)
+		|| pr_token(pr, node, sx_lessand, op_lessand)
+		|| pr_token(pr, node, sx_great, op_great)
+		|| pr_token(pr, node, sx_greatand, op_greatand)
+		|| pr_token(pr, node, sx_dgreat, op_dgreat)
+		|| pr_token(pr, node, sx_lessgreat, op_lessgreat)
+		|| pr_token(pr, node, sx_clobber, op_clobber))
+	{
+		if (pr_token(pr, node, sx_filename, word))
+		{
+			node_add_child(parent, node);
+			return (1);
+		}
+	}
+	node_destroy(node);
+	return (0);
+}
+
+int
+	pr_io_here(t_parser *pr, t_snode *parent)
+{
+	(void) pr;
+	(void) parent;
+	return (0);
+}
+
+int
+	pr_io_redirect(t_parser *pr, t_snode *parent)
+{
+	t_snode	*node;
+	t_token	cpy;
+
+	if (!pr->current_ret)
+		return (0);
+	node = snode(sx_io_redirect);
+	cpy = *pr->current;
+	if (pr_convert_io_number(pr, &cpy))
+		pr_token(pr, node, sx_io_number, io_number);
+	if (pr_io_file(pr, node))
+	{
+		node_add_child(parent, node);
+		return (1);
+	}
+	else if (pr_io_here(pr, node))
+	{
+		node_add_child(parent, node);
+		return (1);
+	}
+	node_destroy(node);
+	return (0);
+}
+
+int
 	pr_seperator_op(t_parser *pr, t_snode *parent)
 {
 	if (pr_token(pr, NULL, sx_and, op_and))
@@ -167,8 +226,18 @@ int
 int
 	pr_cmd_suffix(t_parser *pr, t_snode *parent)
 {
-	(void) pr;
-	(void) parent;
+	t_snode *node;
+
+	node = snode(sx_cmd_suffix);
+	while (!pr_io_redirect(pr, node)
+		&& pr_token(pr, node, sx_word, word))
+		continue;
+	if (node->childs_size != 0)
+	{
+		node_add_child(parent, node);
+		return (1);
+	}
+	node_destroy(node);
 	return (0);	
 }
 
@@ -186,7 +255,53 @@ int
 		node_destroy(node);
 		return (0);
 	}
-	pr_cmd_suffix(pr, parent);
+	pr_cmd_suffix(pr, node);
+	node_add_child(parent, node);
+	return (1);
+}
+
+int
+	pr_redirect_list(t_parser *pr, t_snode *node)
+{
+	(void) pr;
+	(void) parent;
+	return (0);
+}
+
+int
+	pr_compound_cmd(t_parser *pr, t_snode *parent)
+{
+	(void) pr;
+	(void) parent;
+	return (0);
+}
+
+int
+	pr_func_def(t_parser *pr, t_snode *parent)
+{
+	(void) pr;
+	(void) parent;
+	return (0);
+}
+
+int
+	pr_cmd(t_parser *pr, t_snode *parent)
+{
+	t_snode	*node;
+
+	node = node_create();
+	node_init(node, sx_cmd);
+	if (pr_func_def(pr, node))
+		;
+	else if (pr_compound_cmd(pr, parent))
+		pr_redirect_list(pr, parent);
+	else if (pr_simple_cmd(pr, parent))
+		;
+	else
+	{
+		node_destroy(node);
+		return (0);
+	}
 	node_add_child(parent, node);
 	return (1);
 }

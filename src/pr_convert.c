@@ -1,5 +1,7 @@
 #include "minishell.h"
 
+#include <libft.h>
+
 static const char	*g_pr_keywords[] = {
 	"if",
 	"then",
@@ -19,9 +21,11 @@ static const char	*g_pr_keywords[] = {
 	"in"
 };
 
+/* TODO */
 static int
 	pr_is_name(t_token *token)
 {
+	(void) token;
 	return (1);
 }
 
@@ -54,7 +58,7 @@ int
 	while (i < 16)
 	{
 		len = ft_strlen(g_pr_keywords[i]);
-		if (len == token->len && ft_memcmp(g_pr_keywords[i], token->str) == 0)
+		if (len == token->len && ft_memcmp(g_pr_keywords[i], token->str, len) == 0)
 		{
 			token->id = i + kw_if;
 			return (1);
@@ -66,6 +70,7 @@ int
 int
 	pr_convert_7b(t_parser *pr, t_token *token)
 {
+	(void) pr;
 	if (token->len >= 1 && *token->str == '=')
 		return (0);
 	if (ft_memchr(token->str, '=', token->len) != NULL)
@@ -79,6 +84,7 @@ int
 int
 	pr_convert_name(t_parser *pr, t_token *token)
 {
+	(void) pr;
 	if (pr_is_name(token))
 	{
 		token->id = name;

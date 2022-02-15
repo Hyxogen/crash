@@ -27,7 +27,7 @@ static const char	*g_pr_names[] = {
 	"sx_bang"
 };
 
-t_snode	*pr_list(t_parser *pr);
+int		pr_complete_cmd(t_parser *pr);
 int		pr_next_token(t_parser *pr);
 
 static void

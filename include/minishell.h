@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 10:50:42 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/10 15:19:09 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/15 15:09:32 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,6 @@ enum e_syntax_id
 {
 	sx_none,
 	sx_and,
-	sx_cmd_name,
 	sx_cmd_word,
 	sx_semicolon,
 	sx_separator_op,
@@ -96,11 +95,30 @@ enum e_syntax_id
 	sx_complete_cmd,
 	sx_and_or,
 	sx_linebreak,
-	sx_bang
+	sx_bang,
+	sx_io_file,
+	sx_less,
+	sx_lessand,
+	sx_great,
+	sx_greatand,
+	sx_dgreat,
+	sx_lessgreat,
+	sx_clobber,
+	sx_filename,
+	sx_io_redirect,
+	sx_io_number,
+	sx_cmd_suffix
+};
+
+enum e_node_flag
+{
+	flag_and,
+	flag_semi
 };
 
 typedef enum e_token_id		t_token_id;
 typedef enum e_syntax_id	t_syntax_id;
+typedef enum e_node_flag	t_node_flag;
 
 struct s_readline
 {
@@ -152,8 +170,10 @@ struct s_snode
 	t_syntax_id		type;
 	size_t			childs_capacity;
 	size_t			childs_size;
-	struct s_snode	*root;
+	struct s_snode	*parent;
 	struct s_snode	**childs;
+	t_token			*token;
+	int				flags;
 };
 
 char		*sh_readline(t_readline *rl, const char *prompt);
