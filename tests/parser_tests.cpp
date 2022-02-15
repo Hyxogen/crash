@@ -231,6 +231,36 @@ SIMPLE_TEST(pr_io_file) {
 	ASSERT_EQUAL(sx_filename, node->childs[0]->childs[1]->type);
 	ASSERT_EQUAL((int) op_and, pr.current->id);
 	node_destroy(node);
+
+	node = snode(sx_none);
+	clear_tokens();
+	add_token(op_lessgreat, "<>");
+	add_token(word, "/dev/null");
+	add_token(op_and, "&&");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_io_file(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_io_file, node->childs[0]->type);
+	ASSERT_EQUAL(sx_lessgreat, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(sx_filename, node->childs[0]->childs[1]->type);
+	ASSERT_EQUAL((int) op_and, pr.current->id);
+	node_destroy(node);
+
+	node = snode(sx_none);
+	clear_tokens();
+	add_token(op_clobber, ">|");
+	add_token(word, "/dev/null");
+	add_token(op_and, "&&");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_io_file(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_io_file, node->childs[0]->type);
+	ASSERT_EQUAL(sx_clobber, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(sx_filename, node->childs[0]->childs[1]->type);
+	ASSERT_EQUAL((int) op_and, pr.current->id);
+	node_destroy(node);
 }
 
 SIMPLE_TEST(pr_simple_cmd) {
