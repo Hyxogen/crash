@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/10 16:15:06 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/15 10:55:20 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,13 @@ int
 	sh_assert(pr->current != NULL);
 	pr->current_ret = tk_tokenize(pr->tokenizer, pr->current);
 	return (pr->current_ret);
+}
+
+void
+	pr_push_back(t_parser *pr, t_token *token)
+{
+	pr->current = token;
+	pr->current_ret = 1;
 }
 
 int
