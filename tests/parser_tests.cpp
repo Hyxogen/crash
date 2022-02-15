@@ -15,6 +15,8 @@ extern "C" {
 	t_snode	*snode(t_syntax_id syn_id);
 
 	int pr_token(t_parser *pr, t_snode *parent, t_syntax_id syn_id, t_token_id tk_id);
+	int pr_io_file(t_parser *pr, t_snode *parent);
+	int	pr_simple_cmd(t_parser *pr, t_snode *parent);
 }
 
 #pragma clang diagnostic ignored "-Wwritable-strings"
@@ -133,6 +135,122 @@ SIMPLE_TEST(pr_token) {
 	ASSERT_EQUAL((size_t) 2, node->childs_size);
 	ASSERT_EQUAL(sx_word, node->childs[0]->type);
 	ASSERT_EQUAL(sx_pipe, node->childs[1]->type);
+	node_destroy(node);
+}
+
+SIMPLE_TEST(pr_io_file) {
+	t_parser pr;
+	t_snode *node;
+
+	parser_setup(pr);
+	clear_tokens();
+
+	node = snode(sx_none);
+
+	pr_io_file(&pr, node);
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+
+	add_token(op_pipe, "|");
+	add_token(word, "out.txt");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_io_file(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+	ASSERT_EQUAL((int)op_pipe, pr.current->id);
+
+	node = snode(sx_none);
+	clear_tokens();
+	add_token(op_less, "<");
+	add_token(word, "/dev/null");
+	add_token(op_and, "&&");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_io_file(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_io_file, node->childs[0]->type);
+	ASSERT_EQUAL(sx_less, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(sx_filename, node->childs[0]->childs[1]->type);
+	ASSERT_EQUAL((int) op_and, pr.current->id);
+	node_destroy(node);
+
+	node = snode(sx_none);
+	clear_tokens();
+	add_token(op_lessand, "<&");
+	add_token(word, "/dev/null");
+	add_token(op_and, "&&");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_io_file(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_io_file, node->childs[0]->type);
+	ASSERT_EQUAL(sx_lessand, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(sx_filename, node->childs[0]->childs[1]->type);
+	ASSERT_EQUAL((int) op_and, pr.current->id);
+	node_destroy(node);
+
+	node = snode(sx_none);
+	clear_tokens();
+	add_token(op_great, ">");
+	add_token(word, "/dev/null");
+	add_token(op_and, "&&");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_io_file(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_io_file, node->childs[0]->type);
+	ASSERT_EQUAL(sx_great, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(sx_filename, node->childs[0]->childs[1]->type);
+	ASSERT_EQUAL((int) op_and, pr.current->id);
+	node_destroy(node);
+
+	node = snode(sx_none);
+	clear_tokens();
+	add_token(op_greatand, ">&");
+	add_token(word, "/dev/null");
+	add_token(op_and, "&&");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_io_file(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_io_file, node->childs[0]->type);
+	ASSERT_EQUAL(sx_greatand, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(sx_filename, node->childs[0]->childs[1]->type);
+	ASSERT_EQUAL((int) op_and, pr.current->id);
+	node_destroy(node);
+
+	node = snode(sx_none);
+	clear_tokens();
+	add_token(op_dgreat, ">>");
+	add_token(word, "/dev/null");
+	add_token(op_and, "&&");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_io_file(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_io_file, node->childs[0]->type);
+	ASSERT_EQUAL(sx_dgreat, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(sx_filename, node->childs[0]->childs[1]->type);
+	ASSERT_EQUAL((int) op_and, pr.current->id);
+	node_destroy(node);
+}
+
+SIMPLE_TEST(pr_simple_cmd) {
+	t_parser pr;
+	t_snode *node;
+
+	parser_setup(pr);
+	clear_tokens();
+
+	node = snode(sx_none);
+	pr_simple_cmd(&pr, node);
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+
+	add_token(word, "ls");
+	pr_next_token(&pr);
+	pr_simple_cmd(&pr, node);
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_simple_cmd, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_cmd_word, node->childs[0]->childs[0]->type);
 }
 
 int main(int argc, char **argv) {
