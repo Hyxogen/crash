@@ -6,12 +6,13 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/15 10:55:20 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/15 13:05:45 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include <stdlib.h>
+#include <libft.h>
 
 /*
 echo "echo Hallo" | bash > test; echo "Running stuff"
@@ -38,32 +39,33 @@ and_or separator_op and_or (separator_op and_or (separator_op and_or))
 
 #define SH_DEF_CHILD_SIZE 100
 
-/*TODO make parse functions like int pr_thing(t_parser *pr, t_snode **out) which returns whether or not the next token
-should be retrieved*/
-
-t_snode	*pr_pipeline(t_parser *pr);
+void	node_destroy(t_snode *node);
 
 t_snode
-	*node_create_empty(void)
+	*node_init(t_snode *node, t_syntax_id syn_id)
 {
-	t_snode	*node;
-
-	node = sh_safe_malloc(sizeof(*node));
-	node->type = sx_none;
-	node->root = NULL;
+	node->type = syn_id;
+	node->parent = NULL;
 	node->childs = NULL;
 	node->childs_capacity = 0;
 	node->childs_size = 0;
+	node->token = NULL;
 	return (node);
 }
 
 t_snode
-	*node_create_id(t_syntax_id id)
+	*node_create(void)
+{
+	return (sh_safe_malloc(sizeof(t_snode)));
+}
+
+t_snode
+	*snode(t_syntax_id syn_id)
 {
 	t_snode	*node;
 
-	node = node_create_empty();
-	node->type = id;
+	node = node_create();
+	node_init(node, syn_id);
 	return (node);
 }
 
@@ -81,7 +83,7 @@ void
 void
 	node_add_child(t_snode *node, t_snode *child)
 {
-	child->root = node;
+	child->parent = node;
 	if (node->childs_size == node->childs_capacity)
 		node_resize_childs(node, node->childs_capacity + SH_DEF_CHILD_SIZE);
 	node->childs[node->childs_size] = child;
@@ -89,9 +91,25 @@ void
 }
 
 void
+	node_destroy_childs(t_snode *node)
+{
+	size_t	index;
+	
+	index = 0;
+	while (index < node->childs_size)
+	{
+		node_destroy(node->childs[index]);
+		index++;
+	}
+	free(node->childs);
+}
+
+void
 	node_destroy(t_snode *node)
 {
-	free(node->childs);
+	if (!node)
+		return ;
+	node_destroy_childs(node);
 	free(node);
 }
 
@@ -105,266 +123,85 @@ int
 	return (pr->current_ret);
 }
 
-void
-	pr_push_back(t_parser *pr, t_token *token)
-{
-	pr->current = token;
-	pr->current_ret = 1;
-}
-
 int
-	pr_expect_node(t_parser *pr, t_snode *root, t_snode *(*func)(t_parser*), int forward)
+	pr_token(t_parser *pr, t_snode *parent, t_syntax_id syn_id, t_token_id tk_id)
 {
-	t_snode	*expected_node;
+	t_snode *node;
 
-	if (pr->current_ret == 0)
+	if (pr->current_ret == 0 || pr->current->id != tk_id)
 		return (0);
-	expected_node = func(pr);
-	if (!expected_node)
-		return (0);
-	node_add_child(root, expected_node);
-	if (forward)
-		pr_next_token(pr);
+	pr_next_token(pr);
+	if (!parent)
+		return (1);
+	node = node_create();
+	node_init(node, syn_id);
+	node->token = pr->current;
+	node_add_child(parent, node);
 	return (1);
 }
 
-t_snode
-	*pr_bang(t_parser *pr)
+int
+	pr_seperator_op(t_parser *pr, t_snode *parent)
 {
-	if (pr->current->id != bang)
-		return (NULL);
-	return (node_create_id(sx_bang));
-}
-
-t_snode
-	*pr_newline(t_parser *pr)
-{
-	if (pr->current->id != newline)
-		return (NULL);
-	return (node_create_id(sx_newline));
-}
-
-t_snode
-	*pr_pipe(t_parser *pr)
-{
-	if (pr->current->id != op_pipe)
-		return (NULL);
-	return (node_create_id(sx_pipe));
-}
-
-t_snode
-	*pr_and_if(t_parser *pr)
-{
-	if (pr->current->id != op_and_if)
-		return (NULL);
-	return (node_create_id(sx_and_if));
-}
-
-t_snode
-	*pr_or_if(t_parser *pr)
-{
-	if (pr->current->id != op_or_if)
-		return (NULL);
-	return (node_create_id(sx_or_if));
-}
-
-t_snode
-	*pr_newline_list(t_parser *pr)
-{
-	t_snode	*newline_list_node;
-
-	newline_list_node = node_create_id(sx_newline_list);
-	if (!pr_expect_node(pr, newline_list_node, pr_newline, 1))
-		return (NULL);
-	pr_expect_node(pr, newline_list_node, pr_newline_list, 0);
-	return (newline_list_node);
-}
-
-t_snode
-	*pr_linebreak(t_parser *pr)
-{
-	t_snode	*linebreak_node;
-
-	linebreak_node = node_create_id(sx_linebreak);
-	pr_expect_node(pr, linebreak_node, pr_newline_list, 0);
-	return (linebreak_node);
-}
-
-/*TODO implement*/
-t_snode
-	*pr_cmd_suffix(t_parser *pr)
-{
-	(void)pr;
-	return (NULL);
-}
-
-/*TODO apply rule 7a*/
-t_snode
-	*pr_cmd_name(t_parser *pr)
-{
-	if (pr->current->id != word)
-		return (NULL);
-	return (node_create_id(sx_cmd_name));
-}
-
-/*TODO apply rule 7b*/
-t_snode
-	*pr_cmd_word(t_parser *pr)
-{
-	if (pr->current->id != word)
-		return (NULL);
-	return (node_create_id(sx_cmd_word));
-}
-
-/*TODO implement*/
-t_snode
-	*pr_cmd_prefix(t_parser *pr)
-{
-	(void)pr;
-	return (NULL);
-}
-
-t_snode
-	*pr_and(t_parser *pr)
-{
-	if (pr->current->id != op_and)
-		return (NULL);
-	return (node_create_id(sx_and));
-}
-
-t_snode
-	*pr_semicolon(t_parser *pr)
-{
-	if (pr->current->id != op_semi)
-		return (NULL);
-	return (node_create_id(sx_semicolon));
-}
-
-t_snode
-	*pr_separator_op(t_parser *pr)
-{
-	t_snode	*separator_op_node;
-
-	separator_op_node = node_create_id(sx_separator_op);
-	if (!pr_expect_node(pr, separator_op_node, pr_and, 1)
-		&& !pr_expect_node(pr, separator_op_node, pr_semicolon, 1))
-		return (NULL);
-	return (separator_op_node);
-}
-
-t_snode
-	*pr_separator(t_parser *pr)
-{
-	t_snode	*separator_node;
-
-	separator_node = node_create_id(sx_separator);
-	if (pr_expect_node(pr, separator_node, pr_separator_op, 0))
+	if (pr_token(pr, NULL, sx_and, op_and))
 	{
-		if (!pr_expect_node(pr, separator_node, pr_linebreak, 0))
-			return (NULL);
-		return (separator_node);
+		parent->flags |= flag_and;
+		return (1);
 	}
-	if (!pr_expect_node(pr, separator_node, pr_newline_list, 0))
-		return (NULL);
-	return (separator_node);
-}
-
-t_snode
-	*pr_simple_command(t_parser *pr)
-{
-	t_snode	*simple_command_node;
-
-	simple_command_node = node_create_id(sx_simple_cmd);
-	if (!pr_expect_node(pr, simple_command_node, pr_cmd_prefix, 0))
+	if (pr_token(pr, NULL, sx_semicolon, op_semi))
 	{
-		if (!pr_expect_node(pr, simple_command_node, pr_cmd_name, 1))
-			return (NULL);
-		pr_expect_node(pr, simple_command_node, pr_cmd_suffix, 1);
-		return (simple_command_node);
+		parent->flags |= flag_semi;
+		return (1);
 	}
-	if (!pr_expect_node(pr, simple_command_node, pr_cmd_word, 1))
-		return (simple_command_node);
-	pr_expect_node(pr, simple_command_node, pr_cmd_suffix, 0);
-	return (simple_command_node);
+	return (0);
 }
 
-/*TODO add compound command*/
-t_snode
-	*pr_command(t_parser *pr)
+int
+	pr_cmd_prefix(t_parser *pr, t_snode *parent)
 {
-	return (pr_simple_command(pr));
+	(void) pr;
+	(void) parent;
+	return (0);	
 }
 
-t_snode
-	*pr_pipe_sequence(t_parser *pr)
+int
+	pr_cmd_suffix(t_parser *pr, t_snode *parent)
 {
-	t_snode	*pipe_sequence_node;
-
-	pipe_sequence_node = node_create_id(sx_pipe_sequence);
-	if (!pr_expect_node(pr, pipe_sequence_node, pr_command, 0))
-		return (NULL);
-	if (!pr_expect_node(pr, pipe_sequence_node, pr_pipe, 1))
-		return (pipe_sequence_node);
-	pr_expect_node(pr, pipe_sequence_node, pr_linebreak, 0);
-	if (!pr_expect_node(pr, pipe_sequence_node, pr_pipe_sequence, 0))
-		return (NULL);
-	return (pipe_sequence_node);
+	(void) pr;
+	(void) parent;
+	return (0);	
 }
 
-t_snode
-	*pr_pipeline(t_parser *pr)
+int
+	pr_simple_cmd(t_parser *pr, t_snode *parent)
 {
-	t_snode	*pipeline_node;
+	t_snode	*node;
 
-	pipeline_node = node_create_id(sx_pipeline);
-	pr_expect_node(pr, pipeline_node, pr_bang, 1);
-	if (!pr_expect_node(pr, pipeline_node, pr_pipe_sequence, 0))
-		return (NULL);
-	return (pipeline_node);
+	node = node_create();
+	node_init(node, sx_simple_cmd);
+	if (pr_cmd_prefix(pr, node))
+		pr_token(pr, node, sx_cmd_word, word);
+	else if (!pr_token(pr, node, sx_cmd_word, word))
+	{
+		node_destroy(node);
+		return (0);
+	}
+	pr_cmd_suffix(pr, parent);
+	node_add_child(parent, node);
+	return (1);
 }
 
-t_snode
-	*pr_and_or(t_parser *pr)
+int
+	pr_complete_cmd(t_parser *pr)
 {
-	t_snode	*and_or_node;
+	t_snode	*node;
 
-	and_or_node = node_create_id(sx_and_or);
-	if (!pr_expect_node(pr, and_or_node, pr_pipeline, 0))
-		return (NULL);
-	if (!pr_expect_node(pr, and_or_node, pr_and_if, 1)
-		&& !pr_expect_node(pr, and_or_node, pr_or_if, 1))
-		return (and_or_node);
-	if (!pr_expect_node(pr, and_or_node, pr_linebreak, 0))
-		return (NULL);
-	if (!pr_expect_node(pr, and_or_node, pr_and_or, 0))
-		return (NULL);
-	return (and_or_node);
-}
-
-t_snode
-	*pr_list(t_parser *pr)
-{
-	t_snode	*list_node;
-
-	list_node = node_create_id(sx_list);
-	if (!pr_expect_node(pr, list_node, pr_and_or, 0))
-		return (NULL);
-	if (!pr_expect_node(pr, list_node, pr_separator_op, 0))
-		return (list_node);
-	if (!pr_expect_node(pr, list_node, pr_list, 0))
-		return (NULL);
-	return (list_node);
-}
-
-t_snode
-	*pr_complete_cmd(t_parser *pr)
-{
-	t_snode	*complete_cmd_node;
-
-	complete_cmd_node = node_create_id(sx_complete_cmd);
-	if (!pr_expect_node(pr, complete_cmd_node, pr_list, 0))
-		return (NULL);
-	if (!pr_expect_node(pr, complete_cmd_node, pr_separator, 0))
-		return (complete_cmd_node);
-	return (complete_cmd_node);
+	node = node_create();
+	node_init(node, sx_complete_cmd);
+	if (!pr_simple_cmd(pr, node))
+	{
+		node_destroy(node);
+		return (0);
+	}
+	return (1);
 }
