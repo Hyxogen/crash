@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/15 15:56:22 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/16 09:55:48 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -261,7 +261,7 @@ int
 }
 
 int
-	pr_redirect_list(t_parser *pr, t_snode *node)
+	pr_redirect_list(t_parser *pr, t_snode *parent)
 {
 	(void) pr;
 	(void) parent;
@@ -293,9 +293,9 @@ int
 	node_init(node, sx_cmd);
 	if (pr_func_def(pr, node))
 		;
-	else if (pr_compound_cmd(pr, parent))
-		pr_redirect_list(pr, parent);
-	else if (pr_simple_cmd(pr, parent))
+	else if (pr_compound_cmd(pr, node))
+		pr_redirect_list(pr, node);
+	else if (pr_simple_cmd(pr, node))
 		;
 	else
 	{
@@ -304,6 +304,31 @@ int
 	}
 	node_add_child(parent, node);
 	return (1);
+}
+
+int
+	pr_pipe_sequence(t_parser *pr, t_snode *parent)
+{
+	t_snode	*node;
+
+	node = snode(sx_pipe_sequence);
+	if (pr_cmd(pr, node))
+	{
+		if (pr_token(pr, NULL, sx_pipe, op_pipe))
+		{
+			while (pr_token(pr, NULL, sx_newline, newline))
+				continue ;
+			if (!pr_pipe_sequence(pr, node))
+			{
+				node_destroy(node);
+				return (0);
+			}
+		}
+		node_add_child(parent, node);
+		return (1);
+	}
+	node_destroy(node);
+	return (0);
 }
 
 int

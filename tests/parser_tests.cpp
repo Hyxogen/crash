@@ -19,6 +19,8 @@ extern "C" {
 	int	pr_io_redirect(t_parser *pr, t_snode *parent);
 	int	pr_simple_cmd(t_parser *pr, t_snode *parent);
 	int pr_cmd_suffix(t_parser *pr, t_snode *parent);
+	int	pr_cmd(t_parser *pr, t_snode *parent);
+	int	pr_pipe_sequence(t_parser *pr, t_snode *parent);
 }
 
 #pragma clang diagnostic ignored "-Wwritable-strings"
@@ -459,7 +461,7 @@ SIMPLE_TEST(pr_cmd) {
 	clear_tokens();
 
 	node = snode(sx_none);
-	pr_cmd(&pr, node);
+	ASSERT_EQUAL(0, pr_cmd(&pr, node));
 	ASSERT_EQUAL((size_t) 0, node->childs_size);
 	/*TODO add other tests*/
 	add_token(word, "echo");
@@ -476,6 +478,110 @@ SIMPLE_TEST(pr_cmd) {
 	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
 	ASSERT_EQUAL(sx_simple_cmd, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL((int) op_and, pr.current->id);
+	node_destroy(node);
+}
+
+SIMPLE_TEST(pr_pipe_sequence) {
+	t_parser pr;
+	t_snode *node;
+
+	parser_setup(pr);
+	clear_tokens();
+
+	node = snode(sx_none);
+	ASSERT_EQUAL(0, pr_pipe_sequence(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+
+	clear_tokens();
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_pipe_sequence(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+	ASSERT_EQUAL((int) op_semi, pr.current->id);
+
+	clear_tokens();
+	add_token(word, "echo");
+	add_token(word, "Hello");
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_pipe_sequence(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_pipe_sequence, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_cmd, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	node_destroy(node);
+
+	clear_tokens();
+	node = snode(sx_none);
+	add_token(word, "cat");
+	add_token(word, "hello.txt");
+	add_token(op_pipe, "|");
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_pipe_sequence(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+
+	clear_tokens();
+	add_token(word, "cat");
+	add_token(word, "hello.txt");
+	add_token(op_pipe, "|");
+	add_token(word, "bash");
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_pipe_sequence(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_pipe_sequence, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_cmd, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(sx_pipe_sequence, node->childs[0]->childs[1]->type);
+	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	node_destroy(node);
+
+	clear_tokens();
+	node = snode(sx_none);
+	add_token(word, "cat");
+	add_token(op_less, "<");
+	add_token(word, "test");
+	add_token(op_pipe, "|");
+	add_token(newline, "\n");
+	add_token(newline, "\n");
+	add_token(newline, "\n");
+	add_token(word, "bash");
+	add_token(op_great, ">");
+	add_token(word, "test2");
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_pipe_sequence(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_pipe_sequence, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_cmd, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(sx_pipe_sequence, node->childs[0]->childs[1]->type);
+	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	node_destroy(node);
+
+	clear_tokens();
+	node = snode(sx_none);
+	add_token(word, "cat");
+	add_token(word, "test");
+	add_token(op_pipe, "|");
+	add_token(word, "cat");
+	add_token(op_pipe, "|");
+	add_token(word, "bash");
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_pipe_sequence(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_pipe_sequence, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_cmd, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(sx_pipe_sequence, node->childs[0]->childs[1]->type);
+	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs[1]->childs_size);
+	ASSERT_EQUAL(sx_cmd, node->childs[0]->childs[1]->childs[0]->type);
+	ASSERT_EQUAL(sx_pipe_sequence, node->childs[0]->childs[1]->childs[1]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs[1]->childs[1]->childs_size);
+	ASSERT_EQUAL((int) op_semi, pr.current->id);
 	node_destroy(node);
 }
 
