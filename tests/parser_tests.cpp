@@ -26,6 +26,7 @@ extern "C" {
 	int	pr_list(t_parser *pr, t_snode *parent);
 	int	pr_complete_cmd(t_parser *pr, t_snode *parent);
 	int	pr_term(t_parser *pr, t_snode *parent);
+	int	pr_compound_list(t_parser *pr, t_snode *parent);
 }
 
 #pragma clang diagnostic ignored "-Wwritable-strings"
@@ -1352,6 +1353,83 @@ SIMPLE_TEST(pr_term) {
 	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs[1]->childs_size);
 	ASSERT_EQUAL(sx_and_or, node->childs[0]->childs[1]->childs[0]->type);
 	node_destroy(node);
+}
+
+SIMPLE_TEST(pr_compound_list) {
+	t_parser pr;
+	t_snode *node;
+
+	parser_setup(pr);
+	node = snode(sx_none);
+
+	clear_tokens();
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_compound_list(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+
+	add_token(kw_done, "done");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_compound_list(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+	ASSERT_EQUAL(kw_done, pr.current->id);
+	
+	clear_tokens();
+	add_token(tk_newline, "\n");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "out.txt");
+	add_token(op_pipe, "|");
+	add_token(kw_done, "done");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_compound_list(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+
+	clear_tokens();
+	add_token(tk_word, "ls");
+	add_token(kw_done, "done");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_compound_list(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_compound_list, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_term, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(kw_done, pr.current->id);
+	node_destroy(node);
+
+	clear_tokens();
+	node = snode(sx_none);
+	add_token(tk_newline, "\n");
+	add_token(tk_newline, "\n");
+	add_token(tk_newline, "\n");
+	add_token(tk_newline, "\n");
+	add_token(tk_newline, "\n");
+	add_token(tk_newline, "\n");
+	add_token(tk_word, "ls");
+	add_token(kw_done, "done");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_compound_list(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_compound_list, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_term, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(kw_done, pr.current->id);
+	node_destroy(node);
+
+	clear_tokens();
+	node = snode(sx_none);
+	add_token(tk_newline, "\n");
+	add_token(tk_word, "ls");
+	add_token(op_andif, "&&");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "beemovie.txt");
+	add_token(op_semi, ";");
+	add_token(kw_done, "done");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_compound_list(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_compound_list, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_term, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(kw_done, pr.current->id);
 }
 
 int main(int argc, char **argv) {
