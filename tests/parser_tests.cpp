@@ -22,6 +22,7 @@ extern "C" {
 	int	pr_cmd(t_parser *pr, t_snode *parent);
 	int	pr_pipe_sequence(t_parser *pr, t_snode *parent);
 	int	pr_pipeline(t_parser *pr, t_snode *parent);
+	int	pr_and_or(t_parser *pr, t_snode *parent);
 }
 
 #pragma clang diagnostic ignored "-Wwritable-strings"
@@ -66,6 +67,7 @@ SIMPLE_TEST(node_init) {
 	ASSERT_EQUAL(sx_word, node.type);
 	ASSERT_EQUAL((size_t) 0, node.childs_size);
 	ASSERT_TRUE(node.token == NULL);
+	ASSERT_EQUAL(0, node.flags);
 }
 
 
@@ -620,6 +622,7 @@ SIMPLE_TEST(pr_pipeline) {
 	ASSERT_EQUAL((size_t) 1, node->childs_size);
 	ASSERT_EQUAL(sx_pipeline, node->childs[0]->type);
 	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
+	ASSERT_EQUAL(0, node->childs[0]->flags);
 	ASSERT_EQUAL(sx_pipe_sequence, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL((int) op_semi, pr.current->id);
 	node_destroy(node);
@@ -642,6 +645,163 @@ SIMPLE_TEST(pr_pipeline) {
 	ASSERT_TRUE(node->childs[0]->flags & flag_bang);
 	ASSERT_EQUAL(sx_pipe_sequence, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	node_destroy(node);
+}
+
+SIMPLE_TEST(pr_and_or) {
+	t_parser pr;
+	t_snode *node;
+
+	parser_setup(pr);
+	node = snode(sx_none);
+
+	clear_tokens();
+	ASSERT_EQUAL(0, pr_and_or(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+
+	add_token(kw_bang, "!");
+	add_token(word, "cat");
+	add_token(word, "test");
+	add_token(op_pipe, "|");
+	add_token(word, "cat");
+	add_token(op_pipe, "|");
+	add_token(word, "bash");
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_and_or(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_and_or, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_pipeline, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	node_destroy(node);
+
+	clear_tokens();
+	node = snode(sx_none);
+	add_token(kw_bang, "!");
+	add_token(word, "cat");
+	add_token(word, "test");
+	add_token(op_pipe, "|");
+	add_token(word, "cat");
+	add_token(op_pipe, "|");
+	add_token(word, "bash");
+	add_token(op_and_if, "&&");
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_and_or(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+	
+	clear_tokens();
+	add_token(kw_bang, "!");
+	add_token(word, "cat");
+	add_token(word, "test");
+	add_token(op_pipe, "|");
+	add_token(word, "cat");
+	add_token(op_pipe, "|");
+	add_token(word, "bash");
+	add_token(op_and_if, "&&");
+	add_token(word, "ls");
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_and_or(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_and_or, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
+	ASSERT_TRUE(flag_and_if & node->childs[0]->flags);
+	ASSERT_EQUAL(sx_pipeline, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(sx_and_or, node->childs[0]->childs[1]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs[1]->childs_size);
+	ASSERT_EQUAL(0, node->childs[0]->childs[1]->flags);
+	ASSERT_EQUAL(sx_pipeline, node->childs[0]->childs[1]->childs[0]->type);
+	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	node_destroy(node);
+
+	clear_tokens();
+	node = snode(sx_none);
+	add_token(kw_bang, "!");
+	add_token(word, "cat");
+	add_token(word, "test");
+	add_token(op_pipe, "|");
+	add_token(word, "cat");
+	add_token(op_pipe, "|");
+	add_token(word, "bash");
+	add_token(op_or_if, "||");
+	add_token(word, "ls");
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_and_or(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_and_or, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
+	ASSERT_TRUE(flag_or_if & node->childs[0]->flags);
+	ASSERT_EQUAL(sx_pipeline, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(sx_and_or, node->childs[0]->childs[1]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs[1]->childs_size);
+	ASSERT_EQUAL(0, node->childs[0]->childs[1]->flags);
+	ASSERT_EQUAL(sx_pipeline, node->childs[0]->childs[1]->childs[0]->type);
+	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	node_destroy(node);
+
+	clear_tokens();
+	node = snode(sx_none);
+	add_token(op_semi, ";");
+	add_token(word, "cat");
+	add_token(word, "test");
+	add_token(op_pipe, "|");
+	add_token(word, "cat");
+	add_token(op_pipe, "|");
+	add_token(word, "bash");
+	add_token(op_or_if, "||");
+	add_token(word, "ls");
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_and_or(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+	
+	clear_tokens();
+	add_token(kw_bang, "!");
+	add_token(word, "cat");
+	add_token(word, "test");
+	add_token(op_pipe, "|");
+	add_token(word, "cat");
+	add_token(op_pipe, "|");
+	add_token(op_semi, ";");
+	add_token(op_or_if, "||");
+	add_token(word, "ls");
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_and_or(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+
+	clear_tokens();
+	add_token(kw_bang, "!");
+	add_token(word, "cat");
+	add_token(word, "test");
+	add_token(op_pipe, "|");
+	add_token(word, "cat");
+	add_token(op_pipe, "|");
+	add_token(op_semi, ";");
+	add_token(op_or_if, "||");
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_and_or(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+
+	clear_tokens();
+	add_token(kw_bang, "!");
+	add_token(word, "cat");
+	add_token(word, "test");
+	add_token(op_pipe, "|");
+	add_token(word, "cat");
+	add_token(op_pipe, "|");
+	add_token(word, "bash");
+	add_token(op_or_if, "||");
+	add_token(op_or_if, "||");
+	add_token(word, "ls");
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_and_or(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
 	node_destroy(node);
 }
 
