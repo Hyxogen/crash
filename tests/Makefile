@@ -16,7 +16,7 @@ DEP_DIR				:= build
 LIBFT_DIR			:= $(LIB_DIR)/libft
 LIBFT_LIB			:= $(LIBFT_DIR)/libft.a
 
-FILE_NAMES			:= parser.c memory.c assert.c pr_convert.c simple_tests.cpp parser_tests.cpp parser_tests_tokenizer.cpp
+FILE_NAMES			:= parser.c memory.c assert.c simple_tests.cpp parser_tests.cpp parser_tests_lexer.cpp
 
 PARSER_FILE_NAMES	:= parser.c memory.c assert.c simple_tests.cpp parser_test.cpp
 
@@ -40,6 +40,10 @@ $(TARGET): $(LIBFT_LIB) $(OBJECTS)
 	$(LINK_CMD) -o $(TARGET) $(OBJECTS) $(LFLAGS) -L$(LIBFT_DIR) -lft
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c -o $@ $< -MMD $(INC_DIR)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/parser/%.c
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c -o $@ $< -MMD $(INC_DIR)
 

@@ -11,9 +11,9 @@ int
 			return (0);
 		return (1);
 	}
-	if (lex->quote == 2 || lex->arith)
+	if (lex->quote == 2 || lex->end != NULL)
 	{
-		if (lex->cur == '"' && !lex->arith)
+		if (lex->cur == '"' && lex->end == NULL)
 			return (0);
 		if (lex->cur == '\\')
 			return (0);
@@ -39,7 +39,7 @@ int
 			return (1);
 		return (0);
 	}
-	if (lex->quote == 2)
+	if (lex->quote == 2 || lex->end != NULL)
 	{
 		if (lex->next == '$')
 			return (1);

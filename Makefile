@@ -1,6 +1,6 @@
 NAME			:= minishell
 
-FILE_NAMES		:= main.c readchar.c readline.c tk.c tk_word.c tk_op.c tk_util.c assert.c memory.c parser.c pr_debug.c
+FILE_NAMES		:= main.c memory.c assert.c lexer/expand.c lexer/init.c lexer/input.c lexer/lexer.c lexer/operator.c lexer/quote.c lexer/read.c lexer/recurse.c lexer/debug.c lexer/util.c parser/parser.c pr_debug.c
 
 CC				:= cc
 LINK_CMD		:= cc
@@ -41,6 +41,7 @@ $(NAME): $(OBJECTS)
 	$(LINK_CMD) -o $@ $(OBJECTS) $(LIB_DIR)/libft/libft.a $(LFLAGS) -lreadline
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c -o $@ $< -MMD $(patsubst %,-I%,$(INC_DIR))
 
 crash: $(NAME)

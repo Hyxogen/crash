@@ -1,6 +1,8 @@
 #ifndef INPUT_H
 # define INPUT_H
 
+# include <stddef.h>
+
 typedef struct s_readline	t_readline;
 typedef struct s_input		t_input;
 

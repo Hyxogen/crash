@@ -3,10 +3,9 @@
 #include <libft.h>
 #include <stdlib.h>
 
-static const char	*g_pr_names[] = {
+static const char	*g_sx_names[] = {
 	"sx_none",
 	"sx_and",
-	"sx_cmd_name",
 	"sx_cmd_word",
 	"sx_semicolon",
 	"sx_separator_op",
@@ -24,11 +23,30 @@ static const char	*g_pr_names[] = {
 	"sx_complete_cmd",
 	"sx_and_or",
 	"sx_linebreak",
-	"sx_bang"
+	"sx_bang",
+	"sx_io_file",
+	"sx_less",
+	"sx_lessand",
+	"sx_great",
+	"sx_greatand",
+	"sx_dgreat",
+	"sx_lessgreat",
+	"sx_clobber",
+	"sx_filename",
+	"sx_io_redirect",
+	"sx_io_number",
+	"sx_cmd_suffix",
+	"sx_cmd",
+	"sx_term",
+	"sx_compound_list",
+	"sx_subshell",
+	"sx_brace_group",
+	"sx_compound_cmd"
 };
 
-int		pr_complete_cmd(t_parser *pr);
+int		pr_complete_cmd(t_parser *pr, t_snode *parent);
 int		pr_next_token(t_parser *pr);
+t_snode	*snode(t_syntax_id syn_id);
 
 static void
 	pr_print(t_snode *node, size_t depth)
@@ -41,7 +59,7 @@ static void
 		ft_putstr_fd((char*) "  ", STDOUT_FILENO);
 		i += 1;
 	}
-	ft_putstr_fd((char*) g_pr_names[node->type], STDOUT_FILENO);
+	ft_putstr_fd((char*) g_sx_names[node->type], STDOUT_FILENO);
 	ft_putchar_fd('\n', STDOUT_FILENO);
 	i = 0;
 	while (i < node->childs_size)
@@ -54,22 +72,27 @@ static void
 t_snode
 	*pr_parse(t_parser *pr)
 {
-	return pr_list(pr);
+	t_snode	*node;
+
+	node = snode(sx_none);
+	if (!pr_complete_cmd(pr, node))
+		return (NULL);
+	return (node->childs[0]);
 }
 
 void
 	pr_debug(void)
 {
 	t_input		in;
-	t_tokenizer	tk;
+	t_lexer		lx;
 	t_parser	pr;
 	t_snode		*node;
 
 	in.line = NULL;
 	in.index = 0;
 	in.more = 0;
-	tk_create(&tk, &in);
-	pr.tokenizer = &tk;
+	lexer_new(&lx, &in);
+	pr.lexer = &lx;
 	pr.current = NULL;
 	pr.current_ret = 0;
 	pr.current_node = NULL;

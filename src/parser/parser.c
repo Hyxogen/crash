@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/16 15:45:41 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/16 16:13:43 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ and_or separator_op and_or (separator_op and_or (separator_op and_or))
 #define SH_DEF_CHILD_SIZE 100
 
 void	node_destroy(t_snode *node);
+int		pr_compound_list(t_parser *pr, t_snode *parent);
 
 /*TEMPORARY*/
 int
@@ -277,10 +278,59 @@ int
 }
 
 int
+	pr_subshell(t_parser *pr, t_snode *parent)
+{
+	t_snode	*node;
+
+	node = snode(sx_subshell);
+	if (pr_token(pr, NULL, sx_none, op_lparen))
+	{
+		if (pr_compound_list(pr, node))
+		{
+			if (pr_token(pr, NULL, sx_none, op_rparen))
+			{
+				node_add_child(parent, node);
+				return (1);
+			}
+		}
+	}
+	node_destroy(node);
+	return (0);
+}
+
+int
+	pr_brace_group(t_parser *pr, t_snode *parent)
+{
+	t_snode	*node;
+
+	node = snode(sx_brace_group);
+	if (pr_token(pr, NULL, sx_none, kw_lbrace))
+	{
+		if (pr_compound_list(pr, node))
+		{
+			if (pr_token(pr, NULL, sx_none, kw_rbrace))
+			{
+				node_add_child(parent, node);
+				return (1);
+			}
+		}
+	}
+	node_destroy(node);
+	return (0);
+}
+
+int
 	pr_compound_cmd(t_parser *pr, t_snode *parent)
 {
-	(void) pr;
-	(void) parent;
+	t_snode	*node;
+
+	node = snode(sx_compound_cmd);
+	if (pr_brace_group(pr, node) || pr_subshell(pr, node))
+	{
+		node_add_child(parent, node);
+		return (1);
+	}
+	node_destroy(node);
 	return (0);
 }
 

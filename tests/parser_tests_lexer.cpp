@@ -6,12 +6,12 @@ extern "C" {
 
 static std::deque<t_token> g_tokens;
 
-int	tk_tokenize(t_tokenizer *tk, t_token *token) {
+int	lexer_lex(t_lexer *tk, t_token *token) {
 	(void)tk;
 	if (g_tokens.size() == 0)
 		return (0);
 	token->id = g_tokens.front().id;
-	token->str = g_tokens.front().str;
+	token->string = g_tokens.front().string;
 	g_tokens.pop_front();
 	return (1);
 }
@@ -24,7 +24,7 @@ void add_token(t_token_id id, char *str) {
 	t_token token;
 
 	token.id = id;
-	token.str = str;
+	token.string = str;
 	add_token(token);
 }
 

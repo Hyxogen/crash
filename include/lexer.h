@@ -79,29 +79,29 @@ struct s_token
 	size_t		count;
 };
 
-struct s_lexer_state
-{
-	t_expansion	*xp;
-	int			quote;
-	int			arith;
-}
-
 struct s_lexer
 {
 	t_input		*in;
 	t_token		*tok;
-	t_expansion	*xp;
 	int			cur;
 	int			next;
 	int			quote;
-	int			arith;
 	int			bslash;
 	int			btick;
+	const char	*end;
+};
+
+struct s_lexer_state
+{
+	int			quote;
+	int			was_word;
+	const char	*end;
 };
 
 int			lexer_new(t_lexer *lex, t_input *in);
 void		lexer_delete(t_lexer *lex);
-int			token_new(t_token *tok, t_token_id id);
+int			token_new(t_token *tok);
+int			token_start(t_token *tok);
 void		token_delete(t_token *tok);
 
 int			lexer_quoted(t_lexer *lex);
@@ -110,8 +110,13 @@ void		lexer_read(t_lexer *lex, int xp_sep);
 void		lexer_read_raw(t_lexer *lex);
 
 t_token_id	lexer_op(t_lexer *lex);
-void		lexer_expand_dollar(t_lexer *lex, t_expansion_id id);
-void		lexer_expand_backtick(t_lexer *lex);
-void		lexer_recurse(t_lexer *lex);
+int			lexer_expand_dollar(t_lexer *lex, t_expansion_id id);
+int			lexer_expand_backtick(t_lexer *lex);
+int			lexer_recurse(t_lexer *lex);
+
+int			lexer_lex(t_lexer *lex, t_token *tok);
+int			lexer_heredoc(t_lexer *lex, t_token *tok, const char *end);
+int			lexer_ioend(t_lexer *lex);
+void		lexer_debug(void);
 
 #endif

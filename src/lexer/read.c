@@ -22,12 +22,15 @@ static void
 
 	if (lex->cur != -1 && lex->tok != NULL)
 	{
-		xp = &lex->tok->xps[lex->tok->count - 1];
 		lexer_append(lex, &lex->tok->string, &lex->tok->length, 1);
-		if (lex->xp != NULL)
-			lexer_append(lex, &lex->xp->string, &lex->xp->length, !lex->btick);
-		else if (!xp_sep)
-			lexer_append(lex, &xp->string, &xp->length, 0);
+		if (lex->tok->count > 0)
+		{
+			xp = &lex->tok->xps[lex->tok->count - 1];
+			if (xp->id != xp_word)
+				lexer_append(lex, &xp->string, &xp->length, !lex->btick);
+			else if (!xp_sep)
+				lexer_append(lex, &xp->string, &xp->length, 0);
+		}
 	}
 }
 
@@ -40,10 +43,12 @@ void
 		lex->bslash = 0;
 		lex->cur = lex->next;
 		lex->next = -1;
-		if (lex->cur < 0)
+		if (lex->cur == -1)
 			lex->cur = input_readchar(lex->in);
-		lex->next = input_readchar(lex->in);
+		if (lex->cur != -1 && lex->cur != '\n')
+			lex->next = input_readchar(lex->in);
 		if (lex->cur == '\\' && !lexer_quoted(lex) && lexer_bquoted(lex))
+		{
 			lex->bslash = 1;
 			lex->cur = lex->next;
 			lex->next = -1;

@@ -27,6 +27,7 @@ extern "C" {
 	int	pr_complete_cmd(t_parser *pr, t_snode *parent);
 	int	pr_term(t_parser *pr, t_snode *parent);
 	int	pr_compound_list(t_parser *pr, t_snode *parent);
+	int	pr_subshell(t_parser *pr, t_snode *parent);
 }
 
 #pragma clang diagnostic ignored "-Wwritable-strings"
@@ -1430,6 +1431,65 @@ SIMPLE_TEST(pr_compound_list) {
 	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
 	ASSERT_EQUAL(sx_term, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL(kw_done, pr.current->id);
+}
+
+SIMPLE_TEST(pr_subshell) {
+	t_parser pr;
+	t_snode *node;
+
+	parser_setup(pr);
+	node = snode(sx_none);
+
+	clear_tokens();
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_subshell(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+
+	clear_tokens();
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_subshell(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+	ASSERT_EQUAL(op_semi, pr.current->id);
+
+	clear_tokens();
+	add_token(op_lparen, "(");
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_subshell(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+	node_destroy(node);
+
+	clear_tokens();
+	node = snode(sx_none);
+	add_token(op_lparen, "(");
+	add_token(kw_done, "done");
+	add_token(op_rparen, ")");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_subshell(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+	node_destroy(node);
+
+	clear_tokens();
+	node = snode(sx_none);
+	add_token(op_lparen, "(");
+	add_token(tk_newline, "\n");
+	add_token(tk_word, "ls");
+	add_token(op_andif, "&&");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "beemovie.txt");
+	add_token(op_semi, ";");
+	add_token(op_rparen, ")");
+	add_token(kw_done, "done");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_subshell(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_subshell, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_compound_list, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(kw_done, pr.current->id);
+	node_destroy(node);
+	parser_destroy(pr);
 }
 
 int main(int argc, char **argv) {
