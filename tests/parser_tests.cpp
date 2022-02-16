@@ -25,6 +25,7 @@ extern "C" {
 	int	pr_and_or(t_parser *pr, t_snode *parent);
 	int	pr_list(t_parser *pr, t_snode *parent);
 	int	pr_complete_cmd(t_parser *pr, t_snode *parent);
+	int	pr_term(t_parser *pr, t_snode *parent);
 }
 
 #pragma clang diagnostic ignored "-Wwritable-strings"
@@ -1236,6 +1237,120 @@ SIMPLE_TEST(pr_complete_cmd) {
 	ASSERT_EQUAL(sx_complete_cmd, node->childs[0]->type);
 	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
 	ASSERT_EQUAL(sx_list, node->childs[0]->childs[0]->type);
+	node_destroy(node);
+}
+
+SIMPLE_TEST(pr_term) {
+	t_parser pr;
+	t_snode *node;
+
+	parser_setup(pr);
+	node = snode(sx_none);
+
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_term(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+	
+	clear_tokens();
+	add_token(kw_done, "done");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_term(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+	ASSERT_EQUAL(kw_done, pr.current->id);
+
+	clear_tokens();
+	add_token(tk_word, "ls");
+	add_token(kw_done, "done");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_term(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_term, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_and_or, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(kw_done, pr.current->id);
+	node_destroy(node);
+
+	clear_tokens();
+	node = snode(sx_none);
+	add_token(tk_word, "ls");
+	add_token(op_semi, ";");
+	add_token(kw_done, "done");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_term(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_term, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_and_or, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(kw_done, pr.current->id);
+	node_destroy(node);
+
+	clear_tokens();
+	node = snode(sx_none);
+	add_token(tk_word, "ls");
+	add_token(op_semi, "&");
+	add_token(kw_done, "done");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_term(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_term, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_and_or, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(kw_done, pr.current->id);
+	node_destroy(node);
+
+	clear_tokens();
+	node = snode(sx_none);
+	add_token(kw_bang, "!");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "test");
+	add_token(op_pipe, "|");
+	add_token(tk_word, "cat");
+	add_token(op_pipe, "|");
+	add_token(tk_word, "bash");
+	add_token(op_orif, "||");
+	add_token(tk_word, "ls");
+	add_token(op_semi, ";");
+	add_token(tk_newline, "\n");
+	add_token(tk_newline, "\n");
+	add_token(tk_newline, "\n");
+	add_token(tk_word, "ls");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_term(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_term, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_and_or, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(sx_term, node->childs[0]->childs[1]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs[1]->childs_size);
+	ASSERT_EQUAL(sx_and_or, node->childs[0]->childs[1]->childs[0]->type);
+	node_destroy(node);
+
+	clear_tokens();
+	node = snode(sx_none);
+	add_token(kw_bang, "!");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "test");
+	add_token(op_pipe, "|");
+	add_token(tk_word, "cat");
+	add_token(op_pipe, "|");
+	add_token(tk_word, "bash");
+	add_token(op_orif, "||");
+	add_token(tk_word, "ls");
+	add_token(op_semi, ";");
+	add_token(tk_newline, "\n");
+	add_token(tk_newline, "\n");
+	add_token(tk_newline, "\n");
+	add_token(tk_word, "ls");
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_term(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_term, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_and_or, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(sx_term, node->childs[0]->childs[1]->type);
+	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs[1]->childs_size);
+	ASSERT_EQUAL(sx_and_or, node->childs[0]->childs[1]->childs[0]->type);
 	node_destroy(node);
 }
 
