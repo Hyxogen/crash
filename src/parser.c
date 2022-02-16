@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/16 13:31:48 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/16 13:53:11 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -405,16 +405,21 @@ int
 }
 
 int
-	pr_complete_cmd(t_parser *pr)
+	pr_complete_cmd(t_parser *pr, t_snode *parent)
 {
 	t_snode	*node;
 
-	node = node_create();
-	node_init(node, sx_complete_cmd);
-	if (!pr_simple_cmd(pr, node))
+	node = snode(sx_complete_cmd);
+	if (pr_list(pr, node))
 	{
-		node_destroy(node);
-		return (0);
+		while (pr_token(pr, NULL, sx_newline, tk_newline))
+			continue ;
+		if (!pr->current_ret)
+		{
+			node_add_child(parent, node);
+			return (1);
+		}
 	}
-	return (1);
+	node_destroy(node);
+	return (0);
 }
