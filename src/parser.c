@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/16 12:01:05 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/16 13:31:48 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ void
 	node_destroy_childs(t_snode *node)
 {
 	size_t	index;
-	
+
 	index = 0;
 	while (index < node->childs_size)
 	{
@@ -356,6 +356,7 @@ int
 	return (1);
 }
 
+/*Todo test if something like "echo Hallo && || cmd" doesn't work*/
 int
 	pr_and_or(t_parser *pr, t_snode *parent)
 {
@@ -376,6 +377,26 @@ int
 				return (0);
 			}
 		}
+		node_add_child(parent, node);
+		return (1);
+	}
+	node_destroy(node);
+	return (0);
+}
+
+int
+	pr_list(t_parser *pr, t_snode *parent)
+{
+	t_snode	*node;
+
+	node = snode(sx_list);
+	if (pr_and_or(pr, node))
+	{
+		if (pr_token(pr, NULL, sx_and, op_and))
+			node->flags |= flag_and;
+		else if (pr_token(pr, NULL, sx_semicolon, op_semi))
+			node->flags |= flag_semi;
+		pr_list(pr, node);
 		node_add_child(parent, node);
 		return (1);
 	}
