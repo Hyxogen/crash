@@ -23,6 +23,7 @@ extern "C" {
 	int	pr_pipe_sequence(t_parser *pr, t_snode *parent);
 	int	pr_pipeline(t_parser *pr, t_snode *parent);
 	int	pr_and_or(t_parser *pr, t_snode *parent);
+	int	pr_list(t_parser *pr, t_snode *parent);
 }
 
 #pragma clang diagnostic ignored "-Wwritable-strings"
@@ -34,11 +35,11 @@ size_t get_size();
 
 void parser_setup(t_parser &parser) {
 	std::memset(&parser, 0, sizeof(t_parser));
-	parser.tokenizer = (t_tokenizer *) std::malloc(sizeof(t_tokenizer));
+	parser.lexer = (t_lexer *) std::malloc(sizeof(t_lexer));
 }
 
 void parser_destroy(t_parser &parser) {
-	std::free(parser.tokenizer);
+	std::free(parser.lexer);
 }
 
 SIMPLE_TEST(next_token) {
@@ -46,10 +47,10 @@ SIMPLE_TEST(next_token) {
 
 	clear_tokens();
 	parser_setup(parser);
-	for (int i = word; i <= op_semi; i++)
+	for (int i = tk_word; i <= op_semi; i++)
 		add_token((t_token_id) i, (char *) 0);
 	
-	for (int i = word; i <= op_semi; i++) {
+	for (int i = tk_word; i <= op_semi; i++) {
 		pr_next_token(&parser);
 		ASSERT_TRUE(parser.current_ret != 0);
 		ASSERT_TRUE(parser.current != 0);
@@ -125,16 +126,16 @@ SIMPLE_TEST(pr_token) {
 	parser_setup(pr);
 	clear_tokens();
 
-	pr_token(&pr, NULL, sx_none, token_id_null);
+	pr_token(&pr, NULL, sx_none, tk_null);
 
-	add_token(word, "echo");
+	add_token(tk_word, "echo");
 	add_token(op_pipe, "|");
 	node = snode(sx_none);
 	pr_next_token(&pr);
-	pr_token(&pr, node, sx_newline, newline);
+	pr_token(&pr, node, sx_newline, tk_newline);
 	ASSERT_EQUAL((size_t) 0, node->childs_size);
 
-	pr_token(&pr, node, sx_word, word);
+	pr_token(&pr, node, sx_word, tk_word);
 	ASSERT_EQUAL((size_t) 1, node->childs_size);
 	ASSERT_EQUAL(sx_word, node->childs[0]->type);
 
@@ -158,16 +159,16 @@ SIMPLE_TEST(pr_io_file) {
 	ASSERT_EQUAL((size_t) 0, node->childs_size);
 
 	add_token(op_pipe, "|");
-	add_token(word, "out.txt");
+	add_token(tk_word, "out.txt");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(0, pr_io_file(&pr, node));
 	ASSERT_EQUAL((size_t) 0, node->childs_size);
-	ASSERT_EQUAL((int)op_pipe, pr.current->id);
+	ASSERT_EQUAL(op_pipe, pr.current->id);
 
 	node = snode(sx_none);
 	clear_tokens();
 	add_token(op_less, "<");
-	add_token(word, "/dev/null");
+	add_token(tk_word, "/dev/null");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_io_file(&pr, node));
@@ -176,13 +177,13 @@ SIMPLE_TEST(pr_io_file) {
 	ASSERT_EQUAL(sx_io_file, node->childs[0]->type);
 	ASSERT_EQUAL(sx_less, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL(sx_filename, node->childs[0]->childs[1]->type);
-	ASSERT_EQUAL((int) op_and, pr.current->id);
+	ASSERT_EQUAL( op_and, pr.current->id);
 	node_destroy(node);
 
 	node = snode(sx_none);
 	clear_tokens();
 	add_token(op_lessand, "<&");
-	add_token(word, "/dev/null");
+	add_token(tk_word, "/dev/null");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_io_file(&pr, node));
@@ -191,13 +192,13 @@ SIMPLE_TEST(pr_io_file) {
 	ASSERT_EQUAL(sx_io_file, node->childs[0]->type);
 	ASSERT_EQUAL(sx_lessand, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL(sx_filename, node->childs[0]->childs[1]->type);
-	ASSERT_EQUAL((int) op_and, pr.current->id);
+	ASSERT_EQUAL( op_and, pr.current->id);
 	node_destroy(node);
 
 	node = snode(sx_none);
 	clear_tokens();
 	add_token(op_great, ">");
-	add_token(word, "/dev/null");
+	add_token(tk_word, "/dev/null");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_io_file(&pr, node));
@@ -206,13 +207,13 @@ SIMPLE_TEST(pr_io_file) {
 	ASSERT_EQUAL(sx_io_file, node->childs[0]->type);
 	ASSERT_EQUAL(sx_great, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL(sx_filename, node->childs[0]->childs[1]->type);
-	ASSERT_EQUAL((int) op_and, pr.current->id);
+	ASSERT_EQUAL( op_and, pr.current->id);
 	node_destroy(node);
 
 	node = snode(sx_none);
 	clear_tokens();
 	add_token(op_greatand, ">&");
-	add_token(word, "/dev/null");
+	add_token(tk_word, "/dev/null");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_io_file(&pr, node));
@@ -221,13 +222,13 @@ SIMPLE_TEST(pr_io_file) {
 	ASSERT_EQUAL(sx_io_file, node->childs[0]->type);
 	ASSERT_EQUAL(sx_greatand, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL(sx_filename, node->childs[0]->childs[1]->type);
-	ASSERT_EQUAL((int) op_and, pr.current->id);
+	ASSERT_EQUAL( op_and, pr.current->id);
 	node_destroy(node);
 
 	node = snode(sx_none);
 	clear_tokens();
 	add_token(op_dgreat, ">>");
-	add_token(word, "/dev/null");
+	add_token(tk_word, "/dev/null");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_io_file(&pr, node));
@@ -236,13 +237,13 @@ SIMPLE_TEST(pr_io_file) {
 	ASSERT_EQUAL(sx_io_file, node->childs[0]->type);
 	ASSERT_EQUAL(sx_dgreat, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL(sx_filename, node->childs[0]->childs[1]->type);
-	ASSERT_EQUAL((int) op_and, pr.current->id);
+	ASSERT_EQUAL( op_and, pr.current->id);
 	node_destroy(node);
 
 	node = snode(sx_none);
 	clear_tokens();
 	add_token(op_lessgreat, "<>");
-	add_token(word, "/dev/null");
+	add_token(tk_word, "/dev/null");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_io_file(&pr, node));
@@ -251,13 +252,13 @@ SIMPLE_TEST(pr_io_file) {
 	ASSERT_EQUAL(sx_io_file, node->childs[0]->type);
 	ASSERT_EQUAL(sx_lessgreat, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL(sx_filename, node->childs[0]->childs[1]->type);
-	ASSERT_EQUAL((int) op_and, pr.current->id);
+	ASSERT_EQUAL( op_and, pr.current->id);
 	node_destroy(node);
 
 	node = snode(sx_none);
 	clear_tokens();
 	add_token(op_clobber, ">|");
-	add_token(word, "/dev/null");
+	add_token(tk_word, "/dev/null");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_io_file(&pr, node));
@@ -266,7 +267,7 @@ SIMPLE_TEST(pr_io_file) {
 	ASSERT_EQUAL(sx_io_file, node->childs[0]->type);
 	ASSERT_EQUAL(sx_clobber, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL(sx_filename, node->childs[0]->childs[1]->type);
-	ASSERT_EQUAL((int) op_and, pr.current->id);
+	ASSERT_EQUAL( op_and, pr.current->id);
 	node_destroy(node);
 }
 
@@ -283,7 +284,7 @@ SIMPLE_TEST(pr_io_redirect) {
 	ASSERT_EQUAL((size_t) 0, node->childs_size);
 
 	add_token(op_less, "<");
-	add_token(word, "beemovie.txt");
+	add_token(tk_word, "beemovie.txt");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_io_redirect(&pr, node));
@@ -301,9 +302,9 @@ SIMPLE_TEST(pr_io_redirect) {
 /* TODO Add io number tests
 	node = snode(sx_none);
 	clear_tokens();
-	add_token(word, "0");
+	add_token(tk_word, "0");
 	add_token(op_less, "<");
-	add_token(word, "beemovie.txt");
+	add_token(tk_word, "beemovie.txt");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_io_redirect(&pr, node));
@@ -333,11 +334,11 @@ SIMPLE_TEST(pr_cmd_suffix) {
 	pr_next_token(&pr);
 	ASSERT_EQUAL(0, pr_cmd_suffix(&pr, node));
 	ASSERT_EQUAL((size_t) 0, node->childs_size);
-	ASSERT_EQUAL((int) op_and, pr.current->id);
+	ASSERT_EQUAL( op_and, pr.current->id);
 
 	clear_tokens();
-	add_token(word, "Hello");
-	add_token(word, "World!");
+	add_token(tk_word, "Hello");
+	add_token(tk_word, "World!");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_cmd_suffix(&pr, node));
@@ -346,13 +347,13 @@ SIMPLE_TEST(pr_cmd_suffix) {
 	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
 	ASSERT_EQUAL(sx_word, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL(sx_word, node->childs[0]->childs[1]->type);
-	ASSERT_EQUAL((int) op_and, pr.current->id);
+	ASSERT_EQUAL( op_and, pr.current->id);
 	node_destroy(node);
 
 	node = snode(sx_none);
 	clear_tokens();
 	add_token(op_great, ">");
-	add_token(word, "/dev/null");
+	add_token(tk_word, "/dev/null");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_cmd_suffix(&pr, node));
@@ -360,16 +361,16 @@ SIMPLE_TEST(pr_cmd_suffix) {
 	ASSERT_EQUAL(sx_cmd_suffix, node->childs[0]->type);
 	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
 	ASSERT_EQUAL(sx_io_redirect, node->childs[0]->childs[0]->type);
-	ASSERT_EQUAL((int) op_and, pr.current->id);
+	ASSERT_EQUAL( op_and, pr.current->id);
 	node_destroy(node);
 
 	node = snode(sx_none);
 	clear_tokens();
-	add_token(word, "Hello");
-	add_token(word, "World");
-	add_token(word, "!");
+	add_token(tk_word, "Hello");
+	add_token(tk_word, "World");
+	add_token(tk_word, "!");
 	add_token(op_great, ">");
-	add_token(word, "/dev/null");
+	add_token(tk_word, "/dev/null");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_cmd_suffix(&pr, node));
@@ -380,7 +381,7 @@ SIMPLE_TEST(pr_cmd_suffix) {
 	ASSERT_EQUAL(sx_word, node->childs[0]->childs[1]->type);
 	ASSERT_EQUAL(sx_word, node->childs[0]->childs[2]->type);
 	ASSERT_EQUAL(sx_io_redirect, node->childs[0]->childs[3]->type);
-	ASSERT_EQUAL((int) op_and, pr.current->id);
+	ASSERT_EQUAL( op_and, pr.current->id);
 	node_destroy(node);
 }
 
@@ -395,7 +396,7 @@ SIMPLE_TEST(pr_simple_cmd) {
 	pr_simple_cmd(&pr, node);
 	ASSERT_EQUAL((size_t) 0, node->childs_size);
 
-	add_token(word, "ls");
+	add_token(tk_word, "ls");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	pr_simple_cmd(&pr, node);
@@ -403,14 +404,14 @@ SIMPLE_TEST(pr_simple_cmd) {
 	ASSERT_EQUAL(sx_simple_cmd, node->childs[0]->type);
 	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
 	ASSERT_EQUAL(sx_cmd_word, node->childs[0]->childs[0]->type);
-	ASSERT_EQUAL((int) op_and, pr.current->id);
+	ASSERT_EQUAL( op_and, pr.current->id);
 	node_destroy(node);
 
 	node = snode(sx_none);
-	add_token(word, "echo");
-	add_token(word, "Hello");
-	add_token(word, "World");
-	add_token(word, "!");
+	add_token(tk_word, "echo");
+	add_token(tk_word, "Hello");
+	add_token(tk_word, "World");
+	add_token(tk_word, "!");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_simple_cmd(&pr, node));
@@ -419,16 +420,16 @@ SIMPLE_TEST(pr_simple_cmd) {
 	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
 	ASSERT_EQUAL(sx_cmd_word, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL(sx_cmd_suffix, node->childs[0]->childs[1]->type);
-	ASSERT_EQUAL((int) op_and, pr.current->id);
+	ASSERT_EQUAL( op_and, pr.current->id);
 	pr_next_token(&pr);
 
 	node = snode(sx_none);
-	add_token(word, "echo");
-	add_token(word, "Hello");
-	add_token(word, "World");
-	add_token(word, "!");
-	add_token(word, ">");
-	add_token(word, "out.txt");
+	add_token(tk_word, "echo");
+	add_token(tk_word, "Hello");
+	add_token(tk_word, "World");
+	add_token(tk_word, "!");
+	add_token(tk_word, ">");
+	add_token(tk_word, "out.txt");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_simple_cmd(&pr, node));
@@ -437,13 +438,13 @@ SIMPLE_TEST(pr_simple_cmd) {
 	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
 	ASSERT_EQUAL(sx_cmd_word, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL(sx_cmd_suffix, node->childs[0]->childs[1]->type);
-	ASSERT_EQUAL((int) op_and, pr.current->id);
+	ASSERT_EQUAL( op_and, pr.current->id);
 	node_destroy(node);
 
 	node = snode(sx_none);
-	add_token(word, "cat");
-	add_token(word, "<");
-	add_token(word, "/dev/zero");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "<");
+	add_token(tk_word, "/dev/zero");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_simple_cmd(&pr, node));
@@ -452,7 +453,7 @@ SIMPLE_TEST(pr_simple_cmd) {
 	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
 	ASSERT_EQUAL(sx_cmd_word, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL(sx_cmd_suffix, node->childs[0]->childs[1]->type);
-	ASSERT_EQUAL((int) op_and, pr.current->id);
+	ASSERT_EQUAL( op_and, pr.current->id);
 	pr_next_token(&pr);
 }
 
@@ -467,12 +468,12 @@ SIMPLE_TEST(pr_cmd) {
 	ASSERT_EQUAL(0, pr_cmd(&pr, node));
 	ASSERT_EQUAL((size_t) 0, node->childs_size);
 	/*TODO add other tests*/
-	add_token(word, "echo");
-	add_token(word, "Hello");
-	add_token(word, "World");
-	add_token(word, "!");
-	add_token(word, ">");
-	add_token(word, "out.txt");
+	add_token(tk_word, "echo");
+	add_token(tk_word, "Hello");
+	add_token(tk_word, "World");
+	add_token(tk_word, "!");
+	add_token(tk_word, ">");
+	add_token(tk_word, "out.txt");
 	add_token(op_and, "&&");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_cmd(&pr, node));
@@ -480,7 +481,7 @@ SIMPLE_TEST(pr_cmd) {
 	ASSERT_EQUAL(sx_cmd, node->childs[0]->type);
 	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
 	ASSERT_EQUAL(sx_simple_cmd, node->childs[0]->childs[0]->type);
-	ASSERT_EQUAL((int) op_and, pr.current->id);
+	ASSERT_EQUAL( op_and, pr.current->id);
 	node_destroy(node);
 }
 
@@ -500,11 +501,11 @@ SIMPLE_TEST(pr_pipe_sequence) {
 	pr_next_token(&pr);
 	ASSERT_EQUAL(0, pr_pipe_sequence(&pr, node));
 	ASSERT_EQUAL((size_t) 0, node->childs_size);
-	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	ASSERT_EQUAL( op_semi, pr.current->id);
 
 	clear_tokens();
-	add_token(word, "echo");
-	add_token(word, "Hello");
+	add_token(tk_word, "echo");
+	add_token(tk_word, "Hello");
 	add_token(op_semi, ";");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_pipe_sequence(&pr, node));
@@ -512,13 +513,13 @@ SIMPLE_TEST(pr_pipe_sequence) {
 	ASSERT_EQUAL(sx_pipe_sequence, node->childs[0]->type);
 	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
 	ASSERT_EQUAL(sx_cmd, node->childs[0]->childs[0]->type);
-	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	ASSERT_EQUAL( op_semi, pr.current->id);
 	node_destroy(node);
 
 	clear_tokens();
 	node = snode(sx_none);
-	add_token(word, "cat");
-	add_token(word, "hello.txt");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "hello.txt");
 	add_token(op_pipe, "|");
 	add_token(op_semi, ";");
 	pr_next_token(&pr);
@@ -526,10 +527,10 @@ SIMPLE_TEST(pr_pipe_sequence) {
 	ASSERT_EQUAL((size_t) 0, node->childs_size);
 
 	clear_tokens();
-	add_token(word, "cat");
-	add_token(word, "hello.txt");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "hello.txt");
 	add_token(op_pipe, "|");
-	add_token(word, "bash");
+	add_token(tk_word, "bash");
 	add_token(op_semi, ";");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_pipe_sequence(&pr, node));
@@ -538,21 +539,21 @@ SIMPLE_TEST(pr_pipe_sequence) {
 	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
 	ASSERT_EQUAL(sx_cmd, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL(sx_pipe_sequence, node->childs[0]->childs[1]->type);
-	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	ASSERT_EQUAL( op_semi, pr.current->id);
 	node_destroy(node);
 
 	clear_tokens();
 	node = snode(sx_none);
-	add_token(word, "cat");
+	add_token(tk_word, "cat");
 	add_token(op_less, "<");
-	add_token(word, "test");
+	add_token(tk_word, "test");
 	add_token(op_pipe, "|");
-	add_token(newline, "\n");
-	add_token(newline, "\n");
-	add_token(newline, "\n");
-	add_token(word, "bash");
+	add_token(tk_newline, "\n");
+	add_token(tk_newline, "\n");
+	add_token(tk_newline, "\n");
+	add_token(tk_word, "bash");
 	add_token(op_great, ">");
-	add_token(word, "test2");
+	add_token(tk_word, "test2");
 	add_token(op_semi, ";");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_pipe_sequence(&pr, node));
@@ -561,17 +562,17 @@ SIMPLE_TEST(pr_pipe_sequence) {
 	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
 	ASSERT_EQUAL(sx_cmd, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL(sx_pipe_sequence, node->childs[0]->childs[1]->type);
-	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	ASSERT_EQUAL( op_semi, pr.current->id);
 	node_destroy(node);
 
 	clear_tokens();
 	node = snode(sx_none);
-	add_token(word, "cat");
-	add_token(word, "test");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "test");
 	add_token(op_pipe, "|");
-	add_token(word, "cat");
+	add_token(tk_word, "cat");
 	add_token(op_pipe, "|");
-	add_token(word, "bash");
+	add_token(tk_word, "bash");
 	add_token(op_semi, ";");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_pipe_sequence(&pr, node));
@@ -584,7 +585,7 @@ SIMPLE_TEST(pr_pipe_sequence) {
 	ASSERT_EQUAL(sx_cmd, node->childs[0]->childs[1]->childs[0]->type);
 	ASSERT_EQUAL(sx_pipe_sequence, node->childs[0]->childs[1]->childs[1]->type);
 	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs[1]->childs[1]->childs_size);
-	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	ASSERT_EQUAL( op_semi, pr.current->id);
 	node_destroy(node);
 }
 
@@ -610,12 +611,12 @@ SIMPLE_TEST(pr_pipeline) {
 	ASSERT_EQUAL((size_t) 0, node->childs_size);
 
 	clear_tokens();
-	add_token(word, "cat");
-	add_token(word, "test");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "test");
 	add_token(op_pipe, "|");
-	add_token(word, "cat");
+	add_token(tk_word, "cat");
 	add_token(op_pipe, "|");
-	add_token(word, "bash");
+	add_token(tk_word, "bash");
 	add_token(op_semi, ";");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_pipeline(&pr, node));
@@ -624,18 +625,18 @@ SIMPLE_TEST(pr_pipeline) {
 	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
 	ASSERT_EQUAL(0, node->childs[0]->flags);
 	ASSERT_EQUAL(sx_pipe_sequence, node->childs[0]->childs[0]->type);
-	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	ASSERT_EQUAL( op_semi, pr.current->id);
 	node_destroy(node);
 
 	clear_tokens();
 	node = snode(sx_none);
 	add_token(kw_bang, "!");
-	add_token(word, "cat");
-	add_token(word, "test");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "test");
 	add_token(op_pipe, "|");
-	add_token(word, "cat");
+	add_token(tk_word, "cat");
 	add_token(op_pipe, "|");
-	add_token(word, "bash");
+	add_token(tk_word, "bash");
 	add_token(op_semi, ";");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_pipeline(&pr, node));
@@ -644,7 +645,7 @@ SIMPLE_TEST(pr_pipeline) {
 	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
 	ASSERT_TRUE(node->childs[0]->flags & flag_bang);
 	ASSERT_EQUAL(sx_pipe_sequence, node->childs[0]->childs[0]->type);
-	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	ASSERT_EQUAL( op_semi, pr.current->id);
 	node_destroy(node);
 }
 
@@ -660,12 +661,12 @@ SIMPLE_TEST(pr_and_or) {
 	ASSERT_EQUAL((size_t) 0, node->childs_size);
 
 	add_token(kw_bang, "!");
-	add_token(word, "cat");
-	add_token(word, "test");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "test");
 	add_token(op_pipe, "|");
-	add_token(word, "cat");
+	add_token(tk_word, "cat");
 	add_token(op_pipe, "|");
-	add_token(word, "bash");
+	add_token(tk_word, "bash");
 	add_token(op_semi, ";");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_and_or(&pr, node));
@@ -673,19 +674,19 @@ SIMPLE_TEST(pr_and_or) {
 	ASSERT_EQUAL(sx_and_or, node->childs[0]->type);
 	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs_size);
 	ASSERT_EQUAL(sx_pipeline, node->childs[0]->childs[0]->type);
-	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	ASSERT_EQUAL( op_semi, pr.current->id);
 	node_destroy(node);
 
 	clear_tokens();
 	node = snode(sx_none);
 	add_token(kw_bang, "!");
-	add_token(word, "cat");
-	add_token(word, "test");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "test");
 	add_token(op_pipe, "|");
-	add_token(word, "cat");
+	add_token(tk_word, "cat");
 	add_token(op_pipe, "|");
-	add_token(word, "bash");
-	add_token(op_and_if, "&&");
+	add_token(tk_word, "bash");
+	add_token(op_andif, "&&");
 	add_token(op_semi, ";");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(0, pr_and_or(&pr, node));
@@ -693,14 +694,14 @@ SIMPLE_TEST(pr_and_or) {
 	
 	clear_tokens();
 	add_token(kw_bang, "!");
-	add_token(word, "cat");
-	add_token(word, "test");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "test");
 	add_token(op_pipe, "|");
-	add_token(word, "cat");
+	add_token(tk_word, "cat");
 	add_token(op_pipe, "|");
-	add_token(word, "bash");
-	add_token(op_and_if, "&&");
-	add_token(word, "ls");
+	add_token(tk_word, "bash");
+	add_token(op_andif, "&&");
+	add_token(tk_word, "ls");
 	add_token(op_semi, ";");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_and_or(&pr, node));
@@ -713,20 +714,20 @@ SIMPLE_TEST(pr_and_or) {
 	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs[1]->childs_size);
 	ASSERT_EQUAL(0, node->childs[0]->childs[1]->flags);
 	ASSERT_EQUAL(sx_pipeline, node->childs[0]->childs[1]->childs[0]->type);
-	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	ASSERT_EQUAL( op_semi, pr.current->id);
 	node_destroy(node);
 
 	clear_tokens();
 	node = snode(sx_none);
 	add_token(kw_bang, "!");
-	add_token(word, "cat");
-	add_token(word, "test");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "test");
 	add_token(op_pipe, "|");
-	add_token(word, "cat");
+	add_token(tk_word, "cat");
 	add_token(op_pipe, "|");
-	add_token(word, "bash");
-	add_token(op_or_if, "||");
-	add_token(word, "ls");
+	add_token(tk_word, "bash");
+	add_token(op_orif, "||");
+	add_token(tk_word, "ls");
 	add_token(op_semi, ";");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_and_or(&pr, node));
@@ -739,20 +740,20 @@ SIMPLE_TEST(pr_and_or) {
 	ASSERT_EQUAL((size_t) 1, node->childs[0]->childs[1]->childs_size);
 	ASSERT_EQUAL(0, node->childs[0]->childs[1]->flags);
 	ASSERT_EQUAL(sx_pipeline, node->childs[0]->childs[1]->childs[0]->type);
-	ASSERT_EQUAL((int) op_semi, pr.current->id);
+	ASSERT_EQUAL( op_semi, pr.current->id);
 	node_destroy(node);
 
 	clear_tokens();
 	node = snode(sx_none);
 	add_token(op_semi, ";");
-	add_token(word, "cat");
-	add_token(word, "test");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "test");
 	add_token(op_pipe, "|");
-	add_token(word, "cat");
+	add_token(tk_word, "cat");
 	add_token(op_pipe, "|");
-	add_token(word, "bash");
-	add_token(op_or_if, "||");
-	add_token(word, "ls");
+	add_token(tk_word, "bash");
+	add_token(op_orif, "||");
+	add_token(tk_word, "ls");
 	add_token(op_semi, ";");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(0, pr_and_or(&pr, node));
@@ -760,28 +761,14 @@ SIMPLE_TEST(pr_and_or) {
 	
 	clear_tokens();
 	add_token(kw_bang, "!");
-	add_token(word, "cat");
-	add_token(word, "test");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "test");
 	add_token(op_pipe, "|");
-	add_token(word, "cat");
-	add_token(op_pipe, "|");
-	add_token(op_semi, ";");
-	add_token(op_or_if, "||");
-	add_token(word, "ls");
-	add_token(op_semi, ";");
-	pr_next_token(&pr);
-	ASSERT_EQUAL(0, pr_and_or(&pr, node));
-	ASSERT_EQUAL((size_t) 0, node->childs_size);
-
-	clear_tokens();
-	add_token(kw_bang, "!");
-	add_token(word, "cat");
-	add_token(word, "test");
-	add_token(op_pipe, "|");
-	add_token(word, "cat");
+	add_token(tk_word, "cat");
 	add_token(op_pipe, "|");
 	add_token(op_semi, ";");
-	add_token(op_or_if, "||");
+	add_token(op_orif, "||");
+	add_token(tk_word, "ls");
 	add_token(op_semi, ";");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(0, pr_and_or(&pr, node));
@@ -789,22 +776,55 @@ SIMPLE_TEST(pr_and_or) {
 
 	clear_tokens();
 	add_token(kw_bang, "!");
-	add_token(word, "cat");
-	add_token(word, "test");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "test");
 	add_token(op_pipe, "|");
-	add_token(word, "cat");
+	add_token(tk_word, "cat");
 	add_token(op_pipe, "|");
-	add_token(word, "bash");
-	add_token(op_or_if, "||");
-	add_token(op_or_if, "||");
-	add_token(word, "ls");
+	add_token(op_semi, ";");
+	add_token(op_orif, "||");
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_and_or(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+
+	clear_tokens();
+	add_token(kw_bang, "!");
+	add_token(tk_word, "cat");
+	add_token(tk_word, "test");
+	add_token(op_pipe, "|");
+	add_token(tk_word, "cat");
+	add_token(op_pipe, "|");
+	add_token(tk_word, "bash");
+	add_token(op_orif, "||");
+	add_token(op_orif, "||");
+	add_token(tk_word, "ls");
 	add_token(op_semi, ";");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(0, pr_and_or(&pr, node));
 	ASSERT_EQUAL((size_t) 0, node->childs_size);
 	node_destroy(node);
+	parser_destroy(pr);
 }
+/*
+SIMPLE_TEST(pr_list) {
+	t_parser pr;
+	t_snode *node;
 
+	parser_setup(node);
+	node = snode(sx_none);
+
+	clear_tokens();
+	ASSERT_EQUAL(0, pr_list(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+
+	add_token(op_semi, ";");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(0, pr_list(&pr, node));
+	ASSERT_EQUAL((size_t) 0, node->childs_size);
+	ASSERT_EQUAL( op_semi, pr.current->id);
+}
+*/
 int main(int argc, char **argv) {
 	SIMPLE_INIT(argc, argv);
 	SIMPLE_RUN_ALL_TESTS();

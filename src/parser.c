@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/16 11:42:25 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/16 12:01:05 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,14 @@ and_or separator_op and_or (separator_op and_or (separator_op and_or))
 #define SH_DEF_CHILD_SIZE 100
 
 void	node_destroy(t_snode *node);
-int		pr_convert_io_number(t_parser *pr, t_token *token);
+
+/*TEMPORARY*/
+int
+	pr_convert_io_number(t_parser *pr, t_token *token) {
+	(void) pr;
+	(void) token;
+	return (0);
+}
 
 t_snode
 	*node_init(t_snode *node, t_syntax_id syn_id)
@@ -121,7 +128,7 @@ int
 	free(pr->current);
 	pr->current = sh_safe_malloc(sizeof(t_token));
 	sh_assert(pr->current != NULL);
-	pr->current_ret = tk_tokenize(pr->tokenizer, pr->current);
+	pr->current_ret = lexer_lex(pr->lexer, pr->current);
 	return (pr->current_ret);
 }
 
@@ -156,7 +163,7 @@ int
 		|| pr_token(pr, node, sx_lessgreat, op_lessgreat)
 		|| pr_token(pr, node, sx_clobber, op_clobber))
 	{
-		if (pr_token(pr, node, sx_filename, word))
+		if (pr_token(pr, node, sx_filename, tk_word))
 		{
 			node_add_child(parent, node);
 			return (1);
@@ -185,7 +192,7 @@ int
 	node = snode(sx_io_redirect);
 	cpy = *pr->current;
 	if (pr_convert_io_number(pr, &cpy))
-		pr_token(pr, node, sx_io_number, io_number);
+		pr_token(pr, node, sx_io_number, tk_ionumber);
 	if (pr_io_file(pr, node))
 	{
 		node_add_child(parent, node);
@@ -231,7 +238,7 @@ int
 
 	node = snode(sx_cmd_suffix);
 	while (!pr_io_redirect(pr, node)
-		&& pr_token(pr, node, sx_word, word))
+		&& pr_token(pr, node, sx_word, tk_word))
 		continue;
 	if (node->childs_size != 0)
 	{
@@ -250,8 +257,8 @@ int
 	node = node_create();
 	node_init(node, sx_simple_cmd);
 	if (pr_cmd_prefix(pr, node))
-		pr_token(pr, node, sx_cmd_word, word);
-	else if (!pr_token(pr, node, sx_cmd_word, word))
+		pr_token(pr, node, sx_cmd_word, tk_word);
+	else if (!pr_token(pr, node, sx_cmd_word, tk_word))
 	{
 		node_destroy(node);
 		return (0);
@@ -317,7 +324,7 @@ int
 	{
 		if (pr_token(pr, NULL, sx_pipe, op_pipe))
 		{
-			while (pr_token(pr, NULL, sx_newline, newline))
+			while (pr_token(pr, NULL, sx_newline, tk_newline))
 				continue ;
 			if (!pr_pipe_sequence(pr, node))
 			{
@@ -357,11 +364,11 @@ int
 	node = snode(sx_and_or);
 	if (pr_pipeline(pr, node))
 	{
-		node->flags |= flag_and_if * pr_token(pr, NULL, sx_and_if, op_and_if)
-			+ flag_or_if * pr_token(pr, NULL, sx_or_if, op_or_if);
+		node->flags |= flag_and_if * pr_token(pr, NULL, sx_and_if, op_andif)
+			+ flag_or_if * pr_token(pr, NULL, sx_or_if, op_orif);
 		if (!(node->flags & flag_or_if) != !(node->flags & flag_and_if))
 		{
-			while (pr_token(pr, NULL, sx_newline, newline))
+			while (pr_token(pr, NULL, sx_newline, tk_newline))
 				continue ;
 			if (!pr_and_or(pr, node))
 			{
