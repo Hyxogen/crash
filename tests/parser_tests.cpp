@@ -1147,50 +1147,6 @@ SIMPLE_TEST(pr_complete_cmd) {
 
 	clear_tokens();
 	add_token(tk_word, "ls");
-	add_token(op_semi, ";");
-	add_token(kw_done, "done");
-	pr_next_token(&pr);
-	ASSERT_EQUAL(0, pr_complete_cmd(&pr, node));
-	ASSERT_EQUAL((size_t) 0, node->childs_size);
-
-	clear_tokens();
-	add_token(tk_word, "ls");
-	add_token(op_semi, ";");
-	add_token(tk_word, "ls");
-	add_token(op_semi, ";");
-	add_token(kw_done, "done");
-	pr_next_token(&pr);
-	ASSERT_EQUAL(0, pr_complete_cmd(&pr, node));
-	ASSERT_EQUAL((size_t) 0, node->childs_size);
-
-	clear_tokens();
-	add_token(kw_bang, "!");
-	add_token(tk_word, "cat");
-	add_token(tk_word, "test");
-	add_token(op_pipe, "|");
-	add_token(tk_word, "cat");
-	add_token(op_pipe, "|");
-	add_token(tk_word, "bash");
-	add_token(op_orif, "||");
-	add_token(tk_word, "ls");
-	add_token(op_semi, ";");
-	add_token(kw_bang, "!");
-	add_token(tk_word, "cat");
-	add_token(tk_word, "test");
-	add_token(op_pipe, "|");
-	add_token(tk_word, "cat");
-	add_token(op_pipe, "|");
-	add_token(tk_word, "bash");
-	add_token(op_orif, "||");
-	add_token(tk_word, "ls");
-	add_token(op_and, "&");
-	add_token(kw_done, "done");
-	pr_next_token(&pr);
-	ASSERT_EQUAL(0, pr_complete_cmd(&pr, node));
-	ASSERT_EQUAL((size_t) 0, node->childs_size);
-
-	clear_tokens();
-	add_token(tk_word, "ls");
 	pr_next_token(&pr);
 	ASSERT_EQUAL(1, pr_complete_cmd(&pr, node));
 	ASSERT_EQUAL((size_t) 1, node->childs_size);

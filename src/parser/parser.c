@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/16 16:13:43 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/17 11:22:52 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,23 @@ and_or separator_op and_or (separator_op and_or (separator_op and_or))
 void	node_destroy(t_snode *node);
 int		pr_compound_list(t_parser *pr, t_snode *parent);
 
-/*TEMPORARY*/
+
 int
-	pr_convert_io_number(t_parser *pr, t_token *token) {
-	(void) pr;
-	(void) token;
-	return (0);
+	pr_convert_io_number(t_parser *pr, t_token *token)
+{
+	size_t	i;
+
+	if (pr->lexer->cur != '<' && pr->lexer->cur != '>')
+		return (0);
+	i = 0;
+	while (i < token->length)
+	{
+		if (!ft_isdigit(token->string[i]))
+			return (0);
+		i += 1;
+	}
+	token->id = tk_ionumber;
+	return (1);
 }
 
 t_snode
@@ -126,7 +137,6 @@ void
 int
 	pr_next_token(t_parser *pr)
 {
-	free(pr->current);
 	pr->current = sh_safe_malloc(sizeof(t_token));
 	sh_assert(pr->current != NULL);
 	pr->current_ret = lexer_lex(pr->lexer, pr->current);
@@ -140,12 +150,14 @@ int
 
 	if (pr->current_ret == 0 || pr->current->id != tk_id)
 		return (0);
+	node = snode(syn_id);
+	node->token = pr->current;
 	pr_next_token(pr);
 	if (!parent)
+	{
+		node_destroy(node);
 		return (1);
-	node = node_create();
-	node_init(node, syn_id);
-	node->token = pr->current;
+	}
 	node_add_child(parent, node);
 	return (1);
 }
@@ -186,13 +198,11 @@ int
 	pr_io_redirect(t_parser *pr, t_snode *parent)
 {
 	t_snode	*node;
-	t_token	cpy;
 
 	if (!pr->current_ret)
 		return (0);
 	node = snode(sx_io_redirect);
-	cpy = *pr->current;
-	if (pr_convert_io_number(pr, &cpy))
+	if (pr_convert_io_number(pr, pr->current))
 		pr_token(pr, node, sx_io_number, tk_ionumber);
 	if (pr_io_file(pr, node))
 	{
@@ -462,13 +472,8 @@ int
 	node = snode(sx_complete_cmd);
 	if (pr_list(pr, node))
 	{
-		while (pr_token(pr, NULL, sx_newline, tk_newline))
-			continue ;
-		if (!pr->current_ret)
-		{
-			node_add_child(parent, node);
-			return (1);
-		}
+		node_add_child(parent, node);
+		return (1);
 	}
 	node_destroy(node);
 	return (0);
