@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/16 14:13:22 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/17 11:21:45 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/17 14:26:36 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,8 +68,10 @@ int
 	size_t	len;
 
 	(void) pr;
-	len = ft_strlen(g_keywords[kw_if - id]);
-	if (ft_memcmp(g_keywords[kw_if - id], token->string, len + 1) == 0)
+	if (token == NULL || token->id != tk_word)
+		return (0);
+	len = ft_strlen(g_keywords[id - kw_if]);
+	if (ft_memcmp(g_keywords[id - kw_if], token->string, len + 1) == 0)
 	{
 		token->id = id;
 		return (1);
@@ -82,6 +84,8 @@ int
 	pr_convert_name(t_parser *pr, t_token *token)
 {
 	(void) pr;
+	if (token == NULL || token->id != tk_word)
+		return (0);
 	if (pr_is_name(token->string, token->length))
 	{
 		token->id = tk_name;
@@ -96,6 +100,8 @@ int
 {
 	char	*end;
 
+	if (token == NULL || token->id != tk_word)
+		return (0);
 	end = ft_memchr(token->string, '=', token->length);
 	if (end != NULL)
 	{

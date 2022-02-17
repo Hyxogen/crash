@@ -36,6 +36,7 @@ static const char	*g_sx_names[] = {
 	"sx_io_redirect",
 	"sx_io_number",
 	"sx_cmd_suffix",
+	"sx_cmd_prefix",
 	"sx_cmd",
 	"sx_term",
 	"sx_compound_list",
@@ -46,7 +47,10 @@ static const char	*g_sx_names[] = {
 	"sx_until_clause",
 	"sx_do_group",
 	"sx_if_clause",
-	"sx_else_clause"
+	"sx_else_part",
+	"sx_function_def",
+	"sx_function_body",
+	"sx_function_name"
 };
 
 int		pr_complete_cmd(t_parser *pr, t_snode *parent);
@@ -104,7 +108,9 @@ void
 	lexer_new(&lx, &in);
 	pr.lexer = &lx;
 	pr.current = NULL;
+	pr.next = NULL;
 	pr.current_ret = 0;
+	pr.next_ret = 0;
 	pr.current_node = NULL;
 	pr.syntax_tree = NULL;
 	while (1)

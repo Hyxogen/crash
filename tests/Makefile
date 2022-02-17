@@ -16,7 +16,7 @@ DEP_DIR				:= build
 LIBFT_DIR			:= $(LIB_DIR)/libft
 LIBFT_LIB			:= $(LIBFT_DIR)/libft.a
 
-FILE_NAMES			:= parser.c memory.c assert.c simple_tests.cpp parser_tests.cpp parser_tests_lexer.cpp
+FILE_NAMES			:= parser.c convert.c memory.c assert.c simple_tests.cpp parser_tests.cpp parser_tests_lexer.cpp
 
 PARSER_FILE_NAMES	:= parser.c memory.c assert.c simple_tests.cpp parser_test.cpp
 

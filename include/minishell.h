@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 10:50:42 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/17 11:47:31 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/17 15:14:04 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ enum e_syntax_id
 	sx_io_redirect,
 	sx_io_number,
 	sx_cmd_suffix,
+	sx_cmd_prefix,
 	sx_cmd,
 	sx_term,
 	sx_compound_list,
@@ -68,7 +69,10 @@ enum e_syntax_id
 	sx_until_clause,
 	sx_do_group,
 	sx_if_clause,
-	sx_else_clause
+	sx_else_part,
+	sx_function_def,
+	sx_function_body,
+	sx_function_name
 };
 
 enum e_node_flag
