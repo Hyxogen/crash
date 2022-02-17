@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 10:50:42 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/16 16:06:56 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/17 11:47:31 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,12 @@ enum e_syntax_id
 	sx_compound_list,
 	sx_subshell,
 	sx_brace_group,
-	sx_compound_cmd
+	sx_compound_cmd,
+	sx_while_clause,
+	sx_until_clause,
+	sx_do_group,
+	sx_if_clause,
+	sx_else_clause
 };
 
 enum e_node_flag
@@ -84,7 +89,9 @@ typedef struct s_snode		t_snode;
 struct s_parser
 {
 	t_token		*current;
+	t_token		*next;
 	int			current_ret;
+	int			next_ret;
 	t_snode		*syntax_tree;
 	t_snode		*current_node;
 	t_lexer		*lexer;
@@ -111,6 +118,11 @@ int			sh_readchar(t_input *in);
 
 void		*sh_safe_malloc(size_t size);
 void		*sh_safe_realloc(void *ptr, size_t old_size, size_t new_size);
+
+void		pr_convert_reserved(t_parser *pr, t_token *token);
+int			pr_convert_keyword(t_parser *pr, t_token *token, t_token_id id);
+int			pr_convert_name(t_parser *pr, t_token *token);
+int			pr_convert_ass(t_parser *pr, t_token *token, int first);
 
 t_snode		*pr_parse(t_parser *pr);
 void		pr_debug(void);

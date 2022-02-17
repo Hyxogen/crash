@@ -41,7 +41,12 @@ static const char	*g_sx_names[] = {
 	"sx_compound_list",
 	"sx_subshell",
 	"sx_brace_group",
-	"sx_compound_cmd"
+	"sx_compound_cmd",
+	"sx_while_clause",
+	"sx_until_clause",
+	"sx_do_group",
+	"sx_if_clause",
+	"sx_else_clause"
 };
 
 int		pr_complete_cmd(t_parser *pr, t_snode *parent);
@@ -60,6 +65,11 @@ static void
 		i += 1;
 	}
 	ft_putstr_fd((char*) g_sx_names[node->type], STDOUT_FILENO);
+	if (!node->childs_size)
+	{
+		ft_putchar_fd(':', STDOUT_FILENO);
+		ft_putstr_fd((char*) node->token->string, STDOUT_FILENO);
+	}
 	ft_putchar_fd('\n', STDOUT_FILENO);
 	i = 0;
 	while (i < node->childs_size)

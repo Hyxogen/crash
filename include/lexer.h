@@ -116,7 +116,6 @@ int			lexer_recurse(t_lexer *lex);
 
 int			lexer_lex(t_lexer *lex, t_token *tok);
 int			lexer_heredoc(t_lexer *lex, t_token *tok, const char *end);
-int			lexer_ioend(t_lexer *lex);
 void		lexer_debug(void);
 
 #endif

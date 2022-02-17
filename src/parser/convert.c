@@ -6,15 +6,14 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/16 14:13:22 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/16 14:13:59 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/17 11:21:45 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
 #include <libft.h>
 
-static const char	*g_pr_keywords[] = {
+static const char	*g_keywords[] = {
 	"if",
 	"then",
 	"else",
@@ -33,74 +32,83 @@ static const char	*g_pr_keywords[] = {
 	"in"
 };
 
-/* TODO */
 static int
-	pr_is_name(t_token *token)
-{
-	(void) token;
-	return (1);
-}
-
-int
-	pr_convert_io_number(t_parser *pr, t_token *token)
+	pr_is_name(const char *str, size_t size)
 {
 	size_t	i;
 
-	if (pr->lexer->ch1 != '<' && pr->lexer->ch1 != '>')
-		return (0);
 	i = 0;
-	while (i < token->length)
+	while (i < size)
 	{
-		if (!ft_isdigit(token->string[i]))
+		if (!ft_isalnum(str[i]) && str[i] != '_')
 			return (0);
 		i += 1;
 	}
-	token->id = tk_ionumber;
 	return (1);
 }
 
-int
-	pr_convert_keyword(t_parser *pr, t_token *token)
+/* rule 1 */
+void
+	pr_convert_reserved(t_parser *pr, t_token *token)
 {
 	size_t	i;
+
+	i = 0;
+	while (i < sizeof(g_keywords) / sizeof(*g_keywords))
+	{
+		pr_convert_keyword(pr, token, kw_if + i);
+		i += 1;
+	}
+}
+
+/* rule 4, 6 */
+int
+	pr_convert_keyword(t_parser *pr, t_token *token, t_token_id id)
+{
 	size_t	len;
 
 	(void) pr;
-	i = 0;
-	while (i < 16)
+	len = ft_strlen(g_keywords[kw_if - id]);
+	if (ft_memcmp(g_keywords[kw_if - id], token->string, len + 1) == 0)
 	{
-		len = ft_strlen(g_pr_keywords[i]);
-		if (len == token->length && ft_memcmp(g_pr_keywords[i], token->string, len) == 0)
-		{
-			token->id = i + kw_if;
-			return (1);
-		}
-	}
-	return (0);
-}
-
-int
-	pr_convert_7b(t_parser *pr, t_token *token)
-{
-	(void) pr;
-	if (token->length >= 1 && *token->string == '=')
-		return (0);
-	if (ft_memchr(token->string, '=', token->length) != NULL)
-	{
-		token->id = tk_assword;
+		token->id = id;
 		return (1);
 	}
 	return (0);
 }
 
+/* rule 5 */
 int
 	pr_convert_name(t_parser *pr, t_token *token)
 {
 	(void) pr;
-	if (pr_is_name(token))
+	if (pr_is_name(token->string, token->length))
 	{
 		token->id = tk_name;
 		return (1);
+	}
+	return (0);
+}
+
+/* rule 7 */
+int
+	pr_convert_ass(t_parser *pr, t_token *token, int first)
+{
+	char	*end;
+
+	end = ft_memchr(token->string, '=', token->length);
+	if (end != NULL)
+	{
+		if (token->string[0] == '=')
+			return (0);
+		if (!pr_is_name(token->string, end - token->string))
+			return (0);
+		token->id = tk_assword;
+		return (1);
+	}
+	else if (first)
+	{
+		pr_convert_reserved(pr, token);
 	}
 	return (0);
 }

@@ -303,7 +303,7 @@ SIMPLE_TEST(pr_io_redirect) {
 	pr_next_token(&pr);
 	ASSERT_EQUAL(0, pr_io_redirect(&pr, node));
 	node_destroy(node);
-/* TODO Add io number tests
+
 	node = snode(sx_none);
 	clear_tokens();
 	add_token(tk_word, "0");
@@ -318,7 +318,21 @@ SIMPLE_TEST(pr_io_redirect) {
 	ASSERT_EQUAL(sx_io_number, node->childs[0]->childs[0]->type);
 	ASSERT_EQUAL(sx_io_file, node->childs[0]->childs[1]->type);
 	node_destroy(node);
-*/
+
+	node = snode(sx_none);
+	clear_tokens();
+	add_token(tk_word, "0");
+	add_token(op_great, ">");
+	add_token(tk_word, "beemovie.txt");
+	add_token(op_and, "&&");
+	pr_next_token(&pr);
+	ASSERT_EQUAL(1, pr_io_redirect(&pr, node));
+	ASSERT_EQUAL((size_t) 1, node->childs_size);
+	ASSERT_EQUAL(sx_io_redirect, node->childs[0]->type);
+	ASSERT_EQUAL((size_t) 2, node->childs[0]->childs_size);
+	ASSERT_EQUAL(sx_io_number, node->childs[0]->childs[0]->type);
+	ASSERT_EQUAL(sx_io_file, node->childs[0]->childs[1]->type);
+	node_destroy(node);
 }
 
 SIMPLE_TEST(pr_cmd_suffix) {

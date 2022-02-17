@@ -1,6 +1,6 @@
 NAME			:= minishell
 
-FILE_NAMES		:= main.c memory.c assert.c lexer/expand.c lexer/init.c lexer/input.c lexer/lexer.c lexer/operator.c lexer/quote.c lexer/read.c lexer/recurse.c lexer/debug.c lexer/util.c parser/parser.c pr_debug.c
+FILE_NAMES		:= main.c memory.c assert.c lexer/expand.c lexer/init.c lexer/input.c lexer/lexer.c lexer/operator.c lexer/quote.c lexer/read.c lexer/recurse.c lexer/debug.c parser/parser.c parser/convert.c pr_debug.c
 
 CC				:= cc
 LINK_CMD		:= cc

@@ -95,7 +95,7 @@ static int
 	if (lex->tok->xps[lex->tok->count - 1].id == xp_arithmetic)
 		return (lex->cur == ')' && lex->next == ')' && !lexer_quoted(lex));
 	if (lex->end != NULL)
-		return (lexer_ioend(lex));
+		return (lex->cur == -1 && input_ioend(lex->in, lex->end));
 	is_end = ft_strchr(space, lex->cur) != NULL && lex->cur != '\0';
 	return ((is_end && !lexer_quoted(lex)) || lex->cur == -1);
 }

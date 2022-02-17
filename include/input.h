@@ -21,5 +21,6 @@ struct s_input
 
 char	*input_readline(t_readline *rl, const char *prompt);
 int		input_readchar(t_input *in);
+int		input_ioend(t_input *in, const char *end);
 
 #endif

@@ -33,3 +33,15 @@ int
 	}
 	return (c);
 }
+
+int
+	input_ioend(t_input *in, const char *end)
+{
+	if (in->line == NULL && in->more)
+		in->line = input_readline(&in->rl, "> ");
+	else if (in->line == NULL)
+		in->line = input_readline(&in->rl, "$ ");
+	if (in->line == NULL)
+		return (1);
+	return (ft_memcmp(in->line, end, ft_strlen(end) + 1) == 0);
+}

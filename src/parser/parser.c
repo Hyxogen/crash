@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/17 11:22:52 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/17 11:48:56 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,9 +137,19 @@ void
 int
 	pr_next_token(t_parser *pr)
 {
-	pr->current = sh_safe_malloc(sizeof(t_token));
-	sh_assert(pr->current != NULL);
-	pr->current_ret = lexer_lex(pr->lexer, pr->current);
+	if (!pr->next_ret)
+	{
+		pr->next = sh_safe_malloc(sizeof(t_token));
+		pr->next_ret = lexer_lex(pr->lexer, pr->current);
+		return (pr_next_token(pr));
+	}
+	pr->current = pr->next;
+	pr->current_ret = pr->next_ret;
+	if (pr->current->id != tk_newline)
+	{
+		pr->next = sh_safe_malloc(sizeof(t_token));
+		pr->next_ret = lexer_lex(pr->lexer, pr->current);
+	}
 	return (pr->current_ret);
 }
 
@@ -330,12 +340,147 @@ int
 }
 
 int
+	pr_do_group(t_parser *pr, t_snode *parent)
+{
+	t_snode *node;
+	
+	node = snode(sx_do_group);
+	pr_convert_reserved(pr, pr->current);
+	if (pr_token(pr, NULL, sx_do_group, kw_do))
+	{
+		if (pr_compound_list(pr, node))
+		{
+			pr_convert_reserved(pr, pr->current);
+			if (pr_token(pr, NULL, sx_do_group, kw_done))
+			{
+				node_add_child(parent, node);
+				return (1);
+			}
+		}
+	}
+	node_destroy(node);
+	return (0);
+}
+
+int
+	pr_while_clause(t_parser *pr, t_snode *parent)
+{
+	t_snode *node;
+	
+	node = snode(sx_while_clause);
+	if (pr_token(pr, NULL, sx_while_clause, kw_while))
+	{
+		if (pr_compound_list(pr, node))
+		{
+			if (pr_do_group(pr, node))
+			{
+				node_add_child(parent, node);
+				return (1);
+			}
+		}
+	}
+	node_destroy(node);
+	return (0);
+}
+
+int
+	pr_until_clause(t_parser *pr, t_snode *parent)
+{
+	t_snode *node;
+	
+	node = snode(sx_until_clause);
+	if (pr_token(pr, NULL, sx_until_clause, kw_until))
+	{
+		if (pr_compound_list(pr, node))
+		{
+			if (pr_do_group(pr, node))
+			{
+				node_add_child(parent, node);
+				return (1);
+			}
+		}
+	}
+	node_destroy(node);
+	return (0);
+}
+
+int
+	pr_else_part(t_parser *pr, t_snode *parent)
+{
+	t_snode *node;
+	
+	node = snode(sx_else_clause);
+	if (pr_token(pr, NULL, sx_else_clause, kw_elif))
+	{
+		if (pr_compound_list(pr, node))
+		{
+			pr_convert_reserved(pr, pr->current);
+			if (pr_token(pr, NULL, sx_if_clause, kw_then))
+			{
+				if (pr_compound_list(pr, node))
+				{
+					pr_convert_reserved(pr, pr->current);
+					if (pr_else_part(pr, node))
+					{
+						node_add_child(parent, node);
+						return (1);
+					}
+				}
+			}
+		}
+	}
+	else if (pr_token(pr, NULL, sx_elif_clause, kw_else))
+	{
+		if (pr_compound_list(pr, node))
+		{
+			node_add_child(parent, node);
+			return (1);
+		}
+	}
+	node_destroy(node);
+	return (0);
+}
+
+int
+	pr_if_clause(t_parser *pr, t_snode *parent)
+{
+	t_snode *node;
+	
+	node = snode(sx_if_clause);
+	if (pr_token(pr, NULL, sx_if_clause, kw_if))
+	{
+		if (pr_compound_list(pr, node))
+		{
+			if (pr_token(pr, NULL, sx_if_clause, kw_then))
+			{
+				if (pr_compound_list(pr, node))
+				{
+					pr_convert_reserved(pr, pr->current);
+					if (pr_else_part(pr, node)
+						|| pr_token(pr, NULL, sx_if_clause, kw_fi))
+					{
+						node_add_child(parent, node);
+						return (1);
+					}
+				}
+			}
+		}
+	}
+	node_destroy(node);
+	return (0);
+}
+
+int
 	pr_compound_cmd(t_parser *pr, t_snode *parent)
 {
 	t_snode	*node;
 
 	node = snode(sx_compound_cmd);
-	if (pr_brace_group(pr, node) || pr_subshell(pr, node))
+	pr_convert_reserved(pr, pr->current);
+	if (pr_brace_group(pr, node)
+		|| pr_subshell(pr, node)
+		|| pr_while_clause(pr, node)
+		|| pr_until_clause(pr, node))
 	{
 		node_add_child(parent, node);
 		return (1);
