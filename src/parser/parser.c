@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/17 15:20:54 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/17 16:05:48 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ and_or separator_op and_or (separator_op and_or (separator_op and_or))
 void	node_destroy(t_snode *node);
 int		pr_compound_list(t_parser *pr, t_snode *parent);
 int		pr_function_def(t_parser *pr, t_snode *parent);
+int		pr_case_clause(t_parser *pr, t_snode *parent);
 
 int
 	pr_convert_io_number(t_parser *pr, t_token *token)
@@ -254,7 +255,7 @@ int
 	node = snode(sx_cmd_prefix);
 	while (pr_io_redirect(pr, node)
 		|| (pr_convert_ass(pr, pr->current, 1)
-			&& pr_token(pr, node, sx_word, tk_assword)))
+			&& pr_token(pr, node, sx_assword, tk_assword)))
 		continue;
 	if (node->childs_size != 0)
 	{
@@ -368,12 +369,12 @@ int
 	
 	node = snode(sx_do_group);
 	pr_convert_reserved(pr, pr->current);
-	if (pr_token(pr, NULL, sx_do_group, kw_do))
+	if (pr_token(pr, NULL, sx_none, kw_do))
 	{
 		if (pr_compound_list(pr, node))
 		{
 			pr_convert_reserved(pr, pr->current);
-			if (pr_token(pr, NULL, sx_do_group, kw_done))
+			if (pr_token(pr, NULL, sx_none, kw_done))
 			{
 				node_add_child(parent, node);
 				return (1);
@@ -390,7 +391,7 @@ int
 	t_snode *node;
 	
 	node = snode(sx_while_clause);
-	if (pr_token(pr, NULL, sx_while_clause, kw_while))
+	if (pr_token(pr, NULL, sx_none, kw_while))
 	{
 		if (pr_compound_list(pr, node))
 		{
@@ -411,7 +412,7 @@ int
 	t_snode *node;
 	
 	node = snode(sx_until_clause);
-	if (pr_token(pr, NULL, sx_until_clause, kw_until))
+	if (pr_token(pr, NULL, sx_none, kw_until))
 	{
 		if (pr_compound_list(pr, node))
 		{
@@ -432,11 +433,11 @@ int
 	t_snode *node;
 	
 	node = snode(sx_else_part);
-	if (pr_token(pr, NULL, sx_else_part, kw_elif))
+	if (pr_token(pr, NULL, sx_none, kw_elif))
 	{
 		if (pr_compound_list(pr, node))
 		{
-			if (pr_token(pr, NULL, sx_if_clause, kw_then))
+			if (pr_token(pr, NULL, sx_none, kw_then))
 			{
 				if (pr_compound_list(pr, node))
 				{
@@ -449,7 +450,7 @@ int
 			}
 		}
 	}
-	else if (pr_token(pr, NULL, sx_else_part, kw_else))
+	else if (pr_token(pr, NULL, sx_none, kw_else))
 	{
 		if (pr_compound_list(pr, node))
 		{
@@ -467,28 +468,97 @@ int
 	t_snode *node;
 	
 	node = snode(sx_if_clause);
-	if (pr_token(pr, NULL, sx_if_clause, kw_if))
+	if (pr_token(pr, NULL, sx_none, kw_if))
 	{
 		if (pr_compound_list(pr, node))
 		{
-			if (pr_token(pr, NULL, sx_if_clause, kw_then))
+			if (pr_token(pr, NULL, sx_none, kw_then))
 			{
 				if (pr_compound_list(pr, node))
 				{
-					if (pr_token(pr, NULL, sx_if_clause, kw_fi))
+					if (pr_token(pr, NULL, sx_none, kw_fi))
 					{
 						node_add_child(parent, node);
 						return (1);
 					}
 					if (pr_else_part(pr, node))
 					{
-						if (pr_token(pr, NULL, sx_if_clause, kw_fi))
+						if (pr_token(pr, NULL, sx_none, kw_fi))
 						{
 							node_add_child(parent, node);
 							return (1);
 						}
 					}
 				}
+			}
+		}
+	}
+	node_destroy(node);
+	return (0);
+}
+
+int
+	pr_wordlist(t_parser *pr, t_snode *parent)
+{
+	t_snode *node;
+
+	node = snode(sx_wordlist);
+	while (pr_token(pr, node, sx_word, tk_word))
+		continue;
+	if (node->childs_size != 0)
+	{
+		node_add_child(parent, node);
+		return (1);
+	}
+	node_destroy(node);
+	return (0);	
+}
+
+int
+	pr_sequential_sep(t_parser *pr, t_snode *parent)
+{
+	(void) parent;
+	if (!pr_token(pr, NULL, sx_none, op_semi)
+		&& !pr_token(pr, NULL, sx_none, tk_newline))
+		return (0);
+	while (pr_token(pr, NULL, sx_newline, tk_newline))
+		continue ;
+	return (1);
+}
+
+int
+	pr_for_clause(t_parser *pr, t_snode *parent)
+{
+	t_snode *node;
+	
+	node = snode(sx_for_clause);
+	if (pr_token(pr, NULL, sx_none, kw_for))
+	{
+		if (pr_convert_name(pr, pr->current))
+		{
+			pr_token(pr, node, sx_for_name, tk_name);
+			while (pr_token(pr, NULL, sx_newline, tk_newline))
+				continue ;
+			pr_convert_reserved(pr, pr->current);
+			if (pr_token(pr, NULL, sx_none, kw_in))
+			{
+				if (pr_wordlist(pr, node))
+				{
+					if (pr_sequential_sep(pr, node))
+					{
+						pr_convert_reserved(pr, pr->current);
+						if (pr_do_group(pr, node))
+						{
+							node_add_child(parent, node);
+							return (1);
+						}
+					}
+				}
+			}
+			else if (pr_do_group(pr, node))
+			{
+				node_add_child(parent, node);
+				return (1);
 			}
 		}
 	}
@@ -509,7 +579,9 @@ int
 		|| pr_subshell(pr, node)
 		|| pr_while_clause(pr, node)
 		|| pr_until_clause(pr, node)
-		|| pr_if_clause(pr, node))
+		|| pr_if_clause(pr, node)
+		|| pr_for_clause(pr, node)
+		|| pr_case_clause(pr, node))
 	{
 		node_add_child(parent, node);
 		return (1);
@@ -657,12 +729,10 @@ int
 			node->flags |= flag_and;
 		else if (pr_token(pr, NULL, sx_semicolon, op_semi))
 			node->flags |= flag_semi;
+		while (pr_token(pr, NULL, sx_newline, tk_newline))
+			node->flags |= flag_newline;
 		if (node->flags)
-		{
-			while (pr_token(pr, NULL, sx_newline, tk_newline))
-				continue ;
 			pr_term(pr, node);
-		}
 		node_add_child(parent, node);
 		return (1);
 	}
@@ -730,6 +800,89 @@ int
 		{
 			node_add_child(parent, node);
 			return (1);
+		}
+	}
+	node_destroy(node);
+	return (0);
+}
+
+int
+	pr_pattern(t_parser *pr, t_snode *parent)
+{
+	if (!pr->current_ret)
+		return (0);
+	if (pr_convert_keyword(pr, pr->current, kw_esac))
+		return (0);
+	pr_token(pr, parent, sx_pattern, tk_word);
+	return (1);
+}
+
+int
+	pr_case_item(t_parser *pr, t_snode *parent)
+{
+	t_snode	*node;
+
+	node = snode(sx_case_item);
+	pr_token(pr, NULL, sx_none, op_lparen);
+	if (pr_pattern(pr, node)
+		&& pr_token(pr, NULL, sx_none, op_rparen))
+	{
+		if (!pr_compound_list(pr, node))
+		{
+			while (pr_token(pr, NULL, sx_none, tk_newline))
+				continue ;
+		}
+		if (pr_token(pr, NULL, sx_none, op_dsemi))
+		{
+			while (pr_token(pr, NULL, sx_none, tk_newline))
+				continue ;
+			node_add_child(parent, node);
+			return (1);
+		}
+	}
+	node_destroy(node);
+	return (0);
+}
+
+int
+	pr_case_list(t_parser *pr, t_snode *parent)
+{
+	t_snode	*node;
+
+	node = snode(sx_case_list);
+	if (pr_case_item(pr, node))
+	{
+		pr_case_list(pr, node);
+		node_add_child(parent, node);
+		return (1);
+	}
+	node_destroy(node);
+	return (0);
+}
+
+int
+	pr_case_clause(t_parser *pr, t_snode *parent)
+{
+	t_snode	*node;
+	
+	if (!pr_token(pr, NULL, sx_none, kw_case))
+		return (0);
+	node = snode(sx_case_clause);
+	if (pr_token(pr, node, sx_word, tk_word))
+	{
+		while (pr_token(pr, NULL, sx_none, tk_newline))
+			continue ;
+		if (pr_convert_keyword(pr, pr->current, kw_in)
+			&& pr_token(pr, NULL, sx_none, kw_in))
+		{
+			while (pr_token(pr, NULL, sx_none, tk_newline))
+				continue ;
+			pr_case_list(pr, node);
+			if (pr_token(pr, NULL, sx_none, kw_esac))
+			{
+				node_add_child(parent, node);
+				return (1);
+			}
 		}
 	}
 	node_destroy(node);

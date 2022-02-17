@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 10:50:42 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/17 15:14:04 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/17 16:06:22 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ enum e_syntax_id
 	sx_newline,
 	sx_newline_list,
 	sx_word,
+	sx_assword,
 	sx_simple_cmd,
 	sx_pipe_sequence,
 	sx_pipeline,
@@ -72,7 +73,14 @@ enum e_syntax_id
 	sx_else_part,
 	sx_function_def,
 	sx_function_body,
-	sx_function_name
+	sx_function_name,
+	sx_case_clause,
+	sx_case_list,
+	sx_case_item,
+	sx_pattern,
+	sx_for_clause,
+	sx_for_name,
+	sx_wordlist
 };
 
 enum e_node_flag
@@ -81,7 +89,8 @@ enum e_node_flag
 	flag_semi = 1 << 1,
 	flag_bang = 1 << 2,
 	flag_and_if = 1 << 3,
-	flag_or_if = 1 << 4
+	flag_or_if = 1 << 4,
+	flag_newline = 1 << 5
 };
 
 typedef enum e_syntax_id	t_syntax_id;

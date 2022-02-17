@@ -12,6 +12,7 @@ int
 	lex->bslash = 0;
 	lex->btick = 0;
 	lex->end = NULL;
+	lex->xp_id = xp_word;
 	return (0);
 }
 

@@ -16,6 +16,7 @@ static const char	*g_sx_names[] = {
 	"sx_newline",
 	"sx_newline_list",
 	"sx_word",
+	"sx_assword",
 	"sx_simple_cmd",
 	"sx_pipe_sequence",
 	"sx_pipeline",
@@ -50,7 +51,14 @@ static const char	*g_sx_names[] = {
 	"sx_else_part",
 	"sx_function_def",
 	"sx_function_body",
-	"sx_function_name"
+	"sx_function_name",
+	"sx_case_clause",
+	"sx_case_list",
+	"sx_case_item",
+	"sx_pattern",
+	"sx_for_clause",
+	"sx_for_name",
+	"sx_wordlist"
 };
 
 int		pr_complete_cmd(t_parser *pr, t_snode *parent);
@@ -69,7 +77,8 @@ static void
 		i += 1;
 	}
 	ft_putstr_fd((char*) g_sx_names[node->type], STDOUT_FILENO);
-	if (!node->childs_size)
+
+	if (!node->childs_size && node->token && node->token->string)
 	{
 		ft_putchar_fd(':', STDOUT_FILENO);
 		ft_putstr_fd((char*) node->token->string, STDOUT_FILENO);
@@ -117,9 +126,8 @@ void
 	{
 		pr_next_token(&pr);
 		node = pr_parse(&pr);
-		if (node == NULL)
-			break ;
-		pr_print(node, 0);
+		if (node != NULL)
+			pr_print(node, 0);
 	}
 	free(in.line);
 }

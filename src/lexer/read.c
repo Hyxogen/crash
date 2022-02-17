@@ -6,13 +6,15 @@ static void
 {
 	if (lex->bslash && esc)
 	{
-		*string = sh_safe_realloc(*string, *length, *length + 1);
+		*string = sh_safe_realloc(*string, *length, *length + 2);
 		(*string)[*length] = '\\';
 		*length += 1;
+		(*string)[*length] = '\0';
 	}
-	*string = sh_safe_realloc(*string, *length, *length + 1);
+	*string = sh_safe_realloc(*string, *length, *length + 2);
 	(*string)[*length] = lex->cur;
 	*length += 1;
+	(*string)[*length] = '\0';
 }
 
 static void

@@ -81,21 +81,23 @@ struct s_token
 
 struct s_lexer
 {
-	t_input		*in;
-	t_token		*tok;
-	int			cur;
-	int			next;
-	int			quote;
-	int			bslash;
-	int			btick;
-	const char	*end;
+	t_input			*in;
+	t_token			*tok;
+	int				cur;
+	int				next;
+	int				quote;
+	int				bslash;
+	int				btick;
+	const char		*end;
+	t_expansion_id	xp_id;
 };
 
 struct s_lexer_state
 {
-	int			quote;
-	int			was_word;
-	const char	*end;
+	int				quote;
+	int				was_word;
+	const char		*end;
+	t_expansion_id	xp_id;
 };
 
 int			lexer_new(t_lexer *lex, t_input *in);

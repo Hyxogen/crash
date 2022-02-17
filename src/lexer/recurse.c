@@ -44,7 +44,7 @@ static int
 	}
 	if (lex->cur == '$' && !lex->btick)
 	{
-		return lexer_special_dollar(lex);
+		return (lexer_special_dollar(lex));
 	}
 	if (lex->cur == '`' && !lex->btick)
 	{
@@ -88,11 +88,11 @@ static int
 	static const char	*space = "\n\t\r\v\f &();<>|";
 	int					is_end;
 
-	if (lex->tok->xps[lex->tok->count - 1].id == xp_command)
+	if (lex->xp_id == xp_command)
 		return (lex->cur == ')' && !lexer_quoted(lex));
-	if (lex->tok->xps[lex->tok->count - 1].id == xp_parameter)
+	if (lex->xp_id == xp_parameter)
 		return (lex->cur == '}' && !lexer_quoted(lex));
-	if (lex->tok->xps[lex->tok->count - 1].id == xp_arithmetic)
+	if (lex->xp_id == xp_arithmetic)
 		return (lex->cur == ')' && lex->next == ')' && !lexer_quoted(lex));
 	if (lex->end != NULL)
 		return (lex->cur == -1 && input_ioend(lex->in, lex->end));

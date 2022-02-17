@@ -26,8 +26,10 @@ static void
 	state->quote = lex->quote;
 	state->was_word = 0;
 	state->end = lex->end;
+	state->xp_id = lex->xp_id;
 	lex->quote = 0;
 	lex->end = NULL;
+	lex->xp_id = id;
 	if (lex->tok->xps[lex->tok->count - 1].id == xp_word)
 	{
 		xp = lexer_expand(lex->tok);
@@ -46,6 +48,7 @@ static void
 	tok = lex->tok;
 	lex->quote = state->quote;
 	lex->end = state->end;
+	lex->xp_id = state->xp_id;
 	if (state->was_word)
 	{
 		xp = lexer_expand(lex->tok);
