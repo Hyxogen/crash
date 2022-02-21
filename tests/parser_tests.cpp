@@ -39,7 +39,7 @@ size_t get_size();
 
 void parser_setup(t_parser &parser) {
 	std::memset(&parser, 0, sizeof(t_parser));
-	parser.lexer = (t_lexer *) std::malloc(sizeof(t_lexer));
+	parser.lexer = (t_lexer *) std::sh_safe_malloc(sizeof(t_lexer));
 }
 
 void parser_destroy(t_parser &parser) {
