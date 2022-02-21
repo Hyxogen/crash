@@ -6,11 +6,12 @@
 /*   By: csteenvo <csteenvo@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/01/18 13:30:46 by csteenvo      #+#    #+#                 */
-/*   Updated: 2022/01/18 13:30:46 by csteenvo      ########   odam.nl         */
+/*   Updated: 2022/02/21 15:19:22 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+#include "../../include/memory.h"
 #include <stdlib.h>
 
 char
@@ -24,7 +25,7 @@ char
 		return (NULL);
 	len1 = ft_strlen(str1);
 	len2 = ft_strlen(str2);
-	res = malloc(len1 + len2 + 1);
+	res = sh_safe_malloc(len1 + len2 + 1);
 	if (res == NULL)
 		return (NULL);
 	ft_memcpy(res, str1, len1);

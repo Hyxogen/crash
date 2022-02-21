@@ -6,11 +6,12 @@
 /*   By: csteenvo <csteenvo@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/01/18 13:30:49 by csteenvo      #+#    #+#                 */
-/*   Updated: 2022/01/18 13:30:49 by csteenvo      ########   odam.nl         */
+/*   Updated: 2022/02/21 15:19:28 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+#include "../../include/memory.h"
 #include <stdlib.h>
 
 char
@@ -26,7 +27,7 @@ char
 		idx = len;
 	if (idx + max >= len)
 		max = len - idx;
-	res = malloc(max + 1);
+	res = sh_safe_malloc(max + 1);
 	if (res == NULL)
 		return (NULL);
 	ft_memcpy(res, str + idx, max);

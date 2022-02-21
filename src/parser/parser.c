@@ -6,12 +6,13 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/21 14:24:48 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/21 15:28:28 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
+#include "memory.h"
 #include <stdlib.h>
 #include <libft.h>
 
@@ -113,6 +114,18 @@ void
 	free(node);
 }
 
+void
+	pr_process_here(void *data, void *pr)
+{
+	//TODO process heredoc
+}
+
+void
+	pr_nop(void *param)
+{
+	(void)param;
+}
+
 int
 	pr_next_token(t_parser *pr)
 {
@@ -129,6 +142,11 @@ int
 		pr->next = sh_safe_malloc(sizeof(t_token));
 		pr->next_ret = lexer_lex(pr->lexer, pr->next);
 		pr_convert_io_number(pr, pr->next);
+	}
+	else if (pr->current_ret && ft_lstsize(pr->here_docs))
+	{
+		ft_lstforeach(pr->here_docs, pr_process_here, pr);
+		ft_lstclear(&pr->here_docs, pr_nop);
 	}
 	else
 		pr->next_ret = 0;
@@ -182,8 +200,25 @@ int
 int
 	pr_io_here(t_parser *pr, t_snode *parent)
 {
-	(void) pr;
-	(void) parent;
+	t_snode	*node;
+
+	node = snode(sx_io_here);
+	if (pr_token(pr, NULL, sx_none, op_dless)
+		&& pr_token(pr, node, sx_word, tk_word))
+	{
+		ft_lstadd_back(&pr->here_docs, ft_lstnew(node->childs[0]));
+		node_add_child(parent, node);
+		return (1);
+	}
+	else if (pr_token(pr, NULL, sx_none, op_dlessdash)
+		&& pr_token(pr, node, sx_word, tk_word))
+	{
+		node->childs[0]->flags |= flag_trim;
+		ft_lstadd_back(&pr->here_docs, ft_lstnew(node->childs[0]));
+		node_add_child(parent, node);
+		return (1);
+	}
+	node_destroy(node);
 	return (0);
 }
 
@@ -242,25 +277,25 @@ int
 		return (1);
 	}
 	node_destroy(node);
-	return (0);	
+	return (0);
 }
 
 int
 	pr_cmd_suffix(t_parser *pr, t_snode *parent)
 {
-	t_snode *node;
+	t_snode	*node;
 
 	node = snode(sx_cmd_suffix);
 	while (pr_io_redirect(pr, node)
 		|| pr_token(pr, node, sx_word, tk_word))
-		continue;
+		continue ;
 	if (node->childs_size != 0)
 	{
 		node_add_child(parent, node);
 		return (1);
 	}
 	node_destroy(node);
-	return (0);	
+	return (0);
 }
 
 int
@@ -289,14 +324,14 @@ int
 
 	node = snode(sx_cmd_suffix);
 	while (pr_io_redirect(pr, node))
-		continue;
+		continue ;
 	if (node->childs_size != 0)
 	{
 		node_add_child(parent, node);
 		return (1);
 	}
 	node_destroy(node);
-	return (0);	
+	return (0);
 }
 
 int

@@ -6,11 +6,12 @@
 /*   By: csteenvo <csteenvo@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/01/18 13:30:44 by csteenvo      #+#    #+#                 */
-/*   Updated: 2022/01/18 13:30:44 by csteenvo      ########   odam.nl         */
+/*   Updated: 2022/02/21 15:18:54 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+#include "../../include/memory.h"
 #include <stdlib.h>
 
 static size_t
@@ -53,7 +54,7 @@ char
 	if (FT_SAFE >= 1 && str == NULL)
 		return (NULL);
 	count1 = split(str, ch, NULL);
-	res = malloc(sizeof(*res) * (count1 + 1));
+	res = sh_safe_malloc(sizeof(*res) * (count1 + 1));
 	if (res == NULL)
 		return (NULL);
 	count2 = split(str, ch, res);

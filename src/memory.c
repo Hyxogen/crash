@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/08 09:17:46 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/16 13:30:31 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/21 15:17:37 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void
 	*sh_safe_malloc(size_t size) {
 	void	*ptr;
 
-	ptr = malloc(size);
+	ptr = sh_safe_malloc(size);
 	sh_assert(ptr != NULL);
 	return (ptr);
 }

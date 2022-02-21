@@ -61,7 +61,8 @@ static const char	*g_sx_names[] = {
 	"sx_for_name",
 	"sx_wordlist",
 	"sx_condition",
-	"sx_elif_part"
+	"sx_elif_part",
+	"sx_io_here"
 };
 
 int		pr_complete_cmd(t_parser *pr, t_snode *parent);

@@ -6,7 +6,7 @@
 /*   By: csteenvo <csteenvo@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/01/18 13:30:52 by csteenvo      #+#    #+#                 */
-/*   Updated: 2022/01/18 13:31:01 by csteenvo      ########   odam.nl         */
+/*   Updated: 2022/02/21 15:46:41 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ int		ft_memcmp(const void *ptr1, const void *ptr2, size_t size);
 /* malloc */
 void	*ft_calloc(size_t count, size_t size);
 char	*ft_strdup(const char *str);
+char	*ft_strndup(const char *str, size_t n);
 
 /* strings 2 */
 char	*ft_substr(const char *str, unsigned int idx, size_t max);
@@ -81,5 +82,7 @@ void	ft_lstadd_back(t_list **lst, t_list *new);
 void	ft_lstdelone(t_list *lst, void (*del)(void *));
 void	ft_lstclear(t_list **lst, void (*del)(void *));
 void	ft_lstiter(t_list *lst, void (*func)(void *));
+void	ft_lstforeach(const t_list *lst,
+			void (*proc)(void *, void *), void *param);
 t_list	*ft_lstmap(t_list *lst, void *(*func)(void *), void (*del)(void *));
 #endif

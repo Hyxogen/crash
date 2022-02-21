@@ -6,12 +6,14 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 11:30:58 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/21 11:33:17 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/21 15:10:13 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PARSER_H
 # define PARSER_H
+
+# include "libft.h"
 
 enum e_syntax_id
 {
@@ -71,7 +73,8 @@ enum e_syntax_id
 	sx_for_name,
 	sx_wordlist,
 	sx_condition,
-	sx_elif_part
+	sx_elif_part,
+	sx_io_here
 };
 
 enum e_node_flag
@@ -81,7 +84,8 @@ enum e_node_flag
 	flag_bang = 1 << 2,
 	flag_and_if = 1 << 3,
 	flag_or_if = 1 << 4,
-	flag_newline = 1 << 5
+	flag_newline = 1 << 5,
+	flag_trim = 1 << 6
 };
 
 typedef enum e_syntax_id	t_syntax_id;
@@ -98,6 +102,7 @@ struct s_parser
 	t_snode		*syntax_tree;
 	t_snode		*current_node;
 	t_lexer		*lexer;
+	t_list		*here_docs;
 };
 
 struct s_snode

@@ -1,38 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   input.h                                            :+:    :+:            */
+/*   memory.h                                           :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/02/21 15:30:57 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/21 15:30:57 by dmeijer       ########   odam.nl         */
+/*   Created: 2022/02/21 15:13:24 by dmeijer       #+#    #+#                 */
+/*   Updated: 2022/02/21 15:17:37 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef INPUT_H
-# define INPUT_H
+#ifndef MEMORY_H
+# define MEMORY_H
 
-# include <stddef.h>
+# include <sys/types.h>
 
-typedef struct s_readline	t_readline;
-typedef struct s_input		t_input;
-
-struct s_readline
-{
-	int	warning_silencer;
-};
-
-struct s_input
-{
-	t_readline	rl;
-	char		*line;
-	size_t		index;
-	int			more;
-};
-
-char	*input_readline(t_readline *rl, const char *prompt);
-int		input_readchar(t_input *in);
-int		input_ioend(t_input *in, const char *end);
+void	*sh_safe_malloc(size_t size);
+void	*sh_safe_realloc(void *ptr, size_t old_size, size_t new_size);
 
 #endif

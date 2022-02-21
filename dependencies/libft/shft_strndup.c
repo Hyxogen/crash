@@ -1,38 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   input.h                                            :+:    :+:            */
+/*   ft_strndup.c                                       :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/02/21 15:30:57 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/21 15:30:57 by dmeijer       ########   odam.nl         */
+/*   Created: 2022/02/21 15:46:49 by dmeijer       #+#    #+#                 */
+/*   Updated: 2022/02/21 15:47:46 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef INPUT_H
-# define INPUT_H
+#include "libft.h"
 
-# include <stddef.h>
+#include "../../include/memory.h"
 
-typedef struct s_readline	t_readline;
-typedef struct s_input		t_input;
-
-struct s_readline
+char
+	*ft_strndup(const char *s1, size_t n)
 {
-	int	warning_silencer;
-};
+	size_t		len;
+	char		*dup;
+	const char	*cpy;
 
-struct s_input
-{
-	t_readline	rl;
-	char		*line;
-	size_t		index;
-	int			more;
-};
-
-char	*input_readline(t_readline *rl, const char *prompt);
-int		input_readchar(t_input *in);
-int		input_ioend(t_input *in, const char *end);
-
-#endif
+	len = 0;
+	cpy = s1;
+	while (*cpy && n)
+	{
+		len++;
+		cpy++;
+		n--;
+	}
+	dup = sh_safe_malloc(len + 1);
+	if (dup == NULL)
+		return (NULL);
+	ft_memcpy(dup, s1, len);
+	dup[len] = '\0';
+	return (dup);
+}

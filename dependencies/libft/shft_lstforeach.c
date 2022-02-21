@@ -1,38 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   input.h                                            :+:    :+:            */
+/*   shft_lstforeach.c                                  :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/02/21 15:30:57 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/21 15:30:57 by dmeijer       ########   odam.nl         */
+/*   Created: 2022/02/21 15:23:19 by dmeijer       #+#    #+#                 */
+/*   Updated: 2022/02/21 15:27:29 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef INPUT_H
-# define INPUT_H
+#include "libft.h"
 
-# include <stddef.h>
-
-typedef struct s_readline	t_readline;
-typedef struct s_input		t_input;
-
-struct s_readline
+void
+	ft_lstforeach(const t_list *lst, void (*proc)(void *, void *), void *param)
 {
-	int	warning_silencer;
-};
-
-struct s_input
-{
-	t_readline	rl;
-	char		*line;
-	size_t		index;
-	int			more;
-};
-
-char	*input_readline(t_readline *rl, const char *prompt);
-int		input_readchar(t_input *in);
-int		input_ioend(t_input *in, const char *end);
-
-#endif
+	while (lst)
+	{
+		proc(lst->content, param);
+		lst = lst->next;
+	}
+}

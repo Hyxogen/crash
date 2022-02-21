@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 10:50:42 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/21 11:34:25 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/21 15:14:12 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 /* https://pubs.opengroup.org/onlinepubs/009656399/toc.pdf */
 
-# include <stddef.h>
 # include "lexer.h"
 
 # ifdef SH_DEBUG
@@ -33,9 +32,6 @@ struct s_minishell
 
 char	*sh_readline(t_readline *rl, const char *prompt);
 int		sh_readchar(t_input *in);
-
-void	*sh_safe_malloc(size_t size);
-void	*sh_safe_realloc(void *ptr, size_t old_size, size_t new_size);
 
 void	pr_debug(void);
 
