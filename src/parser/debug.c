@@ -58,7 +58,9 @@ static const char	*g_sx_names[] = {
 	"sx_pattern",
 	"sx_for_clause",
 	"sx_for_name",
-	"sx_wordlist"
+	"sx_wordlist",
+	"sx_condition",
+	"sx_elif_part"
 };
 
 int		pr_complete_cmd(t_parser *pr, t_snode *parent);
@@ -128,6 +130,8 @@ void
 		node = pr_parse(&pr);
 		if (node != NULL)
 			pr_print(node, 0);
+		else
+			break ;
 	}
 	free(in.line);
 }

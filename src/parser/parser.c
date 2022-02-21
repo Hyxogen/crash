@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/17 16:05:48 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/21 11:25:10 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,7 +158,8 @@ int
 }
 
 int
-	pr_token(t_parser *pr, t_snode *parent, t_syntax_id syn_id, t_token_id tk_id)
+	pr_token(t_parser *pr, t_snode *parent,
+		t_syntax_id syn_id, t_token_id tk_id)
 {
 	t_snode *node;
 
@@ -366,7 +367,7 @@ int
 	pr_do_group(t_parser *pr, t_snode *parent)
 {
 	t_snode *node;
-	
+
 	node = snode(sx_do_group);
 	pr_convert_reserved(pr, pr->current);
 	if (pr_token(pr, NULL, sx_none, kw_do))
@@ -389,7 +390,7 @@ int
 	pr_while_clause(t_parser *pr, t_snode *parent)
 {
 	t_snode *node;
-	
+
 	node = snode(sx_while_clause);
 	if (pr_token(pr, NULL, sx_none, kw_while))
 	{
@@ -410,7 +411,7 @@ int
 	pr_until_clause(t_parser *pr, t_snode *parent)
 {
 	t_snode *node;
-	
+
 	node = snode(sx_until_clause);
 	if (pr_token(pr, NULL, sx_none, kw_until))
 	{
@@ -428,31 +429,72 @@ int
 }
 
 int
+	pr_condition(t_parser *pr, t_snode *parent)
+{
+	t_snode	*node;
+
+	node = snode(sx_condition);
+	if (pr_compound_list(pr, node))
+	{
+		node_add_child(parent, node);
+		return (1);
+	}
+	node_destroy(node);
+	return (0);
+}
+
+int
+	pr_elif_part(t_parser *pr, t_snode *parent)
+{
+	t_snode	*node;
+
+	node = snode(sx_elif_part);
+	if (pr_token(pr, NULL, sx_none, kw_elif)
+		&& pr_condition(pr, node) && pr_token(pr, NULL, sx_none, kw_then)
+		&& pr_compound_list(pr, node))
+	{
+		node_add_child(parent, node);
+		return (1);
+	}
+	node_destroy(node);
+	return (0);
+}
+
+int
 	pr_else_part(t_parser *pr, t_snode *parent)
 {
-	t_snode *node;
-	
+	t_snode	*node;
+
 	node = snode(sx_else_part);
-	if (pr_token(pr, NULL, sx_none, kw_elif))
+	if (pr_token(pr, NULL, sx_none, kw_else)
+		&& pr_compound_list(pr, node))
 	{
-		if (pr_compound_list(pr, node))
-		{
-			if (pr_token(pr, NULL, sx_none, kw_then))
-			{
-				if (pr_compound_list(pr, node))
-				{
-					if (pr_else_part(pr, node))
-					{
-						node_add_child(parent, node);
-						return (1);
-					}
-				}
-			}
-		}
+		node_add_child(parent, node);
+		return (1);
 	}
-	else if (pr_token(pr, NULL, sx_none, kw_else))
+	node_destroy(node);
+	return (0);
+}
+
+int
+	pr_if_clause(t_parser *pr, t_snode *parent)
+{
+	t_snode	*node;
+
+	node = snode(sx_if_clause);
+	if (pr_token(pr, NULL, sx_none, kw_if)
+		&& pr_condition(pr, node) && pr_token(pr, NULL, sx_none, kw_then)
+		&& pr_compound_list(pr, node))
 	{
-		if (pr_compound_list(pr, node))
+		if (pr_token(pr, NULL, sx_none, kw_fi))
+		{
+			node_add_child(parent, node);
+			return (1);
+		}
+		while (pr_elif_part(pr, node))
+			continue ;
+		pr_else_part(pr, node);
+		if (pr_token(pr, NULL, sx_none, kw_fi))
 		{
 			node_add_child(parent, node);
 			return (1);
@@ -463,55 +505,20 @@ int
 }
 
 int
-	pr_if_clause(t_parser *pr, t_snode *parent)
-{
-	t_snode *node;
-	
-	node = snode(sx_if_clause);
-	if (pr_token(pr, NULL, sx_none, kw_if))
-	{
-		if (pr_compound_list(pr, node))
-		{
-			if (pr_token(pr, NULL, sx_none, kw_then))
-			{
-				if (pr_compound_list(pr, node))
-				{
-					if (pr_token(pr, NULL, sx_none, kw_fi))
-					{
-						node_add_child(parent, node);
-						return (1);
-					}
-					if (pr_else_part(pr, node))
-					{
-						if (pr_token(pr, NULL, sx_none, kw_fi))
-						{
-							node_add_child(parent, node);
-							return (1);
-						}
-					}
-				}
-			}
-		}
-	}
-	node_destroy(node);
-	return (0);
-}
-
-int
 	pr_wordlist(t_parser *pr, t_snode *parent)
 {
-	t_snode *node;
+	t_snode	*node;
 
 	node = snode(sx_wordlist);
 	while (pr_token(pr, node, sx_word, tk_word))
-		continue;
+		continue ;
 	if (node->childs_size != 0)
 	{
 		node_add_child(parent, node);
 		return (1);
 	}
 	node_destroy(node);
-	return (0);	
+	return (0);
 }
 
 int
@@ -529,37 +536,27 @@ int
 int
 	pr_for_clause(t_parser *pr, t_snode *parent)
 {
-	t_snode *node;
-	
+	t_snode	*node;
+
 	node = snode(sx_for_clause);
-	if (pr_token(pr, NULL, sx_none, kw_for))
+	if (pr_token(pr, NULL, sx_none, kw_for)
+		&& pr_convert_name(pr, pr->current))
 	{
-		if (pr_convert_name(pr, pr->current))
+		pr_token(pr, node, sx_for_name, tk_name);
+		while (pr_token(pr, NULL, sx_newline, tk_newline))
+			continue ;
+		if (pr_convert_reserved(pr, pr->current)
+			&& pr_token(pr, NULL, sx_none, kw_in)
+			&& pr_wordlist(pr, node) && pr_sequential_sep(pr, node)
+			&& pr_convert_reserved(pr, pr->current) && pr_do_group(pr, node))
 		{
-			pr_token(pr, node, sx_for_name, tk_name);
-			while (pr_token(pr, NULL, sx_newline, tk_newline))
-				continue ;
-			pr_convert_reserved(pr, pr->current);
-			if (pr_token(pr, NULL, sx_none, kw_in))
-			{
-				if (pr_wordlist(pr, node))
-				{
-					if (pr_sequential_sep(pr, node))
-					{
-						pr_convert_reserved(pr, pr->current);
-						if (pr_do_group(pr, node))
-						{
-							node_add_child(parent, node);
-							return (1);
-						}
-					}
-				}
-			}
-			else if (pr_do_group(pr, node))
-			{
-				node_add_child(parent, node);
-				return (1);
-			}
+			node_add_child(parent, node);
+			return (1);
+		}
+		else if (pr_do_group(pr, node))
+		{
+			node_add_child(parent, node);
+			return (1);
 		}
 	}
 	node_destroy(node);
@@ -663,9 +660,11 @@ int
 	node = snode(sx_and_or);
 	if (pr_pipeline(pr, node))
 	{
-		node->flags |= flag_and_if * pr_token(pr, NULL, sx_and_if, op_andif)
-			+ flag_or_if * pr_token(pr, NULL, sx_or_if, op_orif);
-		if (!(node->flags & flag_or_if) != !(node->flags & flag_and_if))
+		if (pr_token(pr, NULL, sx_and_if, op_andif))
+			node->flags |= flag_and_if;
+		else if (pr_token(pr, NULL, sx_or_if, op_orif))
+			node->flags |= flag_or_if;
+		if (node->flags)
 		{
 			while (pr_token(pr, NULL, sx_newline, tk_newline))
 				continue ;
@@ -707,11 +706,16 @@ int
 {
 	t_snode	*node;
 
+	if (!pr->current_ret)
+		return (0);
 	node = snode(sx_complete_cmd);
 	if (pr_list(pr, node))
 	{
-		node_add_child(parent, node);
-		return (1);
+		if (!pr->next_ret)
+		{
+			node_add_child(parent, node);
+			return (1);
+		}
 	}
 	node_destroy(node);
 	return (0);
@@ -864,7 +868,7 @@ int
 	pr_case_clause(t_parser *pr, t_snode *parent)
 {
 	t_snode	*node;
-	
+
 	if (!pr_token(pr, NULL, sx_none, kw_case))
 		return (0);
 	node = snode(sx_case_clause);

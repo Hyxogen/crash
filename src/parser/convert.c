@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/16 14:13:22 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/17 14:32:17 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/21 11:02:23 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ static int
 }
 
 /* rule 1 */
-void
+int
 	pr_convert_reserved(t_parser *pr, t_token *token)
 {
 	size_t	i;
@@ -56,9 +56,11 @@ void
 	i = 0;
 	while (i < sizeof(g_keywords) / sizeof(*g_keywords))
 	{
-		pr_convert_keyword(pr, token, kw_if + i);
+		if (pr_convert_keyword(pr, token, kw_if + i))
+			return (1);
 		i += 1;
 	}
+	return (0);
 }
 
 /* rule 4, 6 */
