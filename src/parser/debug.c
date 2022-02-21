@@ -1,4 +1,5 @@
 #include "minishell.h"
+#include "parser.h"
 #include <unistd.h>
 #include <libft.h>
 #include <stdlib.h>

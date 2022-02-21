@@ -6,11 +6,12 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/16 14:13:22 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/21 11:02:23 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/21 11:32:50 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "parser.h"
 #include <libft.h>
 
 static const char	*g_keywords[] = {
