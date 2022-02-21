@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 10:50:42 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/17 16:06:22 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/21 11:17:17 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,9 @@ enum e_syntax_id
 	sx_pattern,
 	sx_for_clause,
 	sx_for_name,
-	sx_wordlist
+	sx_wordlist,
+	sx_condition,
+	sx_elif_part
 };
 
 enum e_node_flag
@@ -132,7 +134,7 @@ int			sh_readchar(t_input *in);
 void		*sh_safe_malloc(size_t size);
 void		*sh_safe_realloc(void *ptr, size_t old_size, size_t new_size);
 
-void		pr_convert_reserved(t_parser *pr, t_token *token);
+int			pr_convert_reserved(t_parser *pr, t_token *token);
 int			pr_convert_keyword(t_parser *pr, t_token *token, t_token_id id);
 int			pr_convert_name(t_parser *pr, t_token *token);
 int			pr_convert_ass(t_parser *pr, t_token *token, int first);
