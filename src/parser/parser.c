@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/21 11:32:33 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/21 14:24:48 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,29 +14,6 @@
 #include "parser.h"
 #include <stdlib.h>
 #include <libft.h>
-
-/*
-echo "echo Hallo" | bash > test; echo "Running stuff"
-
-[list]
-WORD WORD pipe_op WORD redirect_op WORD separator_op WORD WORD
-
-[list]
-[and_or]																	[separator_op]
-[pipeline]																	[separator_op]	[and_or]
-[pipe_sequence]																[separator_op]	[pipeline]
-[pipe_sequence] [pipe_op] [linebreak] [command]								[separator_op]	[pipe_sequence]
-[command] [pipe_op] [linebreak] [command]									[separator_op]	[command]
-[simple_command] [pipe_op] [linebreak] [simple_command]						[separator_op]	[simple_command]
-[cmd_name] [cmd_suffix] [pipe_op] [linebreak] [cmd_name] [cmd_suffix]		[separator_op]	[cmd_name] [cmd_suffix]
-[word] [word] [pipe_op] [line_break] [word] [io_redirect]					[separator_op]	[word] [word]
-[word] [word] [pipe_op] [line_break] [word] [io_file]						[separator_op]	[word] [word]
-[word] [word] [pipe_op] [line_break] [word] [red_right] [filename]			[separator_op]	[word] [word]
-
-
-and_or separator_op and_or (separator_op and_or (separator_op and_or))
-
-*/
 
 #define SH_DEF_CHILD_SIZE 100
 
