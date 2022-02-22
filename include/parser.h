@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 11:30:58 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/21 15:10:13 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/22 10:57:53 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,5 +122,6 @@ int		pr_convert_name(t_parser *pr, t_token *token);
 int		pr_convert_ass(t_parser *pr, t_token *token, int first);
 
 t_snode	*pr_parse(t_parser *pr);
+void	pr_init(t_parser *pr);
 
 #endif

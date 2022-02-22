@@ -6,7 +6,7 @@
 /*   By: csteenvo <csteenvo@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/01/18 13:30:52 by csteenvo      #+#    #+#                 */
-/*   Updated: 2022/02/21 15:46:41 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/22 11:22:26 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ char	*ft_strchr(const char *str, int ch);
 char	*ft_strrchr(const char *str, int ch);
 int		ft_strncmp(const char *str1, const char *str2, size_t len);
 char	*ft_strnstr(const char *str1, const char *str2, size_t len);
+char	*ft_strstr(const char *str1, const char *str2);
 int		ft_atoi(const char *str);
 
 /* memory */

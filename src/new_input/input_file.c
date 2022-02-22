@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   file_proc.c                                        :+:    :+:            */
+/*   input_file.c                                       :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 15:50:21 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/21 16:19:51 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/22 11:43:15 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ t_file_handle
 }
 
 void
-	close_read_handle(t_file_handle *rh)
+	close_file_handle(t_file_handle *rh)
 {
 	if (rh)
 		free(rh->buf);
@@ -37,7 +37,7 @@ void
 }
 
 static int
-	push_strn(t_file_handle *rh, const char *str, size_t n)
+	_push_strn(t_file_handle *rh, const char *str, size_t n)
 {
 	void	*tmp;
 
@@ -72,7 +72,7 @@ ssize_t
 		read_size = read(fh->fd, &buffer[0], BUFFER_SIZE);
 		if (read_size < 0)
 			return (-1);
-		push_strn(fh, &buffer[0], read_size);
+		_push_strn(fh, &buffer[0], read_size);
 		if (read_size == 0)
 		{
 			tmp = ft_strndup(&fh->buf[fh->beg], fh->end - fh->beg);
