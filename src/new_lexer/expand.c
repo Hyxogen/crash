@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 10:52:43 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 14:39:29 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/22 16:15:13 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ void
 	t_parser	parser;
 	t_snode		*node;
 
+	/* TODO: multiple commands in command subst */
 	lex_init(&lexer);
 	lexer.prev = lex;
 	lexer.id = lx_command;
@@ -49,6 +50,7 @@ void
 	lexer.here_flags = 0;
 	pr_init(&parser);
 	parser.lexer = &lexer;
+	pr_next_token(&parser);
 	node = pr_parse(&parser);
 	part->data = node;
 	part->quote = lex->quote;
@@ -60,6 +62,7 @@ void
 {
 	t_lexer	lexer;
 
+	printf("called here\n");
 	lex_init(&lexer);
 	lexer.prev = lex;
 	lexer.id = lx_normal;

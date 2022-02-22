@@ -66,7 +66,6 @@ static const char	*g_sx_names[] = {
 };
 
 int		pr_complete_cmd(t_parser *pr, t_snode *parent);
-int		pr_next_token(t_parser *pr);
 t_snode	*snode(t_syntax_id syn_id);
 
 static void

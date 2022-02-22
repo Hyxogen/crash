@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 15:06:15 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/22 16:29:20 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,7 @@ void
 
 	pr = param;
 	node = data;
+	printf("processing here: %s\n", node->token->str);
 	lex_here(pr->lexer, pr->current, node->token->str, node->flags);
 	//TODO process heredoc
 }
@@ -161,7 +162,7 @@ int
 		pr->next_ret = lex_lex(pr->lexer, pr->next);
 		pr_convert_io_number(pr, pr->next);
 	}
-	else if (pr->current_ret && ft_lstsize(pr->here_docs))
+	if (pr->current_ret && pr->current->id == tk_newline && ft_lstsize(pr->here_docs))
 	{
 		ft_lstforeach(pr->here_docs, pr_process_here, pr);
 		ft_lstclear(&pr->here_docs, pr_nop);

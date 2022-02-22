@@ -9,7 +9,7 @@ static int
 static int
 	check_op(t_lexer *lex)
 {
-	if (lex->depth == 0 && lex->src->cur == ')')
+	if (lex->depth == 0 && lex->src->cur == ')' && lex->id == lx_command)
 	{
 		lex->tok->id = op_rparen;
 		return (0);
@@ -45,7 +45,8 @@ int
 	if (lex->src->cur == '\n')
 	{
 		tok->id = tk_newline;
-		lex_advance(lex);
+		lex->src->cur = lex->src->nex;
+		lex->src->nex = -1;
 		return (1);
 	}
 	if (lex->src->cur == -1)

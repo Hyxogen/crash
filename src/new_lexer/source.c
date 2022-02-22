@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 11:44:41 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 15:02:09 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/22 15:47:39 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,33 +44,65 @@ ssize_t
 	return (len);
 }
 
+// void
+// 	src_advance(t_source *src)
+// {
+// 	ssize_t	str_len;
+
+// 	if (!src->str || src->off >= src->len || src->nex == -1)
+// 	{
+// 		str_len = _src_next_line(src, &src->str);
+// 		if (str_len <= 0)
+// 		{
+// 			src->str = NULL;
+// 			src->cur = -1;
+// 			src->nex = -1;
+// 			return ;
+// 		}
+// 		src->len = (size_t) str_len;
+// 		src->off = 0;
+// 		src->nex = src->str[0];
+// 		src_advance(src);
+// 		return ;
+// 	}
+// 	src->off += 1;
+// 	src->cur = src->nex;
+// 	if (src->off >= src->len)
+// 		src->nex = '\n';
+// 	else
+// 		src->nex = src->str[src->off];
+// }
+
+int
+	src_readchar(t_source *src)
+{
+	int	c;
+
+	if (src->str == NULL)
+		_src_next_line(src, &src->str);
+	if (src->str == NULL)
+		return (-1);
+	c = (unsigned char) src->str[src->off];
+	src->off += 1;
+	if (c == '\0')
+	{
+		free(src->str);
+		src->str = NULL;
+		src->off = 0;
+		return ('\n');
+	}
+	return (c);
+}
+
 void
 	src_advance(t_source *src)
 {
-	ssize_t	str_len;
-
-	if (!src->str || src->off >= src->len)
-	{
-		str_len = _src_next_line(src, &src->str);
-		if (str_len <= 0)
-		{
-			src->str = NULL;
-			src->cur = -1;
-			src->nex = 0;
-			return ;
-		}
-		src->len = (size_t) str_len;
-		src->off = 0;
-		src->nex = src->str[0];
-		src_advance(src);
-		return ;
-	}
-	src->off += 1;
 	src->cur = src->nex;
-	if (src->off >= src->len)
-		src->nex = 0;
-	else
-		src->nex = src->str[src->off];
+	src->nex = -1;
+	if (src->cur == -1)
+		src->cur = src_readchar(src);
+	if (src->cur != -1 && src->cur != '\n')
+		src->nex = src_readchar(src);
 }
 
 int

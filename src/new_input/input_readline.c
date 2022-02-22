@@ -24,5 +24,6 @@ ssize_t
 		*lp = readline(SH_INPUT_PROMPT_DEFAULT);
 	if (!*lp)
 		return (0);
+	in->more = 1;
 	return (ft_strlen(*lp));
 }

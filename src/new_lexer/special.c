@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 14:07:12 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 14:42:39 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/22 16:10:37 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,14 +31,17 @@ int
 		lex_update(lex, 1);
 		if (lex->src->cur == '(')
 		{
+			lex_update(lex, 1);
 			part = token_add_part(lex->tok, lx_arithmetic);
 			lex_arithmetic(lex, part);
+			lex_update(lex, 1);
 		}
 		else
 		{
 			part = token_add_part(lex->tok, lx_command);
 			lex_command(lex, part);
 		}
+		lex_update(lex, 1);
 		part = token_add_part(lex->tok, lx_normal);
 		return (1);
 	}
@@ -48,6 +51,7 @@ int
 		lex_update(lex, 1);
 		part = token_add_part(lex->tok, lx_parameter);
 		lex_parameter(lex, part);
+		lex_update(lex, 1);
 		part = token_add_part(lex->tok, lx_normal);
 		return (1);
 	}
@@ -69,6 +73,7 @@ int
 		lex_update(lex, 1);
 		return (1);
 	}
+	/* TODO bracket-less parameter substitutions */
 	if (lex->src->cur == '$')
 		return (lex_special_dollar(lex));
 	if (lex->src->cur == '`')

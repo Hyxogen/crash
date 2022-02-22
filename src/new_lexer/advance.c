@@ -38,7 +38,8 @@ void
 		if (lex->src->cur == '\\' && !lex_quoted(lex) && lex_bquoted(lex))
 		{
 			lex->bslash = 1;
-			src_advance(lex->src);
+			lex->src->cur = lex->src->nex;
+			lex->src->nex = -1;
 		}
 		if (lex->src->cur != '\n' || !lex->bslash)
 			return ;
