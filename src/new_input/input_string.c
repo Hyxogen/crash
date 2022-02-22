@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 15:42:44 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 11:33:13 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/22 15:11:03 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "libft.h"
 
 ssize_t
-	_input_readline_line_proc(t_input *in, char **lp)
+	_input_string_line_proc(t_input *in, char **lp)
 {
 	const char	*str;
 	const char	*newline;

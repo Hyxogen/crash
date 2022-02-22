@@ -6,13 +6,16 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 15:50:21 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 11:43:15 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/22 15:11:04 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "new_input.h"
 
+#include "libft.h"
 #include "memory.h"
+#include <stdlib.h>
+#include <unistd.h>
 
 t_file_handle
 	*start_read(int fd)
@@ -65,7 +68,7 @@ ssize_t
 		if (tmp)
 		{
 			read_size = tmp - &fh->buf[fh->beg];
-			*lp = ft_strndup(&fh->buf[fh->beg], read_size);
+			*lp = ft_strndup(&fh->buf[fh->beg], read_size - 1);
 			fh->beg += (tmp - &fh->buf[fh->beg]) + 1;
 			return (read_size);
 		}
@@ -82,7 +85,7 @@ ssize_t
 	}
 }
 
-ssize_t	_input_readline_proc(t_input *in, char **lp)
+ssize_t	_input_file_line_proc(t_input *in, char **lp)
 {
 	return (_read_line(in->file_handle, lp));
 }

@@ -82,10 +82,10 @@ static void
 	}
 	ft_putstr_fd((char*) g_sx_names[node->type], STDOUT_FILENO);
 
-	if (!node->childs_size && node->token && node->token->string)
+	if (!node->childs_size && node->token && node->token->str)
 	{
 		ft_putchar_fd(':', STDOUT_FILENO);
-		ft_putstr_fd((char*) node->token->string, STDOUT_FILENO);
+		ft_putstr_fd((char*) node->token->str, STDOUT_FILENO);
 	}
 	ft_putchar_fd('\n', STDOUT_FILENO);
 	i = 0;
@@ -111,21 +111,20 @@ void
 	pr_debug(void)
 {
 	t_input		in;
-	t_lexer		lx;
+	t_source	src;
+	t_lexer		lex;
 	t_parser	pr;
 	t_snode		*node;
 
-	in.line = NULL;
-	in.index = 0;
-	in.more = 0;
-	lexer_new(&lx, &in);
-	pr.lexer = &lx;
+	input_new(&in, in_readline, NULL);
+	src_init(&src, &in);
+	lex_init(&lex);
+	lex.src = &src;
+	pr.lexer = &lex;
 	pr.current = NULL;
 	pr.next = NULL;
 	pr.current_ret = 0;
 	pr.next_ret = 0;
-	pr.current_node = NULL;
-	pr.syntax_tree = NULL;
 	while (1)
 	{
 		pr_next_token(&pr);
@@ -135,5 +134,5 @@ void
 		else
 			break ;
 	}
-	free(in.line);
+	input_destroy(&in);
 }

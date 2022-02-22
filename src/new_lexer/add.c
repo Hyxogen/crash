@@ -1,30 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   lex_normal.c                                       :+:    :+:            */
+/*   add.c                                              :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/02/22 10:52:20 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 11:01:28 by dmeijer       ########   odam.nl         */
+/*   Created: 2022/02/22 14:01:51 by dmeijer       #+#    #+#                 */
+/*   Updated: 2022/02/22 14:41:04 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "new_lexer.h"
 
-void
-	lex_normal(t_source *src, t_snode *node)
-{
-	t_parser	parser;
-	t_lexer		lexer;
+#include "memory.h"
 
-	lex_init(&lexer);
-	lexer.prev = NULL;
-	lexer.id = lx_normal;
-	lexer.src = src;
-	lexer.end = NULL;
-	lexer.trim = 0;
-	pr_init(&parser);
-	*node = *pr_parse(&parser);
-	/* TODO: destroy resources */
+t_tpart
+	*token_add_part(t_token *tok, t_lexer_id id)
+{
+	t_tpart	part;
+
+	part.id = id;
+	part.data = NULL;
+	part.len = 0;
+	part.quote = 0;
+	tok->parts = sh_safe_realloc(tok->parts, tok->count * sizeof(part), (tok->count + 1) * sizeof(part));
+	tok->parts[tok->count] = part;
+	tok->count += 1;
+	return (&tok->parts[tok->count - 1]);
 }

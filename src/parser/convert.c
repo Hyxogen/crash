@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/16 14:13:22 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/21 11:32:50 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/22 15:02:32 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ int
 	if (token == NULL || token->id != tk_word)
 		return (0);
 	len = ft_strlen(g_keywords[id - kw_if]);
-	if (ft_memcmp(g_keywords[id - kw_if], token->string, len + 1) == 0)
+	if (ft_memcmp(g_keywords[id - kw_if], token->str, len + 1) == 0)
 	{
 		token->id = id;
 		return (1);
@@ -89,7 +89,7 @@ int
 	(void) pr;
 	if (token == NULL || token->id != tk_word)
 		return (0);
-	if (pr_is_name(token->string, token->length))
+	if (pr_is_name(token->str, token->len))
 	{
 		token->id = tk_name;
 		return (1);
@@ -105,12 +105,12 @@ int
 
 	if (token == NULL || token->id != tk_word)
 		return (0);
-	end = ft_memchr(token->string, '=', token->length);
+	end = ft_memchr(token->str, '=', token->len);
 	if (end != NULL)
 	{
-		if (token->string[0] == '=')
+		if (token->str[0] == '=')
 			return (0);
-		if (!pr_is_name(token->string, end - token->string))
+		if (!pr_is_name(token->str, end - token->str))
 			return (0);
 		token->id = tk_assword;
 		return (1);

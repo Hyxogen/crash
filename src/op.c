@@ -1,19 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   lex_parameter.c                                    :+:    :+:            */
+/*   op.c                                               :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/02/22 10:52:43 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 10:56:32 by dmeijer       ########   odam.nl         */
+/*   Created: 2022/02/22 15:12:16 by dmeijer       #+#    #+#                 */
+/*   Updated: 2022/02/22 15:14:58 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "new_lexer.h"
+#include "minishell.h"
 
 void
-	lex_parameter(t_lexer *lex, t_tpart *part)
+	sh_nop(void *ptr)
 {
-	/* TODO: implement parameter expansion parser */
+	(void) ptr;	
 }

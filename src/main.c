@@ -6,11 +6,12 @@
 /*   By: csteenvo <csteenvo@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 10:21:45 by csteenvo      #+#    #+#                 */
-/*   Updated: 2022/02/16 14:01:51 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/22 14:38:10 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "new_lexer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,6 +23,6 @@ int
 	if (strcmp(argv[1], "pr") == 0)
 		pr_debug();
 	else if (strcmp(argv[1], "tk") == 0)
-		lexer_debug();
+		lex_debug();
 	return (EXIT_SUCCESS);
 }

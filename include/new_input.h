@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 15:31:06 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 11:43:13 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/22 14:28:58 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,9 +58,7 @@ ssize_t			_input_readline_line_proc(t_input *in, char **lp);
 ssize_t			_input_file_line_proc(t_input *in, char **lp);
 ssize_t 		_input_string_line_proc(t_input *in, char **lp);
 
-void			input_setup_string(t_input *in, const char *str);
-void			input_setup_file(t_input *in, int fd);
-void			input_setup_readline(t_input *in);
+void			input_new(t_input *in, t_in_mode mode, void *param);
 
 void			input_destroy(t_input *in);
 

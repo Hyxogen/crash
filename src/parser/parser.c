@@ -6,12 +6,13 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/21 15:28:28 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/22 15:06:15 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
+#include "new_lexer.h"
 #include "memory.h"
 #include <stdlib.h>
 #include <libft.h>
@@ -28,12 +29,12 @@ int
 {
 	size_t	i;
 
-	if (pr->lexer->cur != '<' && pr->lexer->cur != '>')
+	if (pr->lexer->src->cur != '<' && pr->lexer->src->cur != '>')
 		return (0);
 	i = 0;
-	while (i < token->length)
+	while (i < token->len)
 	{
-		if (!ft_isdigit(token->string[i]))
+		if (!ft_isdigit(token->str[i]))
 			return (0);
 		i += 1;
 	}
@@ -115,8 +116,25 @@ void
 }
 
 void
-	pr_process_here(void *data, void *pr)
+	pr_init(t_parser *pr)
 {
+	pr->current = NULL;
+	pr->next = NULL;
+	pr->current_ret = 0;
+	pr->next_ret = 0;
+	pr->lexer = NULL;
+	pr->here_docs = NULL;
+}
+
+void
+	pr_process_here(void *data, void *param)
+{
+	t_parser	*pr;
+	t_snode		*node;
+
+	pr = param;
+	node = data;
+	lex_here(pr->lexer, pr->current, node->token->str, node->flags);
 	//TODO process heredoc
 }
 
@@ -132,7 +150,7 @@ int
 	if (!pr->next_ret)
 	{
 		pr->next = sh_safe_malloc(sizeof(t_token));
-		pr->next_ret = lexer_lex(pr->lexer, pr->next);
+		pr->next_ret = lex_lex(pr->lexer, pr->next);
 		pr_convert_io_number(pr, pr->next);
 	}
 	pr->current = pr->next;
@@ -140,7 +158,7 @@ int
 	if (pr->current->id != tk_newline && pr->current_ret)
 	{
 		pr->next = sh_safe_malloc(sizeof(t_token));
-		pr->next_ret = lexer_lex(pr->lexer, pr->next);
+		pr->next_ret = lex_lex(pr->lexer, pr->next);
 		pr_convert_io_number(pr, pr->next);
 	}
 	else if (pr->current_ret && ft_lstsize(pr->here_docs))

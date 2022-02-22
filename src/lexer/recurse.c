@@ -30,23 +30,23 @@ static int
 static int
 	lexer_special(t_lexer *lex)
 {
-	if (lex->cur == '\'' && !lex->btick)
+	if (lex->cur == '\'')
 	{
 		lex->quote = 1 - lex->quote;
 		lexer_read(lex, 1);
 		return (1);
 	}
-	if (lex->cur == '"' && !lex->btick)
+	if (lex->cur == '"')
 	{
 		lex->quote = 2 - lex->quote;
 		lexer_read(lex, 1);
 		return (1);
 	}
-	if (lex->cur == '$' && !lex->btick)
+	if (lex->cur == '$')
 	{
 		return (lexer_special_dollar(lex));
 	}
-	if (lex->cur == '`' && !lex->btick)
+	if (lex->cur == '`')
 	{
 		lexer_read(lex, 1);
 		lexer_expand_backtick(lex);

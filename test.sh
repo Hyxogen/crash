@@ -1,3 +1,0 @@
-cat <<-"test"
-	asdf\
-	test

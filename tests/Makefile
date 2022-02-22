@@ -52,10 +52,11 @@ $(OBJ_DIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $< -MMD $(INC_DIR)
 
 $(LIBFT_LIB):
-	${MAKE} -C $(LIBFT_DIR)
+	${MAKE} -C $(LIBFT_DIR) bonus
 
 clean:
 	rm -f $(OBJECTS)
+	${MAKE} -C $(LIBFT_DIR) clean
 	rm -f $(TARGET)
 
 re: clean all

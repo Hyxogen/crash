@@ -2,8 +2,13 @@
 # define LEXER_H
 
 # include <stddef.h>
-# include "parser.h"
 # include "new_input.h"
+# include "libft.h"
+
+#define HERE_FLAG_TRIM 1
+#define HERE_FLAG_QUOTE 2
+
+struct s_snode;
 
 enum e_token_id
 {
@@ -75,6 +80,7 @@ struct s_tpart
 	/* - if lx_command: the syntax node for the command substitution */
 	/* - if lx_parameter: some struct for parameter expansions */
 	/* - if lx_arithmetic: a token for arithmetic expansion */
+	/* - if lx_backtick: the literal string for backtick command subst */
 	void		*data;
 	size_t		len;
 	/* whether this part of the token was quoted */
@@ -86,17 +92,26 @@ struct s_token
 	t_token_id	id;
 	t_tpart		*parts;
 	size_t		count;
-	const char	*str;
+	char		*str;
 	size_t		len;
 };
 
 struct s_source
 {
+	/*** internal, buffer*/
 	char	*str;
+	/*** internal, the current read head position*/
 	size_t	off;
+	/*** internal, how long the buffer is*/
 	size_t	len;
+	/* the current character the input currently is at*/
 	int		cur;
+	/* the next character after cur */
 	int		nex;
+	/* if the previous line read ended with \ TODO check if still needed*/
+	int		esc;
+	/** internal, next lines when current line's newline is escaped*/
+	t_list	*lst;
 	t_input	*in;
 };
 
@@ -130,27 +145,30 @@ struct s_lexer
 	int			depth;
 	/* end of heredoc */
 	const char	*end;
-	int			trim;
+	int			here_flags;
 };
 
 /* read in the next character and also read in next if needed */
 void		src_advance(t_source *src);
 /* check if the end of a heredoc has been reached */
-int			src_check_end(t_source *src, const char *end, int trim, int quote);
-/* initializes a new source struct */
-void		src_init(t_source *src, t_input *in);
+int			src_check_end(t_source *src, const char *end, int flags);
+ssize_t		_src_add_next(t_source *src, char **out);
+ssize_t		_src_next_line(t_source *src, char **out);
 
 /*** all of these functions should construct a sublexer and call it */
 /* NORMAL: construct a normal lexer and call it with a new parser */
-void		lex_normal(t_source *src, t_snode *node);
+void		lex_normal(t_source *src, struct s_snode *node);
 /* HEREDOC: construct a lexer and call lex_main */
-void		lex_heredoc(t_lexer *lex, t_token *tok, const char *end, int trim);
+void		lex_here(t_lexer *lex, t_token *tok, const char *end, int flags);
 /* COMMAND: construct a parser and lexer and call the parser */
 void		lex_command(t_lexer *lex, t_tpart *part);
 /* PARAMETERS: use parameter parser for the 1st, make a lexer for the 2nd */
 void		lex_parameter(t_lexer *lex, t_tpart *part);
 /* ARITHMETIC: store a string but make sure to handle escapes correctly */
 void		lex_arithmetic(t_lexer *lex, t_tpart *part);
+
+/* updates the states of the lexer and or will call sublexers to process the current special character*/
+int			lex_special(t_lexer *lex);
 
 /* check if the current character is quoted: */
 /* - if it is precded by a backslash */
@@ -169,7 +187,7 @@ int			lex_bquoted(t_lexer *lex);
 /* also update tok->str of all previous lexers in stack */
 void		lex_advance(t_lexer *lex);
 /* same as lex_advance but also update tok->str of this lexer */
-void		lex_update(t_lexer *lex);
+void		lex_update(t_lexer *lex, int sep);
 /* the main word lexing loop (not whitespace or operators) */
 void		lex_main(t_lexer *lex);
 
@@ -178,9 +196,17 @@ t_token_id	lex_op(t_lexer *lex);
 /* skip whitespace and comments */
 void		lex_skip(t_lexer *lex);
 /* lex a single token from a normal lexer */
-void		lex_lex(t_lexer *lex);
+int			lex_lex(t_lexer *lex, t_token *tok);
+void		lex_debug(void);
 
 /* setup a lexer with initial values */
 void		lex_init(t_lexer *lex);
+/* initializes a new source object */
+void		src_init(t_source *src, t_input *in);
+/* setup a token with initial values */
+void		token_init(t_token *tok);
+
+/* adds a token part to an existing token */
+t_tpart		*token_add_part(t_token *tok, t_lexer_id id);
 
 #endif

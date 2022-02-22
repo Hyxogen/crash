@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 11:30:58 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 10:57:53 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/22 15:06:06 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define PARSER_H
 
 # include "libft.h"
+# include "new_lexer.h"
 
 enum e_syntax_id
 {
@@ -99,8 +100,6 @@ struct s_parser
 	t_token		*next;
 	int			current_ret;
 	int			next_ret;
-	t_snode		*syntax_tree;
-	t_snode		*current_node;
 	t_lexer		*lexer;
 	t_list		*here_docs;
 };

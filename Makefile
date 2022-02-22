@@ -1,6 +1,10 @@
 NAME			:= minishell
 
-FILE_NAMES		:= main.c memory.c assert.c lexer/expand.c lexer/init.c lexer/input.c lexer/lexer.c lexer/operator.c lexer/quote.c lexer/read.c lexer/recurse.c lexer/debug.c parser/parser.c parser/convert.c parser/debug.c
+FILE_NAMES		:= main.c memory.c assert.c new_lexer/expand.c new_lexer/init.c new_lexer/add.c \
+				new_lexer/lex.c new_lexer/operator.c new_lexer/escape.c new_lexer/advance.c \
+				new_lexer/main.c new_lexer/debug.c new_lexer/special.c new_lexer/source.c \
+				new_input/input_file.c new_input/input_readline.c new_input/input_string.c \
+				new_input/input.c parser/parser.c parser/convert.c parser/debug.c op.c
 
 CC				:= cc
 LINK_CMD		:= cc
@@ -12,6 +16,9 @@ LIB_DIR			:= dependencies
 INC_DIR			:= include $(LIB_DIR)/libft
 OBJ_DIR			:= build
 DEP_DIR			:= build
+
+LIBFT_DIR			:= $(LIB_DIR)/libft
+LIBFT_LIB			:= $(LIBFT_DIR)/libft.a
 
 SOURCES			:= $(patsubst %.c,$(SRC_DIR)/%.c,$(FILE_NAMES))
 OBJECTS			:= $(patsubst %.c,$(OBJ_DIR)/%.o,$(FILE_NAMES))
@@ -37,18 +44,22 @@ endif
 all: $(NAME)
 
 # TODO compile libft using its own makefile
-$(NAME): $(OBJECTS)
-	$(LINK_CMD) -o $@ $(OBJECTS) $(LIB_DIR)/libft/libft.a $(LFLAGS) -lreadline
+$(NAME): $(OBJECTS) $(LIBFT_LIB)
+	$(LINK_CMD) -o $@ $(OBJECTS) $(LIBFT_LIB) $(LFLAGS) -lreadline
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c -o $@ $< -MMD $(patsubst %,-I%,$(INC_DIR))
+
+$(LIBFT_LIB):
+	${MAKE} -C $(LIBFT_DIR) bonus
 
 crash: $(NAME)
 	ln -s $(NAME) $@
 
 clean:
 	rm -f $(OBJECTS)
+	${MAKE} -C $(LIBFT_DIR) fclean
 
 fclean: clean
 	rm -f $(NAME)
