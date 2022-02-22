@@ -33,13 +33,13 @@ static int
 	if (lex->cur == '\'')
 	{
 		lex->quote = 1 - lex->quote;
-		lexer_read(lex, 1);
+		lex_update(lex, 1);
 		return (1);
 	}
 	if (lex->cur == '"')
 	{
 		lex->quote = 2 - lex->quote;
-		lexer_read(lex, 1);
+		lex_update(lex, 1);
 		return (1);
 	}
 	if (lex->cur == '$')
