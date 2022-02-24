@@ -21,16 +21,30 @@ static void
 }
 
 void
+	lex_nom(t_lexer *lex, int ch)
+{
+	int		tmp;
+	t_lexer	*super_lexer;
+
+	super_lexer = lex;
+	if (super_lexer != NULL)
+	{
+		tmp = super_lexer->src->cur;
+		super_lexer->src->cur = ch;
+		lex = lex->prev;
+		while (lex != NULL)
+		{
+			append(super_lexer, &lex->tok->str, &lex->tok->len, 1);
+			lex = lex->prev;
+		}
+		super_lexer->src->cur = tmp;
+	}
+}
+
+void
 	lex_advance(t_lexer *lex)
 {
-	t_lexer	*lex2;
-
-	lex2 = lex->prev;
-	while (lex2 != NULL)
-	{
-		append(lex2, &lex2->tok->str, &lex2->tok->len, 1);
-		lex2 = lex2->prev;
-	}
+	lex_nom(lex, lex->src->cur);
 	while (1)
 	{
 		lex->bslash = 0;

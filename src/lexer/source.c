@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 11:44:41 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/24 13:10:36 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/24 15:08:47 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,35 +43,6 @@ ssize_t
 	*out = str;
 	return (len);
 }
-
-// void
-// 	src_advance(t_source *src)
-// {
-// 	ssize_t	str_len;
-
-// 	if (!src->str || src->off >= src->len || src->nex == -1)
-// 	{
-// 		str_len = _src_next_line(src, &src->str);
-// 		if (str_len <= 0)
-// 		{
-// 			src->str = NULL;
-// 			src->cur = -1;
-// 			src->nex = -1;
-// 			return ;
-// 		}
-// 		src->len = (size_t) str_len;
-// 		src->off = 0;
-// 		src->nex = src->str[0];
-// 		src_advance(src);
-// 		return ;
-// 	}
-// 	src->off += 1;
-// 	src->cur = src->nex;
-// 	if (src->off >= src->len)
-// 		src->nex = '\n';
-// 	else
-// 		src->nex = src->str[src->off];
-// }
 
 int
 	src_readchar(t_source *src)
@@ -131,9 +102,10 @@ int
 	if (current)
 	{
 		line = current->content;
-		while (line && *line && *str && *line == *str)
+		while (line && *line && *str && (*line == *str || *line == '\\'))
 		{
-			str++;
+			if (*line == *str)
+				str++;
 			line++;
 			if (!*line)
 			{
@@ -150,37 +122,66 @@ int
 	return (!*str);
 }
 
+void
+	_src_super_nom(t_lexer *lex, const char *str)
+{
+	while (*str)
+	{
+		lex_nom(lex, *str);
+		str++; 
+	}
+	lex_nom(lex, '\n');
+}
+
+void
+	_src_nom(void *ele, void *context)
+{
+	char	*str;
+	t_lexer *lex;
+
+	str = (char*) ele;
+	lex = context;
+	if (!str)
+		return ;
+	_src_super_nom(lex, str);
+}
+
+
 int
-	src_check_end(t_source *src, const char *end, int flags)
+	src_check_end(t_lexer *lex, const char *end, int flags)
 {
 	ssize_t	ret;
 	size_t	line_len;
 	char	*line_str;
 
-	if (src->lst)
+	if (!lex || lex->src->lst || !lex->src->str)
 		return (0);
-	line_str = src->str;
-	line_len = src->len - src->off;
+	line_str = lex->src->str;
+	line_len = lex->src->len;
 	while ((flags & HERE_FLAG_TRIM) && *line_str == '\t')
 	{
 		line_str++;
 		line_len--;
 	}
-	while (!(flags & HERE_FLAG_QUOTE) && (!line_str || *(line_str + line_len - 1) == '\\'))
+	while (!line_str || (!(flags & HERE_FLAG_QUOTE) && line_len > 0 && line_str[line_len - 1] == '\\'))
 	{
-		ret = _src_add_next(src, &line_str);
+		ret = _src_add_next(lex->src, &line_str);
 		if (ret < 0)
 			return (-1);
 		if (ret == 0)
 			break ;
 		line_len = (size_t) ret;
 	}
-	if (_src_cmp(src, end))
+	if (_src_cmp(lex->src, end))
 	{
-		free(src->str);
-		src->str = NULL;
-		src->off = 0;
-		ft_lstclear(&src->lst, free);
+		_src_super_nom(lex, lex->src->str);
+		free(lex->src->str);
+		lex->src->cur = -1;
+		lex->src->nex = -1;
+		lex->src->str = NULL;
+		lex->src->off = 0;
+		ft_lstforeach(lex->src->lst, _src_nom, lex);
+		ft_lstclear(&lex->src->lst, free);
 		return (1);
 	}
 	return (0);

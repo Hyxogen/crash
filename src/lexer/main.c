@@ -14,9 +14,8 @@ static int
 		&& !lex_quoted(lex) && lex->depth == 0);
 	if (lex->end != NULL)
 	{
-		end = src_check_end(lex->src, lex->end, lex->here_flags);
-		printf("end check: %d\n", (lex->src->cur == -1 && end));
-		return (lex->src->cur == -1 && end);
+		end = src_check_end(lex, lex->end, lex->here_flags);
+		return (lex->src->cur == -1 || end);
 	}
 	end = ft_strchr(sep, lex->src->cur) != NULL && lex->src->cur != '\0';
 	return ((end && !lex_quoted(lex)) || lex->src->cur == -1);

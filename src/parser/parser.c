@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/24 11:46:32 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/24 14:40:59 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,6 +136,7 @@ void
 	pr = param;
 	node = data;
 	printf("processing here: %s\n", node->token->str);
+	/* TODO: unquote */
 	lex_here(pr->lexer, pr->current, node->token->str, node->flags);
 	//TODO process heredoc
 }
@@ -760,7 +761,7 @@ int
 	node = snode(sx_complete_cmd);
 	if (pr_list(pr, node))
 	{
-		if (!pr->next_ret) 
+		if (!pr->next_ret)
 		{
 			node_add_child(parent, node);
 			return (1);
@@ -777,7 +778,12 @@ int
 
 	node = snode(sx_complete_cmdlst);
 	while (pr->current_ret != -1 && pr_complete_cmd(pr, node))
+	{
+		printf("complete command added\n");
+		pr_next_token(pr);
 		continue ;
+	}
+	printf("found all complete commands %d\n", pr->current_ret);
 	node_add_child(parent, node);
 	return (1);
 }

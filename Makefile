@@ -29,7 +29,7 @@ ifndef config
 endif
 
 ifeq ($(config), debug)
-	CFLAGS		+= -DSH_DEBUG=1 -fsanitize=address,undefined -g3 -Og
+	CFLAGS		+= -DSH_DEBUG=1 -fsanitize=address,undefined -g3 -O0
 	LFLAGS		+= -DSH_DEBUG=1 -fsanitize=address,undefined
 else ifeq ($(config), release)
 	CFLAGS		+= -Werror -g3 -O2

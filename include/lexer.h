@@ -151,7 +151,7 @@ struct s_lexer
 /* read in the next character and also read in next if needed */
 void		src_advance(t_source *src);
 /* check if the end of a heredoc has been reached */
-int			src_check_end(t_source *src, const char *end, int flags);
+int			src_check_end(t_lexer *lex, const char *end, int flags);
 ssize_t		_src_add_next(t_source *src, char **out);
 ssize_t		_src_next_line(t_source *src, char **out);
 
@@ -183,6 +183,7 @@ int			lex_quoted(t_lexer *lex);
 /* - in string or arithmetic expansion: $, `, ", \ */
 /* - in heredoc or ` string: $, `, \ */
 int			lex_bquoted(t_lexer *lex);
+void		lex_nom(t_lexer *lex, int ch);
 /* read next character using src_advance */
 /* also update tok->str of all previous lexers in stack */
 void		lex_advance(t_lexer *lex);
