@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 11:30:58 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/24 11:15:33 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/24 16:03:41 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,7 @@ t_snode	*pr_parse(t_parser *pr);
 void	pr_init(t_parser *pr);
 int		pr_next_token(t_parser *pr);
 int		pr_complete_cmdlst(t_parser *pr, t_snode *parent);
+int		pr_complete_cmd(t_parser *pr, t_snode *parent);
 t_snode	*snode(t_syntax_id syn_id);
 
 #endif

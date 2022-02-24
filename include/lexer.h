@@ -78,7 +78,7 @@ struct s_tpart
 	/* data for the token, could be: */
 	/* - if lx_normal: the literal string with quote characters removed */
 	/* - if lx_command: the syntax node for the command substitution */
-	/* - if lx_parameter: some struct for parameter expansions */
+	/* - if lx_parameter: a token for parameter expansion */
 	/* - if lx_arithmetic: a token for arithmetic expansion */
 	/* - if lx_backtick: the literal string for backtick command subst */
 	void		*data;

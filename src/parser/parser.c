@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/24 14:40:59 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/24 16:14:07 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,7 @@ void
 void
 	node_destroy(t_snode *node)
 {
+	return ;
 	if (!node)
 		return ;
 	node_destroy_childs(node);
@@ -135,7 +136,6 @@ void
 
 	pr = param;
 	node = data;
-	printf("processing here: %s\n", node->token->str);
 	/* TODO: unquote */
 	lex_here(pr->lexer, pr->current, node->token->str, node->flags);
 	//TODO process heredoc
@@ -150,12 +150,9 @@ void
 int
 	pr_check_here(t_parser *pr)
 {
-	printf("here docs size:%zu\n", ft_lstsize(pr->here_docs));
 	if (pr->current_ret && pr->current->id == tk_newline && ft_lstsize(pr->here_docs))
 	{
-		printf("Start processing here\n");
 		ft_lstforeach(pr->here_docs, pr_process_here, pr);
-		ft_lstclear(&pr->here_docs, pr_nop);
 	}
 	return (1);
 }
@@ -168,7 +165,6 @@ int
 	{
 		pr->next = sh_safe_malloc(sizeof(t_token));
 		pr->next_ret = lex_lex(pr->lexer, pr->next);
-		printf("called lex_lex (1): %d\n", pr->next_ret);
 		pr_convert_io_number(pr, pr->next);
 	}
 	pr->current = pr->next;
@@ -178,7 +174,6 @@ int
 	{
 		pr->next = sh_safe_malloc(sizeof(t_token));
 		pr->next_ret = lex_lex(pr->lexer, pr->next);
-		printf("called lex_lex (2): %d\n", pr->next_ret);
 		pr_convert_io_number(pr, pr->next);
 	}
 	return (pr->current_ret);
@@ -194,7 +189,6 @@ int
 		return (0);
 	node = snode(syn_id);
 	node->token = pr->current;
-	// printf("ate: %s\n", pr->current->str);
 	pr_next_token(pr);
 	if (!parent)
 	{
@@ -237,10 +231,8 @@ int
 	node = snode(sx_io_here);
 	if (pr_token(pr, NULL, sx_none, op_dless))
 	{
-		printf("found dless\n");
 		if (pr_token(pr, node, sx_word, tk_word))
 		{
-			printf("found io_here\n");
 			ft_lstadd_back(&pr->here_docs, ft_lstnew(node->childs[0]));
 			node_add_child(parent, node);
 			pr_check_here(pr);
@@ -779,11 +771,9 @@ int
 	node = snode(sx_complete_cmdlst);
 	while (pr->current_ret != -1 && pr_complete_cmd(pr, node))
 	{
-		printf("complete command added\n");
 		pr_next_token(pr);
 		continue ;
 	}
-	printf("found all complete commands %d\n", pr->current_ret);
 	node_add_child(parent, node);
 	return (1);
 }

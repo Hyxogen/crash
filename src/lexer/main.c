@@ -30,6 +30,6 @@ void
 		if (lex->src->cur == -1)
 			return ;
 		if (lex_quoted(lex) || !lex_special(lex))
-			lex_update(lex, 1);
+			lex_update(lex, 0);
 	}
 }

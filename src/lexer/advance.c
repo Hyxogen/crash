@@ -26,7 +26,6 @@ void
 	int		tmp;
 	t_lexer	*super_lexer;
 
-	printf("nom: %d %c\n", ch, ch);
 	super_lexer = lex;
 	if (super_lexer != NULL)
 	{

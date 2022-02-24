@@ -1,10 +1,10 @@
 NAME			:= minishell
 
-FILE_NAMES		:= main.c memory.c assert.c lexer/expand.c lexer/init.c lexer/add.c \
+FILE_NAMES		:= debug.c memory.c assert.c lexer/expand.c lexer/init.c lexer/add.c \
 				lexer/lex.c lexer/operator.c lexer/escape.c lexer/advance.c \
-				lexer/main.c lexer/debug.c lexer/special.c lexer/source.c \
+				lexer/main.c lexer/special.c lexer/source.c \
 				input/input_file.c input/input_readline.c input/input_string.c \
-				input/input.c parser/parser.c parser/convert.c parser/debug.c op.c
+				input/input.c parser/parser.c parser/convert.c op.c
 
 CC				:= cc
 LINK_CMD		:= cc
@@ -29,7 +29,7 @@ ifndef config
 endif
 
 ifeq ($(config), debug)
-	CFLAGS		+= -DSH_DEBUG=1 -fsanitize=address,undefined -g3 -O0
+	CFLAGS		+= -DSH_DEBUG=1 -fsanitize=address,undefined -g3 -Og
 	LFLAGS		+= -DSH_DEBUG=1 -fsanitize=address,undefined
 else ifeq ($(config), release)
 	CFLAGS		+= -Werror -g3 -O2

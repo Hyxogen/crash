@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 10:52:43 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/24 11:57:34 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/24 15:39:54 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,6 @@ void
 {
 	t_lexer	lexer;
 
-	printf("called lex_here\n");
 	lex_init(&lexer);
 	lexer.prev = lex;
 	lexer.id = lx_normal;
@@ -107,7 +106,18 @@ void
 void
 	lex_parameter(t_lexer *lex, t_tpart *part)
 {
-	(void) lex;
-	(void) part;
-	/* TODO: implement parameter expansion parser */
+	t_lexer	lexer;
+
+	part->id = lx_parameter;
+	part->data = sh_safe_malloc(sizeof(t_token));
+	part->quote = lex->quote;
+	token_init(part->data);
+	lex_init(&lexer);
+	lexer.tok = part->data;
+	lexer.prev = lex;
+	lexer.id = lx_parameter;
+	lexer.src = lex->src;
+	lexer.end = NULL;
+	lexer.here_flags = 0;
+	lex_main(&lexer);
 }

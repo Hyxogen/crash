@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 11:44:41 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/24 15:08:47 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/24 15:51:00 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,6 @@ int
 		ret = _src_next_line(src, &src->str);
 		if (ret < 0)
 			return (-1);
-		if (ret == 0)
-			return (0);
 		src->len = (size_t) ret;
 	}
 	if (src->str == NULL)
