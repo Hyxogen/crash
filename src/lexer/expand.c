@@ -32,6 +32,7 @@ void
 	part->id = lx_arithmetic;
 	part->data = sh_safe_malloc(sizeof(t_token));
 	part->quote = lex->quote;
+	token_init(part->data);
 	lex_init(&lexer);
 	lexer.tok = part->data;
 	lexer.prev = lex;

@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 15:50:21 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/24 11:10:38 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/24 15:24:47 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ ssize_t
 		{
 			tmp = ft_strndup(&fh->buf[fh->beg], fh->end - fh->beg);
 			*lp = tmp;
-			return (0);
+			return (-1);
 		}
 	}
 }

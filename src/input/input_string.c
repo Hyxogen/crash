@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 15:42:44 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/24 11:10:42 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/24 15:24:57 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ ssize_t
 	const char	*newline;
 
 	if (!in->string_handle)
-		return (0);
+		return (-1);
 	str = in->string_handle;
 	newline = ft_strchr(str, '\n');
 	if (!newline)

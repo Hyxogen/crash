@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 16:06:07 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/24 12:01:29 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/24 15:23:48 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ ssize_t
 	if (!*lp)
 	{
 		*lp = NULL;
-		return (0);
+		return (-1);
 	}
 	in->more = 1;
 	return (ft_strlen(*lp));
