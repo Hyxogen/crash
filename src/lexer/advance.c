@@ -1,4 +1,4 @@
-#include "new_lexer.h"
+#include "lexer.h"
 
 #include "memory.h"
 

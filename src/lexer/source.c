@@ -6,18 +6,18 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 11:44:41 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 15:47:39 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/24 13:10:36 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "new_lexer.h"
+#include "lexer.h"
 #include <stdlib.h>
 
 ssize_t
 	_src_next_line(t_source *src, char **out)
 {
 	t_list	*tmp;
-	
+
 	if (src->lst)
 	{
 		free(src->str);
@@ -76,10 +76,18 @@ ssize_t
 int
 	src_readchar(t_source *src)
 {
-	int	c;
+	int		c;
+	ssize_t	ret;
 
 	if (src->str == NULL)
-		_src_next_line(src, &src->str);
+	{
+		ret = _src_next_line(src, &src->str);
+		if (ret < 0)
+			return (-1);
+		if (ret == 0)
+			return (0);
+		src->len = (size_t) ret;
+	}
 	if (src->str == NULL)
 		return (-1);
 	c = (unsigned char) src->str[src->off];
@@ -112,26 +120,31 @@ int
 	const char 		*line;
 
 	line = src->str;
+	if (!line)
+		return (0);
 	while (*line && *str && *line == *str)
 	{
 		line++;
 		str++;
 	}
 	current = src->lst;
-	line = current->content;
-	while (line && *line && *str && *line == *str)
+	if (current)
 	{
-		str++;
-		line++;
-		if (!*line)
+		line = current->content;
+		while (line && *line && *str && *line == *str)
 		{
-			if (current->next)
+			str++;
+			line++;
+			if (!*line)
 			{
-				current = current->next;
-				line = current->content;
+				if (current->next)
+				{
+					current = current->next;
+					line = current->content;
+				}
+				else
+					line = NULL;
 			}
-			else
-				line = NULL;
 		}
 	}
 	return (!*str);
@@ -153,7 +166,7 @@ int
 		line_str++;
 		line_len--;
 	}
-	while (!(flags & HERE_FLAG_QUOTE) && *(line_str + line_len - 1) == '\\')
+	while (!(flags & HERE_FLAG_QUOTE) && (!line_str || *(line_str + line_len - 1) == '\\'))
 	{
 		ret = _src_add_next(src, &line_str);
 		if (ret < 0)
@@ -165,6 +178,8 @@ int
 	if (_src_cmp(src, end))
 	{
 		free(src->str);
+		src->str = NULL;
+		src->off = 0;
 		ft_lstclear(&src->lst, free);
 		return (1);
 	}

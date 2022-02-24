@@ -1,29 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   input_readline.c                                   :+:    :+:            */
+/*   input_string.c                                     :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/02/21 16:06:07 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 15:11:11 by dmeijer       ########   odam.nl         */
+/*   Created: 2022/02/21 15:42:44 by dmeijer       #+#    #+#                 */
+/*   Updated: 2022/02/24 11:10:42 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "new_input.h"
+#include "input.h"
 
 #include "libft.h"
-#include <readline/readline.h>
 
 ssize_t
-	_input_readline_line_proc(t_input *in, char **lp)
+	_input_string_line_proc(t_input *in, char **lp)
 {
-	if (in->more)
-		*lp = readline(SH_INPUT_PROMPT_MORE);
-	else
-		*lp = readline(SH_INPUT_PROMPT_DEFAULT);
-	if (!*lp)
+	const char	*str;
+	const char	*newline;
+
+	if (!in->string_handle)
 		return (0);
-	in->more = 1;
+	str = in->string_handle;
+	newline = ft_strchr(str, '\n');
+	if (!newline)
+	{
+		*lp = ft_strdup(in->string_handle);
+		in->string_handle = NULL;
+		return (ft_strlen(*lp));
+	}
+	*lp = ft_strndup(str, (newline - str) + 1);
+	str = newline + 1;
+	in->string_handle = str;
 	return (ft_strlen(*lp));
 }

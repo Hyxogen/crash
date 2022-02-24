@@ -6,11 +6,11 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 15:40:28 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 15:14:45 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/24 11:10:44 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "new_input.h"
+#include "input.h"
 
 void
 	input_new(t_input *in, t_in_mode mode, void *param)

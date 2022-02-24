@@ -1,10 +1,10 @@
 NAME			:= minishell
 
-FILE_NAMES		:= main.c memory.c assert.c new_lexer/expand.c new_lexer/init.c new_lexer/add.c \
-				new_lexer/lex.c new_lexer/operator.c new_lexer/escape.c new_lexer/advance.c \
-				new_lexer/main.c new_lexer/debug.c new_lexer/special.c new_lexer/source.c \
-				new_input/input_file.c new_input/input_readline.c new_input/input_string.c \
-				new_input/input.c parser/parser.c parser/convert.c parser/debug.c op.c
+FILE_NAMES		:= main.c memory.c assert.c lexer/expand.c lexer/init.c lexer/add.c \
+				lexer/lex.c lexer/operator.c lexer/escape.c lexer/advance.c \
+				lexer/main.c lexer/debug.c lexer/special.c lexer/source.c \
+				input/input_file.c input/input_readline.c input/input_string.c \
+				input/input.c parser/parser.c parser/convert.c parser/debug.c op.c
 
 CC				:= cc
 LINK_CMD		:= cc
@@ -59,6 +59,7 @@ crash: $(NAME)
 
 clean:
 	rm -f $(OBJECTS)
+	rm -f $(DEPENDS)
 	${MAKE} -C $(LIBFT_DIR) fclean
 
 fclean: clean

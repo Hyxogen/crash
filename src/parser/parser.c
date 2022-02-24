@@ -6,16 +6,17 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 16:29:20 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/24 11:46:32 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
-#include "new_lexer.h"
+#include "lexer.h"
 #include "memory.h"
 #include <stdlib.h>
 #include <libft.h>
+#include <stdio.h>
 
 #define SH_DEF_CHILD_SIZE 100
 
@@ -146,29 +147,39 @@ void
 }
 
 int
+	pr_check_here(t_parser *pr)
+{
+	printf("here docs size:%zu\n", ft_lstsize(pr->here_docs));
+	if (pr->current_ret && pr->current->id == tk_newline && ft_lstsize(pr->here_docs))
+	{
+		printf("Start processing here\n");
+		ft_lstforeach(pr->here_docs, pr_process_here, pr);
+		ft_lstclear(&pr->here_docs, pr_nop);
+	}
+	return (1);
+}
+
+int
 	pr_next_token(t_parser *pr)
 {
+	pr_check_here(pr);
 	if (!pr->next_ret)
 	{
 		pr->next = sh_safe_malloc(sizeof(t_token));
 		pr->next_ret = lex_lex(pr->lexer, pr->next);
+		printf("called lex_lex (1): %d\n", pr->next_ret);
 		pr_convert_io_number(pr, pr->next);
 	}
 	pr->current = pr->next;
 	pr->current_ret = pr->next_ret;
+	pr->next_ret = 0;
 	if (pr->current->id != tk_newline && pr->current_ret)
 	{
 		pr->next = sh_safe_malloc(sizeof(t_token));
 		pr->next_ret = lex_lex(pr->lexer, pr->next);
+		printf("called lex_lex (2): %d\n", pr->next_ret);
 		pr_convert_io_number(pr, pr->next);
 	}
-	if (pr->current_ret && pr->current->id == tk_newline && ft_lstsize(pr->here_docs))
-	{
-		ft_lstforeach(pr->here_docs, pr_process_here, pr);
-		ft_lstclear(&pr->here_docs, pr_nop);
-	}
-	else
-		pr->next_ret = 0;
 	return (pr->current_ret);
 }
 
@@ -182,6 +193,7 @@ int
 		return (0);
 	node = snode(syn_id);
 	node->token = pr->current;
+	// printf("ate: %s\n", pr->current->str);
 	pr_next_token(pr);
 	if (!parent)
 	{
@@ -195,7 +207,7 @@ int
 int
 	pr_io_file(t_parser *pr, t_snode *parent)
 {
-	t_snode *node;
+	t_snode	*node;
 
 	node = snode(sx_io_file);
 	if (pr_token(pr, node, sx_less, op_less)
@@ -222,12 +234,17 @@ int
 	t_snode	*node;
 
 	node = snode(sx_io_here);
-	if (pr_token(pr, NULL, sx_none, op_dless)
-		&& pr_token(pr, node, sx_word, tk_word))
+	if (pr_token(pr, NULL, sx_none, op_dless))
 	{
-		ft_lstadd_back(&pr->here_docs, ft_lstnew(node->childs[0]));
-		node_add_child(parent, node);
-		return (1);
+		printf("found dless\n");
+		if (pr_token(pr, node, sx_word, tk_word))
+		{
+			printf("found io_here\n");
+			ft_lstadd_back(&pr->here_docs, ft_lstnew(node->childs[0]));
+			node_add_child(parent, node);
+			pr_check_here(pr);
+			return (1);
+		}
 	}
 	else if (pr_token(pr, NULL, sx_none, op_dlessdash)
 		&& pr_token(pr, node, sx_word, tk_word))
@@ -743,7 +760,7 @@ int
 	node = snode(sx_complete_cmd);
 	if (pr_list(pr, node))
 	{
-		if (!pr->next_ret)
+		if (!pr->next_ret) 
 		{
 			node_add_child(parent, node);
 			return (1);
@@ -751,6 +768,18 @@ int
 	}
 	node_destroy(node);
 	return (0);
+}
+
+int
+	pr_complete_cmdlst(t_parser *pr, t_snode *parent)
+{
+	t_snode	*node;
+
+	node = snode(sx_complete_cmdlst);
+	while (pr->current_ret != -1 && pr_complete_cmd(pr, node))
+		continue ;
+	node_add_child(parent, node);
+	return (1);
 }
 
 int

@@ -1,4 +1,4 @@
-#include "new_lexer.h"
+#include "lexer.h"
 
 int
 	lex_quoted(t_lexer *lex)

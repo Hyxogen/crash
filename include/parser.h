@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 11:30:58 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 15:52:31 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/24 11:15:33 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define PARSER_H
 
 # include "libft.h"
-# include "new_lexer.h"
+# include "lexer.h"
 
 enum e_syntax_id
 {
@@ -75,7 +75,8 @@ enum e_syntax_id
 	sx_wordlist,
 	sx_condition,
 	sx_elif_part,
-	sx_io_here
+	sx_io_here,
+	sx_complete_cmdlst
 };
 
 enum e_node_flag
@@ -123,5 +124,7 @@ int		pr_convert_ass(t_parser *pr, t_token *token, int first);
 t_snode	*pr_parse(t_parser *pr);
 void	pr_init(t_parser *pr);
 int		pr_next_token(t_parser *pr);
+int		pr_complete_cmdlst(t_parser *pr, t_snode *parent);
+t_snode	*snode(t_syntax_id syn_id);
 
 #endif

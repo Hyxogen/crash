@@ -6,11 +6,11 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 14:01:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 14:41:04 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/24 11:10:48 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "new_lexer.h"
+#include "lexer.h"
 
 #include "memory.h"
 

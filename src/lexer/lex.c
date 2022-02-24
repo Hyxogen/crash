@@ -1,4 +1,4 @@
-#include "new_lexer.h"
+#include "lexer.h"
 
 static int
 	is_blank(int c)
@@ -56,9 +56,13 @@ int
 	}
 	status = check_op(lex);
 	if (tok->id != tk_null)
+	{
+		// printf("token in lexer: %d: %s\n", lex->tok->id, lex->tok->str);
 		return (status);
+	}
 	token_add_part(lex->tok, lx_normal);
 	tok->id = tk_word;
 	lex_main(lex);
+	// printf("token in lexer: %d: %s\n", lex->tok->id, lex->tok->str);
 	return (1);
 }

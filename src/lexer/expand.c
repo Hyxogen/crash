@@ -1,99 +1,112 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        ::::::::            */
+/*   expand.c                                           :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2022/02/22 10:52:43 by dmeijer       #+#    #+#                 */
+/*   Updated: 2022/02/24 11:57:34 by dmeijer       ########   odam.nl         */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "lexer.h"
-#include "minishell.h"
+#include "parser.h"
+#include "memory.h"
 
-static t_expansion
-	*lexer_expand(t_token *tok)
+t_snode
+	*lexpr_parse(t_parser *pr)
 {
-	size_t		old_size;
-	size_t		new_size;
-	t_expansion	*xp;
+	t_snode	*node;
 
-	old_size = (tok->count + 0) * sizeof(*tok->xps);
-	new_size = (tok->count + 1) * sizeof(*tok->xps);
-	tok->xps = sh_safe_realloc(tok->xps, old_size, new_size);
-	xp = &tok->xps[tok->count];
-	xp->string = NULL;
-	xp->length = 0;
-	tok->count += 1;
-	return (xp);
+	node = snode(sx_none);
+	pr_complete_cmdlst(pr, node);
+	return (node->childs[0]);
 }
 
-static void
-	lexer_state_push(t_lexer *lex, t_lexer_state *state, t_expansion_id id)
+void
+	lex_arithmetic(t_lexer *lex, t_tpart *part)
 {
-	t_expansion	*xp;
+	t_lexer	lexer;
 
-	state->quote = lex->quote;
-	state->was_word = 0;
-	state->end = lex->end;
-	state->xp_id = lex->xp_id;
-	lex->quote = 0;
-	lex->end = NULL;
-	lex->xp_id = id;
-	if (lex->tok->xps[lex->tok->count - 1].id == xp_word)
-	{
-		xp = lexer_expand(lex->tok);
-		xp->id = id;
-		xp->quoted = state->quote > 0;
-		state->was_word = 1;
-	}
+	part->id = lx_arithmetic;
+	part->data = sh_safe_malloc(sizeof(t_token));
+	part->quote = lex->quote;
+	lex_init(&lexer);
+	lexer.tok = part->data;
+	lexer.prev = lex;
+	lexer.id = lx_arithmetic;
+	lexer.src = lex->src;
+	lexer.end = NULL;
+	lexer.here_flags = 0;
+	lex_main(&lexer);
+	/* TODO: destroy resources */
 }
 
-static void
-	lexer_state_pop(t_lexer *lex, t_lexer_state *state)
-{
-	t_token		*tok;
-	t_expansion	*xp;
 
-	tok = lex->tok;
-	lex->quote = state->quote;
-	lex->end = state->end;
-	lex->xp_id = state->xp_id;
-	if (state->was_word)
-	{
-		xp = lexer_expand(lex->tok);
-		xp->id = xp_word;
-		xp->quoted = 0;
-	}
+void
+	lex_command(t_lexer *lex, t_tpart *part)
+{
+	t_lexer		lexer;
+	t_parser	parser;
+	t_snode		*node;
+
+	/* TODO: multiple commands in command subst */
+	lex_init(&lexer);
+	lexer.prev = lex;
+	lexer.id = lx_command;
+	lexer.src = lex->src;
+	lexer.end = NULL;
+	lexer.here_flags = 0;
+	pr_init(&parser);
+	parser.lexer = &lexer;
+	pr_next_token(&parser);
+	node = lexpr_parse(&parser);
+	part->data = node;
+	part->quote = lex->quote;
+	/* TODO: destroy resources */
 }
 
-int
-	lexer_expand_dollar(t_lexer *lex, t_expansion_id id)
+void
+	lex_here(t_lexer *lex, t_token *tok, const char *end, int flags)
 {
-	t_lexer_state	state;
-	int				skip;
-	int				status;
+	t_lexer	lexer;
 
-	lexer_state_push(lex, &state, id);
-	status = lexer_recurse(lex);
-	lexer_state_pop(lex, &state);
-	if (id == xp_arithmetic)
-		skip = 2;
-	else
-		skip = 1;
-	if (status < 0)
-		return (status);
-	while (skip > 0)
-	{
-		lexer_read(lex, 1);
-		skip -= 1;
-	}
-	return (0);
+	printf("called lex_here\n");
+	lex_init(&lexer);
+	lexer.prev = lex;
+	lexer.id = lx_normal;
+	lexer.src = lex->src;
+	lexer.end = end;
+	lexer.here_flags = flags;
+	lexer.tok = tok;
+	if (lex->src->cur == -1)
+		lex_advance(&lexer);
+	lex_main(&lexer);
+	/* TODO: destroy resources */
 }
 
-int
-	lexer_expand_backtick(t_lexer *lex)
+void
+	lex_normal(t_source *src, struct s_snode *node)
 {
-	t_lexer_state	state;
+	t_parser	parser;
+	t_lexer		lexer;
 
-	lexer_state_push(lex, &state, xp_command);
-	lex->btick = 1;
-	while ((lex->cur != '`' || lexer_quoted(lex)) && lex->cur != -1)
-		lexer_read(lex, 0);
-	lex->btick = 0;
-	lexer_state_pop(lex, &state);
-	if (lex->cur == -1)
-		return (-1);
-	lexer_read(lex, 1);
-	return (0);
+	lex_init(&lexer);
+	lexer.prev = NULL;
+	lexer.id = lx_normal;
+	lexer.src = src;
+	lexer.end = NULL;
+	lexer.here_flags = 0;
+	pr_init(&parser);
+	*node = *pr_parse(&parser);
+	/* TODO: destroy resources */
+}
+
+void
+	lex_parameter(t_lexer *lex, t_tpart *part)
+{
+	(void) lex;
+	(void) part;
+	/* TODO: implement parameter expansion parser */
 }

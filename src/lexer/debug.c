@@ -1,4 +1,5 @@
 #include "lexer.h"
+#include "input.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <libft.h>
@@ -46,11 +47,12 @@ static const char	*g_tk_names[] = {
 	"op_semi"
 };
 
-static const char	*g_px_names[] = {
-	"xp_word",
-	"xp_parameter",
-	"xp_command",
-	"xp_arithmetic"
+static const char	*g_lx_names[] = {
+	"lx_normal",
+	"lx_command",
+	"lx_parameter",
+	"lx_arithmetic",
+	"lx_backtick"
 };
 
 static void
@@ -58,47 +60,49 @@ static void
 {
 	ft_putstr_fd((char *) g_tk_names[tok->id], STDOUT_FILENO);
 	ft_putstr_fd((char *) ": ", STDOUT_FILENO);
-	write(STDOUT_FILENO, tok->string, tok->length);
+	write(STDOUT_FILENO, tok->str, tok->len);
 	ft_putchar_fd('\n', STDOUT_FILENO);
 }
 
-static void
-	write_expansion(t_expansion *xp)
-{
-	ft_putchar_fd('\t', STDOUT_FILENO);
-	if (xp->quoted)
-		ft_putstr_fd("(quoted) ", STDOUT_FILENO);
-	ft_putstr_fd((char *) g_px_names[xp->id], STDOUT_FILENO);
-	ft_putstr_fd((char *) ": ", STDOUT_FILENO);
-	write(STDOUT_FILENO, xp->string, xp->length);
-	ft_putchar_fd('\n', STDOUT_FILENO);
-}
+// static void
+// 	write_expansion(t_tpart *part)
+// {
+// 	return ;
+// 	ft_putchar_fd('\t', STDOUT_FILENO);
+// 	if (part->quote)
+// 		ft_putstr_fd("(quoted) ", STDOUT_FILENO);
+// 	ft_putstr_fd((char *) g_lx_names[part->id], STDOUT_FILENO);
+// 	ft_putstr_fd((char *) ": ", STDOUT_FILENO);
+// 	write(STDOUT_FILENO, part->data, part->len);
+// 	ft_putchar_fd('\n', STDOUT_FILENO);
+// }
 
 void
-	lexer_debug(void)
+	lex_debug(void)
 {
-	t_input	in;
-	t_lexer	lex;
-	t_token	token;
-	size_t	i;
+	t_input		in;
+	t_source	src;
+	t_lexer		lex;
+	t_token		token;
+	// size_t		i;
 
-	in.line = NULL;
-	in.index = 0;
-	in.more = 0;
-	lexer_new(&lex, &in);
+	(void)g_lx_names;
+	input_new(&in, in_readline, NULL);
+	src_init(&src, &in);
+	lex_init(&lex);
+	lex.src = &src;
 	while (1)
 	{
-		if (lexer_lex(&lex, &token) != 1)
+		if (lex_lex(&lex, &token) != 1)
 			break ;
 		write_token(&token);
-		i = 0;
-		while (i < token.count)
-		{
-			write_expansion(&token.xps[i]);
-			i += 1;
-		}
-		token_delete(&token);
+		// i = 0;
+		// while (i < token.count)
+		// {
+		// 	write_expansion(&token.xps[i]);
+		// 	i += 1;
+		// }
+		// token_delete(&token);
 	}
-	lexer_delete(&lex);
-	free(in.line);
+	// lexer_delete(&lex);
 }

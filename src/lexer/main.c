@@ -1,4 +1,4 @@
-#include "new_lexer.h"
+#include "lexer.h"
 
 static int
 	lex_check_end(t_lexer *lex)
@@ -15,6 +15,7 @@ static int
 	if (lex->end != NULL)
 	{
 		end = src_check_end(lex->src, lex->end, lex->here_flags);
+		printf("end check: %d\n", (lex->src->cur == -1 && end));
 		return (lex->src->cur == -1 && end);
 	}
 	end = ft_strchr(sep, lex->src->cur) != NULL && lex->src->cur != '\0';
