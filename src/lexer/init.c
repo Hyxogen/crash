@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 13:52:28 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/24 11:11:03 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/25 10:32:02 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ void
 	src->str = NULL;
 	src->off = 0;
 	src->len = 0;
+	src->bslash = 0;
 	src->cur = -1;
 	src->nex = -1;
 	src->esc = 0;
@@ -32,7 +33,6 @@ void
 	lex->id = lx_normal;
 	lex->src = NULL;
 	lex->tok = NULL;
-	lex->bslash = 0;
 	lex->btick = 0;
 	lex->quote = 0;
 	lex->depth = 0;

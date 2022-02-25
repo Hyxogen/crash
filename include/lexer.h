@@ -104,6 +104,8 @@ struct s_source
 	size_t	off;
 	/*** internal, how long the buffer is*/
 	size_t	len;
+	/* whether there was a \ before the current character */
+	int		bslash;
 	/* the current character the input currently is at*/
 	int		cur;
 	/* the next character after cur */
@@ -131,8 +133,6 @@ struct s_lexer
 	t_source	*src;
 	/* the current token being read to */
 	t_token 	*tok;
-	/* whether there was a \ before the current character */
-	int			bslash;
 	/* whether we're in a ` string */
 	int			btick;
 	/* the quote state, could be: */
@@ -184,6 +184,7 @@ int			lex_quoted(t_lexer *lex);
 /* - in heredoc or ` string: $, `, \ */
 int			lex_bquoted(t_lexer *lex);
 void		lex_nom(t_lexer *lex, int ch);
+void		lex_nom_and_skip(t_lexer *lex);
 /* read next character using src_advance */
 /* also update tok->str of all previous lexers in stack */
 void		lex_advance(t_lexer *lex);

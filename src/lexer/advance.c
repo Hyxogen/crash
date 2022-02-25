@@ -7,7 +7,7 @@ static void
 {
 	if (lex->src->cur == -1)
 		return ;
-	if (lex->bslash && esc)
+	if (lex->src->bslash && esc)
 	{
 		*string = sh_safe_realloc(*string, *length, *length + 2);
 		(*string)[*length] = '\\';
@@ -42,20 +42,28 @@ void
 }
 
 void
+	lex_nom_and_skip(t_lexer *lex)
+{
+	append(lex, &lex->tok->str, &lex->tok->len, 1);
+	lex_nom(lex, lex->src->cur);
+	lex->src->cur = -1;
+}
+
+void
 	lex_advance(t_lexer *lex)
 {
 	lex_nom(lex, lex->src->cur);
 	while (1)
 	{
-		lex->bslash = 0;
+		lex->src->bslash = 0;
 		src_advance(lex->src);
 		if (lex->src->cur == '\\' && !lex_quoted(lex) && lex_bquoted(lex))
 		{
-			lex->bslash = 1;
+			lex->src->bslash = 1;
 			lex->src->cur = lex->src->nex;
 			lex->src->nex = -1;
 		}
-		if (lex->src->cur != '\n' || !lex->bslash)
+		if (lex->src->cur != '\n' || !lex->src->bslash)
 			return ;
 	}
 }

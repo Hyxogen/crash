@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 14:07:12 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/24 11:11:15 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/25 10:42:16 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,16 +28,17 @@ int
 	if (lex->src->nex == '(')
 	{
 		lex_update(lex, 1);
-		lex_update(lex, 1);
-		if (lex->src->cur == '(')
+		if (lex->src->nex == '(')
 		{
 			lex_update(lex, 1);
+			lex_nom_and_skip(lex);
 			part = token_add_part(lex->tok, lx_arithmetic);
 			lex_arithmetic(lex, part);
 			lex_update(lex, 1);
 		}
 		else
 		{
+			lex_nom_and_skip(lex);
 			part = token_add_part(lex->tok, lx_command);
 			lex_command(lex, part);
 		}
@@ -48,7 +49,7 @@ int
 	else if (lex->src->nex == '{')
 	{
 		lex_update(lex, 1);
-		lex_update(lex, 1);
+		lex_nom_and_skip(lex);
 		part = token_add_part(lex->tok, lx_parameter);
 		lex_parameter(lex, part);
 		lex_update(lex, 1);

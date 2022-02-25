@@ -3,7 +3,7 @@
 int
 	lex_quoted(t_lexer *lex)
 {
-	if (lex->bslash)
+	if (lex->src->bslash)
 		return (1);
 	if (lex->btick)
 	{

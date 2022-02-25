@@ -45,9 +45,7 @@ int
 	if (lex->src->cur == '\n')
 	{
 		tok->id = tk_newline;
-		lex_nom(lex, lex->src->cur);
-		lex->src->cur = lex->src->nex;
-		lex->src->nex = -1;
+		lex_nom_and_skip(lex);
 		return (1);
 	}
 	if (lex->src->cur == -1)

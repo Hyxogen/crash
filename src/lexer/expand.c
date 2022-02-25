@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 10:52:43 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/24 15:39:54 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/25 10:44:33 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,13 +33,17 @@ void
 	part->data = sh_safe_malloc(sizeof(t_token));
 	part->quote = lex->quote;
 	token_init(part->data);
+	token_add_part(part->data, lx_normal);
 	lex_init(&lexer);
 	lexer.tok = part->data;
+	lexer.tok->id = tk_word;
 	lexer.prev = lex;
 	lexer.id = lx_arithmetic;
 	lexer.src = lex->src;
 	lexer.end = NULL;
 	lexer.here_flags = 0;
+	if (lexer.src->cur == -1)
+		lex_advance(&lexer);
 	lex_main(&lexer);
 	/* TODO: destroy resources */
 }
@@ -59,6 +63,8 @@ void
 	lexer.src = lex->src;
 	lexer.end = NULL;
 	lexer.here_flags = 0;
+	if (lexer.src->cur == -1)
+		lex_advance(&lexer);
 	pr_init(&parser);
 	parser.lexer = &lexer;
 	pr_next_token(&parser);
@@ -80,7 +86,7 @@ void
 	lexer.end = end;
 	lexer.here_flags = flags;
 	lexer.tok = tok;
-	if (lex->src->cur == -1)
+	if (lexer.src->cur == -1)
 		lex_advance(&lexer);
 	lex_main(&lexer);
 	/* TODO: destroy resources */
@@ -98,6 +104,8 @@ void
 	lexer.src = src;
 	lexer.end = NULL;
 	lexer.here_flags = 0;
+	if (lexer.src->cur == -1)
+		lex_advance(&lexer);
 	pr_init(&parser);
 	*node = *pr_parse(&parser);
 	/* TODO: destroy resources */
@@ -119,5 +127,7 @@ void
 	lexer.src = lex->src;
 	lexer.end = NULL;
 	lexer.here_flags = 0;
+	if (lexer.src->cur == -1)
+		lex_advance(&lexer);
 	lex_main(&lexer);
 }

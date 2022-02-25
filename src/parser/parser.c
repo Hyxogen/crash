@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 11:35:51 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/24 16:14:07 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/25 10:43:20 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,6 +245,7 @@ int
 		node->childs[0]->flags |= flag_trim;
 		ft_lstadd_back(&pr->here_docs, ft_lstnew(node->childs[0]));
 		node_add_child(parent, node);
+		pr_check_here(pr);
 		return (1);
 	}
 	node_destroy(node);

@@ -116,35 +116,64 @@ static const char	*g_lx_names[] = {
 	"lx_backtick"
 };
 
+static const char	*g_sx_fnames[] = {
+	"&",
+	";",
+	"!",
+	"&&",
+	"||",
+	"\\n",
+	"-"
+};
+
 void	print_node(t_snode *node, size_t depth);
 void	print_token(t_token *tok, size_t depth);
+
+void
+	print_sflags(t_snode *node)
+{
+	int flag;
+
+	flag = 1;
+	while (flag <= flag_trim)
+	{
+		if (node->flags & flag)
+		{
+			ft_putchar_fd(' ', STDOUT_FILENO);
+			ft_putstr_fd((char *) g_sx_fnames[__builtin_ctz(node->flags & flag)], STDOUT_FILENO);
+		}
+		flag <<= 1;
+	}
+}
 
 void
 	print_tpart(t_tpart *part, size_t depth)
 {
 	size_t	i;
 
+	i = 0;
+	while (i < depth)
+	{
+		ft_putstr_fd((char*) "  ", STDOUT_FILENO);
+		i += 1;
+	}
+	if (part->quote)
+		ft_putstr_fd("(quoted) ", STDOUT_FILENO);
+	ft_putstr_fd((char *) g_lx_names[part->id], STDOUT_FILENO);
 	if (part->id == lx_normal || part->id == lx_backtick)
 	{
-		i = 0;
-		while (i < depth)
-		{
-			ft_putstr_fd((char*) "  ", STDOUT_FILENO);
-			i += 1;
-		}
-		if (part->quote)
-			ft_putstr_fd("(quoted) ", STDOUT_FILENO);
-		ft_putstr_fd((char *) g_lx_names[part->id], STDOUT_FILENO);
 		ft_putstr_fd((char *) ": ", STDOUT_FILENO);
 		write(STDOUT_FILENO, part->data, part->len);
 		ft_putchar_fd('\n', STDOUT_FILENO);
 	}
 	else if (part->id == lx_command)
 	{
+		ft_putstr_fd((char *) ":\n", STDOUT_FILENO);
 		print_node(part->data, depth + 1);
 	}
 	else if (part->id == lx_parameter || part->id == lx_arithmetic)
 	{
+		ft_putstr_fd((char *) ":\n", STDOUT_FILENO);
 		print_token(part->data, depth + 1);
 	}
 }
@@ -184,7 +213,7 @@ void
 		i += 1;
 	}
 	ft_putstr_fd((char*) g_sx_names[node->type], STDOUT_FILENO);
-
+	print_sflags(node);
 	if (!node->childs_size && node->token && node->token->str)
 	{
 		ft_putchar_fd(':', STDOUT_FILENO);
