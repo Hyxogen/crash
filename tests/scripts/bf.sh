@@ -2,6 +2,9 @@ mem_size=300
 stride=3
 dataptr=0
 
+stack=""
+stack_ptr=-1
+
 return=
 memory=""
 echo "Setting up memory..."
@@ -41,7 +44,66 @@ setbyte() {
 	memory=$new_mem
 }
 
-setbyte 2 10
+stack_push() {
+	stack="$stack $1"
+	stack_ptr=$(($stack_ptr + 1))
+	return=1
+}
+
+stack_pop() {
+	index=0
+	new_stack=""
+	if [ "$stack" = "" ]
+	then
+		echo "Pop on empty stack"
+		exit
+	fi
+
+	for i in $stack
+	do
+		if [ $index -eq $stack_ptr ]
+		then
+			return=$i
+		else
+			new_stack="$new_stack $i"
+		fi
+		index=$(($index + 1))
+	done
+	stack=$new_stack
+	stack_ptr=$(($stack_ptr - 1))
+}
+
+stack_top() {
+	index=0
+	return=0
+	for i in $stack
+	do
+		if [ $index -eq $stack_ptr ]
+		then
+			return=$i
+		fi
+		index=$(($index + 1))
+	done
+}
+
+debugprint() {
+	if [ 0 -eq 1 ]
+	then
+		echo "$1"
+	fi
+}
+
+debugnprint() {
+	if [ 0 -eq 1 ]
+	then
+		echo -n "$1"
+	fi
+}
+
+stack_clear() {
+	stack=""
+}
+
 echo $memory
 
 instrs="$(echo "$1" | sed 's/\(.\)/\1 /g')"
@@ -62,13 +124,15 @@ do
 	cur_depth=0
 	for instr in $instrs
 	do
-		if [ $instr = "[" ]
-		then
-			last_cond=$cur
-			cur_depth=$(($cur_depth + 1))
-		elif [ $instr = "]" ]
-		then
-		fi
+		# if [ $instr = "[" ]
+		# then
+		# 	push "$cur"
+		# 	last_cond=$cur
+		# 	cur_depth=$(($cur_depth + 1))
+		# elif [ $instr = "]" ]
+		# then
+
+		# fi
 
 		if [ $cur -eq $pc ] && [ $cond_fj -eq 0 ] && [ $cond_bj -eq 0 ]
 		then
@@ -79,20 +143,20 @@ do
 			pc="$cur"
 			cond_fj=0
 			break
-		elif [ $instr = "[" ] && [ $cond_bj -eq 1 ] && [ $cur_depth -eq $b_depth ]
-		then
-			pc=$(($last_cond - 1))
-			echo "New pc:$pc"
-			instr=""
-			cond_bj=0
-			break
+		# elif [ $instr = "[" ] && [ $cond_bj -eq 1 ] && [ $cur_depth -eq $b_depth ]
+		# then
+		# 	pc=$(($last_cond - 1))
+		# 	echo "New pc:$pc"
+		# 	instr=""
+		# 	cond_bj=0
+		# 	break
 		else
 			cur=$((cur + 1))
 		fi
 	done
 	case $instr in
 		">")
-			echo -n ">"
+			debugnprint ">"
 			dataptr=$(($dataptr + 1))
 			if [ $dataptr -ge $(($mem_size * $stride)) ]
 			then
@@ -101,7 +165,7 @@ do
 			fi
 			;;
 		"<")
-			echo -n "<"
+			debugnprint "<"
 			dataptr=$(($dataptr - 1))
 			if [ $dataptr -lt 0 ]
 			then
@@ -110,7 +174,7 @@ do
 			fi
 			;;
 		"+")
-			echo -n "+"
+			debugnprint "+"
 			getbyte $dataptr
 			byte=$return
 
@@ -123,7 +187,7 @@ do
 			setbyte $dataptr $byte
 			;;
 		"-")
-			echo -n "-"
+			debugnprint "-"
 			getbyte $dataptr
 			byte=$return
 
@@ -136,44 +200,50 @@ do
 			setbyte $dataptr $byte
 			;;
 		".")
-			echo -n "."
+			debugnprint "."
 			getbyte $dataptr
-			printf "%c" $return
+			# echo "printval:$return"
+			printf "\\$(printf '%03o' "$return")"
 			;;
 		",")
-			echo -n ","
+			debugnprint ","
 			read -n 1 $val
 			val=$(printf "%d" "'$val")
 			setbyte $dataptr $val
 			;;
 		"[")
-			echo -n "["
+			debugnprint "["
 			getbyte $dataptr
 			byte=$return
 
-			echo $byte
 			if [ $byte -eq 0 ]
 			then
 				depth=$(($depth + 1))
-				echo "Took forward jump"
+				debugprint "Took forward jump"
 				cond_fj=1
 				continue
+			else
+				stack_push $pc
+				debugprint "Pushed $pc onto the stack"
 			fi
 			;;
 		"]")
-			echo -n "]"
+			debugnprint "]"
 			getbyte $dataptr
 			byte=$return
 
-			echo "{$dataptr=$byte}"
+			debugprint "{$dataptr=$byte}"
 
 			if [ $byte -ne 0 ]
 			then
-				echo "Took backward jump pc:$pc"
-				cond_bj=1
+				debugprint "$stack"
+				stack_top
+				pc=$return
+				debugprint "Took backward jump pc:$pc"
 				b_depth=$depth
-				continue
 			else
+				stack_pop
+				debugprint "Popped stack"
 				depth=$(($depth - 1))
 			fi
 			;;
