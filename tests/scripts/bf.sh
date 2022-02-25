@@ -1,4 +1,4 @@
-mem_size=300
+mem_size=50
 stride=3
 dataptr=0
 
@@ -14,6 +14,17 @@ done
 echo "Done setting up memory!"
 
 # memory="123 456 789"
+
+
+print_current() {
+	debugprint "$str"
+	index=0
+	for i in $(seq 1 $pc)
+	do
+		debugnprint " "
+	done
+	debugprint "^"
+}
 
 getbyte() {
 	index=0
@@ -55,6 +66,7 @@ stack_pop() {
 	new_stack=""
 	if [ "$stack" = "" ]
 	then
+		print_current
 		echo "Pop on empty stack"
 		exit
 	fi
@@ -106,8 +118,11 @@ stack_clear() {
 
 echo $memory
 
-instrs="$(echo "$1" | sed 's/\(.\)/\1 /g')"
-count="${#1}"
+str=$1
+str="$(echo "$str" | tr -d ' ')"
+echo $str
+instrs="$(echo "$str" | sed 's/\(.\{1\}\)/\1 /g')"
+count="${#str}"
 history=""
 cond_fj=0
 cond_bj=0
@@ -122,6 +137,7 @@ do
 	# echo -n "[$dataptr]:{$return}"
 	cur=0
 	cur_depth=0
+	debugprint "pc:$pc"
 	for instr in $instrs
 	do
 		# if [ $instr = "[" ]
@@ -137,13 +153,14 @@ do
 		if [ $cur -eq $pc ] && [ $cond_fj -eq 0 ] && [ $cond_bj -eq 0 ]
 		then
 			break
-		elif [ $instr = "]" ] && [ $cond_fj -eq 1 ]
-		then
-			cur="$((cur + 1))"
-			pc="$cur"
-			cond_fj=0
-			break
-		# elif [ $instr = "[" ] && [ $cond_bj -eq 1 ] && [ $cur_depth -eq $b_depth ]
+		# elif [ $instr = "]" ] && [ $cond_fj -eq 1 ] && [ $cur -ge $pc ]
+		# then
+		# 	pc="$cur"
+		# 	cur="$((cur + 1))"
+		# 	cond_fj=0
+		# 	instr=""
+		# 	break
+		# # elif [ $instr = "[" ] && [ $cond_bj -eq 1 ] && [ $cur_depth -eq $b_depth ]
 		# then
 		# 	pc=$(($last_cond - 1))
 		# 	echo "New pc:$pc"
@@ -154,100 +171,118 @@ do
 			cur=$((cur + 1))
 		fi
 	done
-	case $instr in
-		">")
-			debugnprint ">"
-			dataptr=$(($dataptr + 1))
-			if [ $dataptr -ge $(($mem_size * $stride)) ]
-			then
-				echo "Out of bounds (upper)"
-				exit
-			fi
-			;;
-		"<")
-			debugnprint "<"
-			dataptr=$(($dataptr - 1))
-			if [ $dataptr -lt 0 ]
-			then
-				echo "Out of bounds (lower)"
-				exit
-			fi
-			;;
-		"+")
-			debugnprint "+"
-			getbyte $dataptr
-			byte=$return
+	debugprint "instr:$instr"
+	print_current
+	if [ $cond_fj -eq 0 ]
+	then
+		case $instr in
+			">")
+				debugnprint ">"
+				dataptr=$((($dataptr + 1) % $mem_size))
+				# if [ $dataptr -ge $(($mem_size * $stride)) ]
+				# then
+				# 	echo "Out of bounds (upper)"
+				# 	exit
+				# fi
+				;;
+			"<")
+				debugnprint "<"
+				dataptr=$((($dataptr - 1) % $mem_size))
+				# if [ $dataptr -lt 0 ]
+				# then
+				# 	echo "Out of bounds (lower)"
+				# 	exit
+				# fi
+				;;
+			"+")
+				debugnprint "+"
+				getbyte $dataptr
+				byte=$return
 
-			byte=$(($byte + 1))
-			if [ $byte -gt 255 ]
-			then
-				echo "Data overflow"
-				exit
-			fi
-			setbyte $dataptr $byte
-			;;
-		"-")
-			debugnprint "-"
-			getbyte $dataptr
-			byte=$return
+				byte=$(($byte + 1))
+				# if [ $byte -gt 255 ]
+				# then
+				# 	echo "Data overflow"
+				# 	exit
+				# fi
+				setbyte $dataptr $byte
+				;;
+			"-")
+				debugnprint "-"
+				getbyte $dataptr
+				byte=$return
 
-			byte=$(($byte - 1))
-			if [ $byte -lt 0 ]
-			then
-				echo "Data underflow"
-				exit
-			fi
-			setbyte $dataptr $byte
-			;;
-		".")
-			debugnprint "."
-			getbyte $dataptr
-			# echo "printval:$return"
-			printf "\\$(printf '%03o' "$return")"
-			;;
-		",")
-			debugnprint ","
-			read -n 1 $val
-			val=$(printf "%d" "'$val")
-			setbyte $dataptr $val
-			;;
+				byte=$(($byte - 1))
+				# if [ $byte -lt 0 ]
+				# then
+				# 	echo "Data underflow"
+				# 	exit
+				# fi
+				setbyte $dataptr $byte
+				;;
+			".")
+				debugnprint "."
+				getbyte $dataptr
+				# echo "printval:$return"
+				printf "\\$(printf '%03o' "$return")"
+				;;
+			",")
+				debugnprint ","
+				val=
+				read -n 1 $val
+				val=$(printf "%d" "'$val")
+				setbyte $dataptr $val
+				;;
+			"[")
+				debugnprint "["
+				getbyte $dataptr
+				byte=$return
+
+				if [ $byte -eq 0 ]
+				then
+					depth=$(($depth + 1))
+					debugprint "Took forward jump"
+					cond_fj=$stack_ptr
+				else
+					stack_push $pc
+					debugprint "Pushed $pc onto the stack"
+				fi
+				;;
+			"]")
+				debugnprint "]"
+				getbyte $dataptr
+				byte=$return
+
+				debugprint "{$dataptr=$byte}"
+
+				if [ $byte -ne 0 ]
+				then
+					debugprint "$stack"
+					stack_top
+					pc=$return
+					debugprint "Took backward jump pc:$pc"
+					b_depth=$depth
+				else
+					stack_pop
+					debugprint "Popped stack"
+					depth=$(($depth - 1))
+				fi
+				;;
+		esac
+	else
+		case $instr in
 		"[")
-			debugnprint "["
-			getbyte $dataptr
-			byte=$return
-
-			if [ $byte -eq 0 ]
-			then
-				depth=$(($depth + 1))
-				debugprint "Took forward jump"
-				cond_fj=1
-				continue
-			else
-				stack_push $pc
-				debugprint "Pushed $pc onto the stack"
-			fi
+			stack_push=$pc
 			;;
 		"]")
-			debugnprint "]"
-			getbyte $dataptr
-			byte=$return
-
-			debugprint "{$dataptr=$byte}"
-
-			if [ $byte -ne 0 ]
+			stack_pop
+			if [ $stack_ptr -eq $depth ]
 			then
-				debugprint "$stack"
-				stack_top
-				pc=$return
-				debugprint "Took backward jump pc:$pc"
-				b_depth=$depth
-			else
-				stack_pop
-				debugprint "Popped stack"
-				depth=$(($depth - 1))
+				cond_fj=0
 			fi
 			;;
-	esac
+		esac
+	fi
 	pc=$(($pc + 1))
 	if [ $pc -ge $count ]
 	then
@@ -255,3 +290,7 @@ do
 	fi
 done
 echo "Done"
+echo
+
+echo "Memory dump"
+echo "$memory"
