@@ -107,7 +107,7 @@ stack_clear() {
 echo $memory
 
 instrs="$(echo "$1" | sed 's/\(.\)/\1 /g')"
-count="${#instrs}"
+count="${#1}"
 history=""
 cond_fj=0
 cond_bj=0
