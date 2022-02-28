@@ -8,10 +8,10 @@ static int
 
 	if (lex->id == lx_parameter)
 		return (lex->src->cur == '}'
-		&& !lex_quoted(lex));
+			&& !lex_quoted(lex));
 	if (lex->id == lx_arithmetic)
 		return (lex->src->cur == ')' && lex->src->nex == ')'
-		&& !lex_quoted(lex) && lex->depth == 0);
+			&& !lex_quoted(lex) && lex->depth == 0);
 	if (lex->end != NULL)
 	{
 		end = src_check_end(lex, lex->end, lex->here_flags);

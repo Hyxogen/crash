@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 15:12:16 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 15:14:58 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 16:18:55 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,5 +15,5 @@
 void
 	sh_nop(void *ptr)
 {
-	(void) ptr;	
+	(void) ptr;
 }
