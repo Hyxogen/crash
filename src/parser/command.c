@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:05:14 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 11:26:48 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 15:34:27 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,19 +18,20 @@ int
 	t_snode	*node;
 
 	node = snode(sx_compound_cmd);
-	if (!pr->current_ret)
-		return (0);
-	pr_convert_reserved(pr, pr->current);
-	if (pr_brace_group(pr, node)
-		|| pr_subshell(pr, node)
-		|| pr_while_clause(pr, node)
-		|| pr_until_clause(pr, node)
-		|| pr_if_clause(pr, node)
-		|| pr_for_clause(pr, node)
-		|| pr_case_clause(pr, node))
+	if (pr->current_ret)
 	{
-		node_add_child(parent, node);
-		return (1);
+		pr_convert_reserved(pr, pr->current);
+		if (pr_brace_group(pr, node)
+			|| pr_subshell(pr, node)
+			|| pr_while_clause(pr, node)
+			|| pr_until_clause(pr, node)
+			|| pr_if_clause(pr, node)
+			|| pr_for_clause(pr, node)
+			|| pr_case_clause(pr, node))
+		{
+			node_add_child(parent, node);
+			return (1);
+		}
 	}
 	node_destroy(node);
 	return (0);

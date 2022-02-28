@@ -252,7 +252,10 @@ t_snode
 
 	node = snode(sx_none);
 	if (!pr_complete_cmd(pr, node))
+	{
+		node_destroy(node);
 		return (NULL);
+	}
 	sh_assert(node->childs_size == 1);
 	child = node->childs[0];
 	node->childs_size = 0;

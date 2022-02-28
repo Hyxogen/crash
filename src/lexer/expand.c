@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 10:52:43 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 14:13:58 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 15:33:37 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,15 @@ t_snode
 	*lexpr_parse(t_parser *pr)
 {
 	t_snode	*node;
+	t_snode	*child;
 
 	node = snode(sx_none);
 	pr_complete_cmdlst(pr, node);
-	return (node->childs[0]);
+	sh_assert(node->childs_size == 1);
+	child = node->childs[0];
+	node->childs_size = 0;
+	node_destroy(node);
+	return (child);
 }
 
 void
@@ -71,6 +76,7 @@ void
 	node = lexpr_parse(&parser);
 	part->data = node;
 	part->quote = lex->quote;
+	pr_destroy(&parser);
 	/* TODO: destroy resources */
 }
 
@@ -111,6 +117,7 @@ void
 		lex_advance(&lexer);
 	pr_init(&parser);
 	*node = *pr_parse(&parser);
+	pr_destroy(&parser);
 	/* TODO: destroy resources */
 }
 

@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 14:51:59 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 14:52:17 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 14:53:11 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ void
 	else if (part->id == lx_parameter || part->id == lx_arithmetic)
 	{
 		token_destroy(part->data);
+		free(part->data);
 	}
 }
 

@@ -1,3 +1,6 @@
+make CC=clang
+make[1]: Nothing to be done for `all'.
+ASAN_OPTIONS=detect_leaks=1 ./crash < tests/scripts/cowsay.sh
 sx_complete_cmd
   sx_list
     sx_and_or
@@ -485,6 +488,16 @@ sx_complete_cmd
                                     sx_word:
                                       tk_word: END
                                         lx_normal: END
+                                      HERE CONTENT:
+                                        tk_word: $progname [-bdgpstwy] [-h] [-e eyes] [-f cowfile]
+	[-l] [-n] [-T tongue] [-W wrapcolumn] [message]
+
+                                          lx_normal: 
+                                          lx_parameter:
+                                            tk_word: progname
+                                          lx_normal:  [-bdgpstwy] [-h] [-e eyes] [-f cowfile]
+	[-l] [-n] [-T tongue] [-W wrapcolumn] [message]
+
                                 sx_io_redirect
                                   sx_io_file
                                     sx_greatand:
@@ -498,73 +511,8 @@ sx_complete_cmd
                             sx_cmd
                               sx_simple_cmd
                                 sx_cmd_word:
-                                  tk_word: $progname
-                                    lx_normal: 
-                                    lx_parameter:
-                                      tk_word: progname
-                                    lx_normal: 
-                                sx_cmd_suffix
-                                  sx_word:
-                                    tk_word: [-bdgpstwy]
-                                      lx_normal: [-bdgpstwy]
-                                  sx_word:
-                                    tk_word: [-h]
-                                      lx_normal: [-h]
-                                  sx_word:
-                                    tk_word: [-e
-                                      lx_normal: [-e
-                                  sx_word:
-                                    tk_word: eyes]
-                                      lx_normal: eyes]
-                                  sx_word:
-                                    tk_word: [-f
-                                      lx_normal: [-f
-                                  sx_word:
-                                    tk_word: cowfile]
-                                      lx_normal: cowfile]
-                        sx_term \n
-                          sx_and_or
-                            sx_pipe_sequence
-                              sx_cmd
-                                sx_simple_cmd
-                                  sx_cmd_word:
-                                    tk_word: [-l]
-                                      lx_normal: [-l]
-                                  sx_cmd_suffix
-                                    sx_word:
-                                      tk_word: [-n]
-                                        lx_normal: [-n]
-                                    sx_word:
-                                      tk_word: [-T
-                                        lx_normal: [-T
-                                    sx_word:
-                                      tk_word: tongue]
-                                        lx_normal: tongue]
-                                    sx_word:
-                                      tk_word: [-W
-                                        lx_normal: [-W
-                                    sx_word:
-                                      tk_word: wrapcolumn]
-                                        lx_normal: wrapcolumn]
-                                    sx_word:
-                                      tk_word: [message]
-                                        lx_normal: [message]
-                          sx_term \n
-                            sx_and_or
-                              sx_pipe_sequence
-                                sx_cmd
-                                  sx_simple_cmd
-                                    sx_cmd_word:
-                                      tk_word: END
-                                        lx_normal: END
-                            sx_term \n
-                              sx_and_or
-                                sx_pipe_sequence
-                                  sx_cmd
-                                    sx_simple_cmd
-                                      sx_cmd_word:
-                                        tk_word: exit
-                                          lx_normal: exit
+                                  tk_word: exit
+                                    lx_normal: exit
 sx_complete_cmd
   sx_list
     sx_and_or
@@ -1741,6 +1689,25 @@ sx_complete_cmd
                                     sx_word -:
                                       tk_word: END
                                         lx_normal: END
+                                      HERE CONTENT:
+                                        tk_word: 		my \$thoughts = \$ENV{'thoughts'};
+		my \$eyes = \$ENV{'eyes'};
+		my \$tongue = \$ENV{'tongue'};
+		my \$eye = '0';
+		open my \$file, '<', \$ENV{'full'} or die \$!;
+		my \$file_content = do { local \$/; <\$file> };
+		eval \$file_content;
+		print \$the_cow;
+
+                                          lx_normal: 		my $thoughts = $ENV{thoughts};
+		my $eyes = $ENV{eyes};
+		my $tongue = $ENV{tongue};
+		my $eye = 0;
+		open my $file, <, $ENV{full} or die $!;
+		my $file_content = do { local $/; <$file> };
+		eval $file_content;
+		print $the_cow;
+
 sx_complete_cmd
   sx_list
     sx_and_or
@@ -2535,4 +2502,3 @@ sx_complete_cmd
             sx_cmd_word:
               tk_word: get_cow
                 lx_normal: get_cow
-Processing here END
