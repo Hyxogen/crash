@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:12:45 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 11:27:52 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 16:17:53 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,6 @@ int
 		&& pr_token(pr, NULL, sx_none, kw_then)
 		&& pr_compound_list(pr, node))
 	{
-		
 		while (pr_elif_part(pr, node))
 			continue ;
 		pr_else_part(pr, node);

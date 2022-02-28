@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 10:52:43 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 15:33:37 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 16:04:22 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ void
 	lex_main(&lexer);
 	/* TODO: destroy resources */
 }
-
 
 void
 	lex_command(t_lexer *lex, t_tpart *part)

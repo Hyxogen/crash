@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:20:35 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 10:55:27 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 16:05:58 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int
 int
 	pr_redirect_list(t_parser *pr, t_snode *parent)
 {
-	t_snode *node;
+	t_snode	*node;
 
 	node = snode(sx_cmd_suffix);
 	while (pr_io_redirect(pr, node))

@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 11:44:41 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 11:52:56 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 16:02:00 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,38 +86,27 @@ void
 int
 	_src_cmp(const t_source *src, const char *str, int flags)
 {
-	const t_list	*current;
-	const char 		*line;
+	const t_list	*next;
+	const char		*line;
 
 	line = src->str;
-	if (!line)
-		return (0);
-	while ((flags & flag_trim) && *line == '\t')
+	next = src->lst;
+	while (line && (flags & flag_trim) && *line == '\t')
 		line++;
-	while (*line && *str && *line == *str)
+	while (line && *line && *str && (*line == *str || *line == '\\'))
 	{
+		if (*line == *str)
+			str++;
 		line++;
-		str++;
-	}
-	current = src->lst;
-	if (current)
-	{
-		line = current->content;
-		while (line && *line && *str && (*line == *str || *line == '\\'))
+		if (!*line)
 		{
-			if (*line == *str)
-				str++;
-			line++;
-			if (!*line)
+			if (next)
 			{
-				if (current->next)
-				{
-					current = current->next;
-					line = current->content;
-				}
-				else
-					line = NULL;
+				line = next->content;
+				next = next->next;
 			}
+			else
+				line = NULL;
 		}
 	}
 	return (!*str);
@@ -129,7 +118,7 @@ void
 	while (*str)
 	{
 		lex_nom(lex, *str);
-		str++; 
+		str++;
 	}
 	lex_nom(lex, '\n');
 }
@@ -138,15 +127,24 @@ void
 	_src_nom(void *ele, void *context)
 {
 	char	*str;
-	t_lexer *lex;
+	t_lexer	*lex;
 
-	str = (char*) ele;
+	str = (char *) ele;
 	lex = context;
 	if (!str)
 		return ;
 	_src_super_nom(lex, str);
 }
 
+void
+	_src_reset(t_source *src)
+{
+	free(src->str);
+	src->cur = -1;
+	src->nex = -1;
+	src->str = NULL;
+	src->off = 0;
+}
 
 int
 	src_check_end(t_lexer *lex, const char *end, int flags)
@@ -155,7 +153,8 @@ int
 
 	if (!lex || lex->src->lst || !lex->src->str)
 		return (0);
-	while (!lex->src->str || (!(flags & flag_quote) && lex->src->len > 0 && lex->src->str[lex->src->len - 1] == '\\'))
+	while (!lex->src->str || (!(flags & flag_quote)
+			&& lex->src->len > 0 && lex->src->str[lex->src->len - 1] == '\\'))
 	{
 		ret = _src_add_next(lex->src, &lex->src->str);
 		if (ret < 0)
@@ -167,11 +166,7 @@ int
 	if (_src_cmp(lex->src, end, flags))
 	{
 		_src_super_nom(lex, lex->src->str);
-		free(lex->src->str);
-		lex->src->cur = -1;
-		lex->src->nex = -1;
-		lex->src->str = NULL;
-		lex->src->off = 0;
+		_src_reset(lex->src);
 		ft_lstforeach(lex->src->lst, _src_nom, lex);
 		ft_lstclear(&lex->src->lst, free);
 		return (1);

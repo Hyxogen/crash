@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:07:29 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 10:36:52 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 16:06:17 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int
 int
 	pr_while_clause(t_parser *pr, t_snode *parent)
 {
-	t_snode *node;
+	t_snode	*node;
 
 	node = snode(sx_while_clause);
 	if (pr_token(pr, NULL, sx_none, kw_while))
@@ -66,7 +66,7 @@ int
 int
 	pr_until_clause(t_parser *pr, t_snode *parent)
 {
-	t_snode *node;
+	t_snode	*node;
 
 	node = snode(sx_until_clause);
 	if (pr_token(pr, NULL, sx_none, kw_until))
@@ -87,7 +87,7 @@ int
 int
 	pr_do_group(t_parser *pr, t_snode *parent)
 {
-	t_snode *node;
+	t_snode	*node;
 
 	node = snode(sx_do_group);
 	pr_convert_reserved(pr, pr->current);

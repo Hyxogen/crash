@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:21:00 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 13:19:17 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 16:06:48 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,8 @@ void
 int
 	pr_check_here(t_parser *pr)
 {
-	if (pr->current_ret && pr->current->id == tk_newline && ft_lstsize(pr->here_docs))
+	if (pr->current_ret && pr->current->id == tk_newline
+		&& ft_lstsize(pr->here_docs))
 	{
 		ft_lstforeach(pr->here_docs, pr_process_here, pr);
 		ft_lstclear(&pr->here_docs, sh_nop);

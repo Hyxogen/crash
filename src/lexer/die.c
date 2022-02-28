@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 14:51:59 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 14:53:11 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 16:05:02 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void
 	token_destroy(t_token *tok)
 {
 	size_t	i;
-	
+
 	i = 0;
 	free(tok->str);
 	while (i < tok->count)

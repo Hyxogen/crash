@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 14:07:12 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 10:50:14 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 16:01:10 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int
 	lex_special_lparen(t_lexer *lex)
 {
 	t_tpart	*part;
-	
+
 	lex_update(lex, 1);
 	if (lex->src->nex == '(')
 	{
@@ -43,7 +43,7 @@ int
 	lex_special_parameter(t_lexer *lex)
 {
 	t_token	*tmp;
-	
+
 	if ((ft_isalnum(lex->src->nex) || lex->src->cur == '_')
 		&& !lex->btick)
 	{

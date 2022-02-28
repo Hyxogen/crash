@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        ::::::::            */
+/*   advance.c                                          :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2022/02/28 16:05:07 by dmeijer       #+#    #+#                 */
+/*   Updated: 2022/02/28 16:05:22 by dmeijer       ########   odam.nl         */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "lexer.h"
 
 #include "memory.h"
@@ -78,7 +90,7 @@ void
 	{
 		part = &lex->tok->parts[lex->tok->count - 1];
 		if ((part->id == lx_backtick || part->id == lx_normal) && !sep)
-			lex_append(lex, (char**) &part->data, &part->len, 0);
+			lex_append(lex, (char **) &part->data, &part->len, 0);
 	}
 	lex_advance(lex);
 }
