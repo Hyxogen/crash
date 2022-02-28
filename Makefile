@@ -80,7 +80,10 @@ re: fclean all
 
 test:
 	make CC=clang
+	ASAN_OPTIONS=detect_leaks=1 ./crash < tests/scripts/bf.sh
 	ASAN_OPTIONS=detect_leaks=1 ./crash < tests/scripts/cowsay.sh
+	ASAN_OPTIONS=detect_leaks=1 ./crash < tests/scripts/fib.sh
+	ASAN_OPTIONS=detect_leaks=1 ./crash < tests/scripts/tableflip.sh
 
 -include $(DEPENDS)
 .PHONY: all clean fclean re

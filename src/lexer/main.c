@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        ::::::::            */
+/*   main.c                                             :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2022/02/28 16:34:03 by dmeijer       #+#    #+#                 */
+/*   Updated: 2022/02/28 16:34:03 by dmeijer       ########   odam.nl         */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "lexer.h"
 
 static int
@@ -17,7 +29,7 @@ static int
 		end = src_check_end(lex, lex->end, lex->here_flags);
 		return (lex->src->cur == -1 || end);
 	}
-	end = ft_strchr(sep, lex->src->cur) != NULL && lex->src->cur != '\0';
+	end = (ft_strchr(sep, lex->src->cur) != NULL && lex->src->cur != '\0');
 	return ((end && !lex_quoted(lex)) || lex->src->cur == -1);
 }
 
