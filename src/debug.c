@@ -224,6 +224,17 @@ void
 	{
 		ft_putchar_fd('\n', STDOUT_FILENO);
 	}
+	if (node->here_content != NULL)
+	{
+		i = 0;
+		while (i < depth + 1)
+		{
+			ft_putstr_fd((char*) "  ", STDOUT_FILENO);
+			i += 1;
+		}
+		ft_putstr_fd((char*) "HERE CONTENT:\n", STDOUT_FILENO);
+		print_token(node->here_content, depth + 2);
+	}
 	i = 0;
 	while (i < node->childs_size)
 	{

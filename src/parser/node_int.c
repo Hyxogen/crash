@@ -34,5 +34,6 @@ t_snode
 	node->childs_size = 0;
 	node->token = NULL;
 	node->flags = 0;
+	node->here_content = NULL;
 	return (node);
 }

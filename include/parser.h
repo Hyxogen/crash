@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 11:30:58 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 10:49:06 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 11:53:05 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,8 @@ enum e_node_flag
 	flag_and_if = 1 << 3,
 	flag_or_if = 1 << 4,
 	flag_newline = 1 << 5,
-	flag_trim = 1 << 6
+	flag_trim = 1 << 6,
+	flag_quote = 1 << 7
 };
 
 typedef enum e_syntax_id	t_syntax_id;
@@ -113,6 +114,7 @@ struct s_snode
 	struct s_snode	*parent;
 	struct s_snode	**childs;
 	t_token			*token;
+	t_token			*here_content;
 	int				flags;
 };
 

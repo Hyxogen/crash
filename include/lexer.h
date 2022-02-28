@@ -5,9 +5,6 @@
 # include "input.h"
 # include "libft.h"
 
-#define HERE_FLAG_TRIM 1
-#define HERE_FLAG_QUOTE 2
-
 struct s_snode;
 
 enum e_token_id

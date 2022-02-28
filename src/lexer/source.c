@@ -6,12 +6,13 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 11:44:41 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/24 15:51:00 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 11:52:56 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lexer.h"
 #include <stdlib.h>
+#include "parser.h"
 
 ssize_t
 	_src_next_line(t_source *src, char **out)
@@ -83,7 +84,7 @@ void
 }
 
 int
-	_src_cmp(const t_source *src, const char *str)
+	_src_cmp(const t_source *src, const char *str, int flags)
 {
 	const t_list	*current;
 	const char 		*line;
@@ -91,6 +92,8 @@ int
 	line = src->str;
 	if (!line)
 		return (0);
+	while ((flags & flag_trim) && *line == '\t')
+		line++;
 	while (*line && *str && *line == *str)
 	{
 		line++;
@@ -149,28 +152,19 @@ int
 	src_check_end(t_lexer *lex, const char *end, int flags)
 {
 	ssize_t	ret;
-	size_t	line_len;
-	char	*line_str;
 
 	if (!lex || lex->src->lst || !lex->src->str)
 		return (0);
-	line_str = lex->src->str;
-	line_len = lex->src->len;
-	while ((flags & HERE_FLAG_TRIM) && *line_str == '\t')
+	while (!lex->src->str || (!(flags & flag_quote) && lex->src->len > 0 && lex->src->str[lex->src->len - 1] == '\\'))
 	{
-		line_str++;
-		line_len--;
-	}
-	while (!line_str || (!(flags & HERE_FLAG_QUOTE) && line_len > 0 && line_str[line_len - 1] == '\\'))
-	{
-		ret = _src_add_next(lex->src, &line_str);
+		ret = _src_add_next(lex->src, &lex->src->str);
 		if (ret < 0)
 			return (-1);
 		if (ret == 0)
 			break ;
-		line_len = (size_t) ret;
+		lex->src->len = (size_t) ret;
 	}
-	if (_src_cmp(lex->src, end))
+	if (_src_cmp(lex->src, end, flags))
 	{
 		_src_super_nom(lex, lex->src->str);
 		free(lex->src->str);

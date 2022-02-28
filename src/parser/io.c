@@ -6,22 +6,32 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:21:00 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 10:37:00 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 13:19:03 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.h"
+#include "memory.h"
 
 void
 	pr_process_here(void *data, void *param)
 {
 	t_parser	*pr;
 	t_snode		*node;
+	size_t		i;
 
 	pr = param;
 	node = data;
 	/* TODO: unquote */
-	lex_here(pr->lexer, pr->current, node->token->str, node->flags);
+	i = 0;
+	while (i < node->token->count)
+	{
+		if (node->token->parts[i].quote)
+			node->flags |= flag_quote;
+		i += 1;
+	}
+	node->here_content = sh_safe_malloc(sizeof(*node->here_content));
+	lex_here(pr->lexer, node->here_content, node->token->str, node->flags);
 }
 
 int
@@ -30,6 +40,7 @@ int
 	if (pr->current_ret && pr->current->id == tk_newline && ft_lstsize(pr->here_docs))
 	{
 		ft_lstforeach(pr->here_docs, pr_process_here, pr);
+		ft_lstclear(&pr->here_docs, sh_nop);
 	}
 	return (1);
 }
@@ -64,15 +75,13 @@ int
 	t_snode	*node;
 
 	node = snode(sx_io_here);
-	if (pr_token(pr, NULL, sx_none, op_dless))
+	if (pr_token(pr, NULL, sx_none, op_dless)
+		&& pr_token(pr, node, sx_word, tk_word))
 	{
-		if (pr_token(pr, node, sx_word, tk_word))
-		{
-			ft_lstadd_back(&pr->here_docs, ft_lstnew(node->childs[0]));
-			node_add_child(parent, node);
-			pr_check_here(pr);
-			return (1);
-		}
+		ft_lstadd_back(&pr->here_docs, ft_lstnew(node->childs[0]));
+		node_add_child(parent, node);
+		pr_check_here(pr);
+		return (1);
 	}
 	else if (pr_token(pr, NULL, sx_none, op_dlessdash)
 		&& pr_token(pr, node, sx_word, tk_word))
