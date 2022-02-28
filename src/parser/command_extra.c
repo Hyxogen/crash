@@ -19,7 +19,8 @@ int
 
 	node = snode(sx_cmd_prefix);
 	while (pr_io_redirect(pr, node)
-		|| (pr_convert_ass(pr, pr->current, 1)
+		|| (pr->current_ret != 0
+			&& pr_convert_ass(pr, pr->current, 1)
 			&& pr_token(pr, node, sx_assword, tk_assword)))
 		continue;
 	if (node->childs_size != 0)

@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 15:40:28 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/24 11:10:44 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 14:21:15 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void
 	}
 	else if (mode == in_file)
 	{
-		in->file_handle = start_read((int) param);
+		in->file_handle = start_read((int) (unsigned long) param);
 		in->line_proc = _input_file_line_proc;
 	}
 	else if (mode == in_readline)

@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:15:17 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 10:39:27 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 14:42:56 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,18 @@ void
 void
 	node_destroy(t_snode *node)
 {
-	return ;
 	if (!node)
 		return ;
 	node_destroy_childs(node);
+	if (node->token != NULL)
+	{
+		token_destroy(node->token);
+		free(node->token);
+	}
+	if (node->here_content != NULL)
+	{
+		token_destroy(node->here_content);
+		free(node->here_content);
+	}
 	free(node);
 }

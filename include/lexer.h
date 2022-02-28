@@ -206,6 +206,8 @@ void		src_init(t_source *src, t_input *in);
 /* setup a token with initial values */
 void		token_init(t_token *tok);
 
+void		token_destroy(t_token *tok);
+
 /* adds a token part to an existing token */
 t_tpart		*token_add_part(t_token *tok, t_lexer_id id);
 

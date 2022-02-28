@@ -4,13 +4,13 @@ BASE_FILES		:= \
 	debug.c memory.c assert.c op.c
 LEXER_FILES		:= \
 	expand.c init.c add.c lex.c operator.c escape.c advance.c main.c \
-	special.c source.c
+	special.c source.c die.c
 INPUT_FILES		:= \
 	input_file.c input_readline.c input_string.c input.c
 PARSER_FILES	:= \
 	and_or.c case.c command_extra.c command.c condition.c convert.c \
 	function.c general.c io.c list.c loop.c node_int.c node.c other.c \
-	pipe.c redirect.c separator.c subshell.c
+	pipe.c redirect.c separator.c subshell.c die.c
 
 FILE_NAMES		:= \
 	$(BASE_FILES) \
@@ -18,8 +18,8 @@ FILE_NAMES		:= \
 	$(patsubst %,input/%,$(INPUT_FILES)) \
 	$(patsubst %,parser/%,$(PARSER_FILES))
 
-CC				:= cc
-LINK_CMD		:= cc
+CC				:= clang
+LINK_CMD		:= $(CC)
 CFLAGS			:= -Wall -Wextra -pedantic
 LFLAGS			:= -Wall -Wextra
 
@@ -77,6 +77,10 @@ fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
+
+test:
+	make CC=clang
+	ASAN_OPTIONS=detect_leaks=1 ./crash < tests/scripts/cowsay.sh
 
 -include $(DEPENDS)
 .PHONY: all clean fclean re

@@ -3,6 +3,7 @@
 #include "parser.h"
 
 #include <unistd.h>
+#include <stdlib.h>
 
 static const char	*g_sx_names[] = {
 	"sx_none",
@@ -247,11 +248,16 @@ t_snode
 	*pr_parse(t_parser *pr)
 {
 	t_snode	*node;
+	t_snode	*child;
 
 	node = snode(sx_none);
 	if (!pr_complete_cmd(pr, node))
 		return (NULL);
-	return (node->childs[0]);
+	sh_assert(node->childs_size == 1);
+	child = node->childs[0];
+	node->childs_size = 0;
+	node_destroy(node);
+	return (child);
 }
 
 int
@@ -262,6 +268,7 @@ int
 	t_lexer		lex;
 	t_parser	pr;
 	t_snode		*node;
+	t_token		*tmp;
 
 	input_new(&in, in_readline, NULL);
 	src_init(&src, &in);
@@ -271,12 +278,22 @@ int
 	pr.lexer = &lex;
 	while (1)
 	{
-		pr_next_token(&pr);
+		if (pr.current_ret != 0)
+		{
+			tmp = pr.current;
+			pr_next_token(&pr);
+			token_destroy(tmp);
+			free(tmp);
+		}
+		else
+			pr_next_token(&pr);
 		if (pr.current_ret == 0)
 			break ;
 		node = pr_parse(&pr);
 		if (node != NULL)
 			print_node(node, 0);
+		node_destroy(node);
 	}
 	input_destroy(&in);
+	pr_destroy(&pr);
 }

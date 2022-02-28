@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 10:52:43 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 13:27:52 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 14:13:58 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ void
 	t_lexer	lexer;
 
 	lex_init(&lexer);
-	lexer.prev = lex->prev;
+	lexer.prev = lex;
 	lexer.id = lx_normal;
 	lexer.src = lex->src;
 	lexer.end = end;

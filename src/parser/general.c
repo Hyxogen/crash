@@ -6,12 +6,13 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:03:53 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 13:17:38 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 15:04:01 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.h"
 #include "memory.h"
+#include <stdlib.h>
 
 void
 	pr_init(t_parser *pr)
@@ -32,16 +33,28 @@ int
 	{
 		pr->next = sh_safe_malloc(sizeof(t_token));
 		pr->next_ret = lex_lex(pr->lexer, pr->next);
-		pr_convert_io_number(pr, pr->next);
+		if (pr->next_ret != 0)
+			pr_convert_io_number(pr, pr->next);
+		else
+		{
+			token_destroy(pr->next);
+			free(pr->next);
+		}
 	}
 	pr->current = pr->next;
 	pr->current_ret = pr->next_ret;
 	pr->next_ret = 0;
-	if (pr->current->id != tk_newline && pr->current_ret)
+	if (pr->current_ret && pr->current->id != tk_newline)
 	{
 		pr->next = sh_safe_malloc(sizeof(t_token));
 		pr->next_ret = lex_lex(pr->lexer, pr->next);
-		pr_convert_io_number(pr, pr->next);
+		if (pr->next_ret != 0)
+			pr_convert_io_number(pr, pr->next);
+		else
+		{
+			token_destroy(pr->next);
+			free(pr->next);
+		}
 	}
 	return (pr->current_ret);
 }

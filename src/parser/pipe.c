@@ -40,7 +40,8 @@ int
 int
 	pr_pipeline(t_parser *pr, t_snode *parent)
 {
-	if (pr_convert_reserved(pr, pr->current)
+	if (pr->current_ret != 0
+		&& pr_convert_reserved(pr, pr->current)
 		&& pr_bang(pr, parent))
 		return (1);
 	return (pr_pipe_sequence(pr, parent));

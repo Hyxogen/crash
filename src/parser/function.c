@@ -15,8 +15,8 @@
 int
 	pr_convert_func_def(t_parser *pr)
 {
-	if (pr->next->id == op_lparen)
-		if (pr_convert_name(pr, pr->current))
+	if (pr->next_ret != 0 && pr->next->id == op_lparen)
+		if (pr->current_ret != 0 && pr_convert_name(pr, pr->current))
 			return (1);
 	return (0);
 }
