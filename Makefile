@@ -1,10 +1,22 @@
 NAME			:= minishell
 
-FILE_NAMES		:= debug.c memory.c assert.c lexer/expand.c lexer/init.c lexer/add.c \
-				lexer/lex.c lexer/operator.c lexer/escape.c lexer/advance.c \
-				lexer/main.c lexer/special.c lexer/source.c \
-				input/input_file.c input/input_readline.c input/input_string.c \
-				input/input.c parser/parser.c parser/convert.c op.c
+BASE_FILES		:= \
+	debug.c memory.c assert.c op.c
+LEXER_FILES		:= \
+	expand.c init.c add.c lex.c operator.c escape.c advance.c main.c \
+	special.c source.c
+INPUT_FILES		:= \
+	input_file.c input_readline.c input_string.c input.c
+PARSER_FILES	:= \
+	and_or.c case.c command_extra.c command.c condition.c convert.c \
+	function.c general.c io.c list.c loop.c node_int.c node.c other.c \
+	pipe.c redirect.c separator.c subshell.c
+
+FILE_NAMES		:= \
+	$(BASE_FILES) \
+	$(patsubst %,lexer/%,$(LEXER_FILES)) \
+	$(patsubst %,input/%,$(INPUT_FILES)) \
+	$(patsubst %,parser/%,$(PARSER_FILES))
 
 CC				:= cc
 LINK_CMD		:= cc
@@ -41,7 +53,7 @@ else
 $(error "invalid config $(config"))
 endif
 
-all: $(NAME)
+all: $(NAME) crash
 
 # TODO compile libft using its own makefile
 $(NAME): $(OBJECTS) $(LIBFT_LIB)
@@ -58,8 +70,7 @@ crash: $(NAME)
 	ln -s $(NAME) $@
 
 clean:
-	rm -f $(OBJECTS)
-	rm -f $(DEPENDS)
+	rm -rf build
 	${MAKE} -C $(LIBFT_DIR) fclean
 
 fclean: clean

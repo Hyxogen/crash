@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 10:52:43 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/25 10:44:33 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/28 10:59:59 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,7 @@ void
 	token_init(part->data);
 	lex_init(&lexer);
 	lexer.tok = part->data;
+	lexer.tok->id = tk_word;
 	lexer.prev = lex;
 	lexer.id = lx_parameter;
 	lexer.src = lex->src;
@@ -130,4 +131,5 @@ void
 	if (lexer.src->cur == -1)
 		lex_advance(&lexer);
 	lex_main(&lexer);
+	/* TODO: destroy resources */
 }

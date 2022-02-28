@@ -1,0 +1,460 @@
+sx_complete_cmd
+  sx_list
+    sx_and_or
+      sx_pipe_sequence
+        sx_cmd
+          sx_simple_cmd
+            sx_cmd_prefix
+              sx_assword:
+                tk_assword: cowfile="default.cow"
+                  lx_normal: cowfile=default.cow
+sx_complete_cmd
+  sx_list
+    sx_and_or
+      sx_pipe_sequence
+        sx_cmd
+          sx_simple_cmd
+            sx_cmd_word:
+              tk_word: export
+                lx_normal: export
+            sx_cmd_suffix
+              sx_word:
+                tk_word: eyes="oo"
+                  lx_normal: eyes=oo
+sx_complete_cmd
+  sx_list
+    sx_and_or
+      sx_pipe_sequence
+        sx_cmd
+          sx_simple_cmd
+            sx_cmd_word:
+              tk_word: export
+                lx_normal: export
+            sx_cmd_suffix
+              sx_word:
+                tk_word: tongue="  "
+                  lx_normal: tongue=  
+sx_complete_cmd
+  sx_list
+    sx_and_or
+      sx_pipe_sequence
+        sx_cmd
+          sx_simple_cmd
+            sx_cmd_prefix
+              sx_assword:
+                tk_assword: wrapcolumn=40
+                  lx_normal: wrapcolumn=40
+sx_complete_cmd
+  sx_list
+    sx_and_or
+      sx_pipe_sequence
+        sx_cmd
+          sx_simple_cmd
+            sx_cmd_prefix
+              sx_assword:
+                tk_assword: progname="$(basename $0)"
+                  lx_normal: progname=
+                  (quoted) lx_command:
+                    sx_complete_cmdlst
+                      sx_complete_cmd
+                        sx_list
+                          sx_and_or
+                            sx_pipe_sequence
+                              sx_cmd
+                                sx_simple_cmd
+                                  sx_cmd_word:
+                                    tk_word: basename
+                                      lx_normal: basename
+                                  sx_cmd_suffix
+                                    sx_word:
+                                      tk_word: $0
+                                        lx_normal: 
+                                        lx_parameter:
+                                          tk_word: 0
+                                        lx_normal: 
+                  lx_normal: 
+sx_complete_cmd
+  sx_list
+    sx_and_or
+      sx_pipe_sequence
+        sx_cmd
+          sx_simple_cmd
+            sx_cmd_prefix
+              sx_assword:
+                tk_assword: cowpath="${COWPATH:-cows}"
+                  lx_normal: cowpath=
+                  (quoted) lx_parameter:
+                    tk_word: COWPATH:-cows
+                  lx_normal: 
+sx_complete_cmd
+  sx_list
+    sx_and_or
+      sx_pipe_sequence
+        sx_cmd
+          sx_function_def
+            sx_function_name:
+              tk_name: wrap
+                lx_normal: wrap
+            sx_function_body
+              sx_compound_cmd
+                sx_brace_group
+                  sx_compound_list
+                    sx_term \n
+                      sx_and_or
+                        sx_pipe_sequence
+                          sx_cmd
+                            sx_simple_cmd
+                              sx_cmd_prefix
+                                sx_assword:
+                                  tk_assword: width=$1
+                                    lx_normal: width=
+                                    lx_parameter:
+                                      tk_word: 1
+                                    lx_normal: 
+                      sx_term \n
+                        sx_and_or
+                          sx_pipe_sequence
+                            sx_cmd
+                              sx_simple_cmd
+                                sx_cmd_prefix
+                                  sx_assword:
+                                    tk_assword: line="$2"
+                                      lx_normal: line=
+                                      lx_parameter:
+                                        tk_word: 2
+                                      lx_normal: 
+                        sx_term \n
+                          sx_and_or
+                            sx_pipe_sequence
+                              sx_cmd
+                                sx_simple_cmd
+                                  sx_cmd_word:
+                                    tk_word: shift
+                                      lx_normal: shift
+                                  sx_cmd_suffix
+                                    sx_word:
+                                      tk_word: 2
+                                        lx_normal: 2
+                          sx_term \n
+                            sx_and_or
+                              sx_pipe_sequence
+                                sx_cmd
+                                  sx_compound_cmd
+                                    sx_for_clause
+                                      sx_for_name:
+                                        tk_name: word
+                                          lx_normal: word
+                                      sx_wordlist
+                                        sx_word:
+                                          tk_word: $*
+                                            lx_normal: $*
+                                      sx_do_group
+                                        sx_compound_list
+                                          sx_term \n
+                                            sx_and_or
+                                              sx_pipe_sequence
+                                                sx_cmd
+                                                  sx_compound_cmd
+                                                    sx_if_clause
+                                                      sx_condition
+                                                        sx_compound_list
+                                                          sx_term ;
+                                                            sx_and_or
+                                                              sx_pipe_sequence
+                                                                sx_cmd
+                                                                  sx_simple_cmd
+                                                                    sx_cmd_word:
+                                                                      tk_word: [
+                                                                        lx_normal: [
+                                                                    sx_cmd_suffix
+                                                                      sx_word:
+                                                                        tk_word: $((${#line} + ${#word}))
+                                                                          lx_normal: 
+                                                                          lx_arithmetic:
+                                                                            tk_word: ${#line} + ${#word}
+                                                                              lx_normal: 
+                                                                              lx_parameter:
+                                                                                tk_word: #line
+                                                                              lx_normal:  + 
+                                                                              lx_parameter:
+                                                                                tk_word: #word
+                                                                              lx_normal: 
+                                                                          lx_normal: 
+                                                                      sx_word:
+                                                                        tk_word: -ge
+                                                                          lx_normal: -ge
+                                                                      sx_word:
+                                                                        tk_word: $width
+                                                                          lx_normal: 
+                                                                          lx_parameter:
+                                                                            tk_word: width
+                                                                          lx_normal: 
+                                                                      sx_word:
+                                                                        tk_word: ]
+                                                                          lx_normal: ]
+                                                      sx_compound_list
+                                                        sx_term \n
+                                                          sx_and_or
+                                                            sx_pipe_sequence
+                                                              sx_cmd
+                                                                sx_simple_cmd
+                                                                  sx_cmd_word:
+                                                                    tk_word: echo
+                                                                      lx_normal: echo
+                                                                  sx_cmd_suffix
+                                                                    sx_word:
+                                                                      tk_word: "$line"
+                                                                        lx_normal: 
+                                                                        lx_parameter:
+                                                                          tk_word: line
+                                                                        lx_normal: 
+                                                          sx_term \n
+                                                            sx_and_or
+                                                              sx_pipe_sequence
+                                                                sx_cmd
+                                                                  sx_simple_cmd
+                                                                    sx_cmd_prefix
+                                                                      sx_assword:
+                                                                        tk_assword: line="$word"
+                                                                          lx_normal: line=
+                                                                          lx_parameter:
+                                                                            tk_word: word
+                                                                          lx_normal: 
+                                                      sx_else_part
+                                                        sx_compound_list
+                                                          sx_term \n
+                                                            sx_and_or
+                                                              sx_pipe_sequence
+                                                                sx_cmd
+                                                                  sx_simple_cmd
+                                                                    sx_cmd_prefix
+                                                                      sx_assword:
+                                                                        tk_assword: line="$line $word"
+                                                                          lx_normal: line=
+                                                                          lx_parameter:
+                                                                            tk_word: line
+                                                                          lx_normal:  
+                                                                          lx_parameter:
+                                                                            tk_word: word
+                                                                          lx_normal: 
+                            sx_term \n
+                              sx_and_or &&
+                                sx_pipe_sequence
+                                  sx_cmd
+                                    sx_simple_cmd
+                                      sx_cmd_word:
+                                        tk_word: [
+                                          lx_normal: [
+                                      sx_cmd_suffix
+                                        sx_word:
+                                          tk_word: -n
+                                            lx_normal: -n
+                                        sx_word:
+                                          tk_word: "$line"
+                                            lx_normal: 
+                                            lx_parameter:
+                                              tk_word: line
+                                            lx_normal: 
+                                        sx_word:
+                                          tk_word: ]
+                                            lx_normal: ]
+                                sx_and_or
+                                  sx_pipe_sequence
+                                    sx_cmd
+                                      sx_simple_cmd
+                                        sx_cmd_word:
+                                          tk_word: echo
+                                            lx_normal: echo
+                                        sx_cmd_suffix
+                                          sx_word:
+                                            tk_word: "$line"
+                                              lx_normal: 
+                                              lx_parameter:
+                                                tk_word: line
+                                              lx_normal: 
+sx_complete_cmd
+  sx_list
+    sx_and_or
+      sx_pipe_sequence
+        sx_cmd
+          sx_function_def
+            sx_function_name:
+              tk_name: list_cowfiles
+                lx_normal: list_cowfiles
+            sx_function_body
+              sx_compound_cmd
+                sx_brace_group
+                  sx_compound_list
+                    sx_term \n
+                      sx_and_or
+                        sx_pipe_sequence
+                          sx_cmd
+                            sx_compound_cmd
+                              sx_for_clause
+                                sx_for_name:
+                                  tk_name: d
+                                    lx_normal: d
+                                sx_wordlist
+                                  sx_word:
+                                    tk_word: $(IFS=: echo $cowpath)
+                                      lx_normal: 
+                                      lx_command:
+                                        sx_complete_cmdlst
+                                          sx_complete_cmd
+                                            sx_list
+                                              sx_and_or
+                                                sx_pipe_sequence
+                                                  sx_cmd
+                                                    sx_simple_cmd
+                                                      sx_cmd_prefix
+                                                        sx_assword:
+                                                          tk_assword: IFS=:
+                                                            lx_normal: IFS=:
+                                                      sx_cmd_word:
+                                                        tk_word: echo
+                                                          lx_normal: echo
+                                                      sx_cmd_suffix
+                                                        sx_word:
+                                                          tk_word: $cowpath
+                                                            lx_normal: 
+                                                            lx_parameter:
+                                                              tk_word: cowpath
+                                                            lx_normal: 
+                                      lx_normal: 
+                                sx_do_group
+                                  sx_compound_list
+                                    sx_term \n
+                                      sx_and_or
+                                        sx_pipe_sequence
+                                          sx_cmd
+                                            sx_simple_cmd
+                                              sx_cmd_word:
+                                                tk_word: echo
+                                                  lx_normal: echo
+                                              sx_cmd_suffix
+                                                sx_word:
+                                                  tk_word: "Cow files in $d:"
+                                                    lx_normal: Cow files in 
+                                                    lx_parameter:
+                                                      tk_word: d
+                                                    lx_normal: :
+                                      sx_term \n
+                                        sx_and_or
+                                          sx_pipe_sequence
+                                            sx_cmd
+                                              sx_simple_cmd
+                                                sx_cmd_prefix
+                                                  sx_assword:
+                                                    tk_assword: files=
+                                                      lx_normal: files=
+                                        sx_term \n
+                                          sx_and_or
+                                            sx_pipe_sequence
+                                              sx_cmd
+                                                sx_compound_cmd
+                                                  sx_for_clause
+                                                    sx_for_name:
+                                                      tk_name: file
+                                                        lx_normal: file
+                                                    sx_wordlist
+                                                      sx_word:
+                                                        tk_word: $(ls "$d")
+                                                          lx_normal: 
+                                                          lx_command:
+                                                            sx_complete_cmdlst
+                                                              sx_complete_cmd
+                                                                sx_list
+                                                                  sx_and_or
+                                                                    sx_pipe_sequence
+                                                                      sx_cmd
+                                                                        sx_simple_cmd
+                                                                          sx_cmd_word:
+                                                                            tk_word: ls
+                                                                              lx_normal: ls
+                                                                          sx_cmd_suffix
+                                                                            sx_word:
+                                                                              tk_word: "$d"
+                                                                                lx_normal: 
+                                                                                lx_parameter:
+                                                                                  tk_word: d
+                                                                                lx_normal: 
+                                                          lx_normal: 
+                                                    sx_do_group
+                                                      sx_compound_list
+                                                        sx_term \n
+                                                          sx_and_or
+                                                            sx_pipe_sequence
+                                                              sx_cmd
+                                                                sx_compound_cmd
+                                                                  sx_if_clause
+                                                                    sx_condition
+                                                                      sx_compound_list
+                                                                        sx_term ;
+                                                                          sx_and_or
+                                                                            sx_pipe_sequence
+                                                                              sx_cmd
+                                                                                sx_simple_cmd
+                                                                                  sx_cmd_word:
+                                                                                    tk_word: [
+                                                                                      lx_normal: [
+                                                                                  sx_cmd_suffix
+                                                                                    sx_word:
+                                                                                      tk_word: "${file%.cow}"
+                                                                                        lx_normal: 
+                                                                                        (quoted) lx_parameter:
+                                                                                          tk_word: file%.cow
+                                                                                        lx_normal: 
+                                                                                    sx_word:
+                                                                                      tk_word: !=
+                                                                                        lx_normal: !=
+                                                                                    sx_word:
+                                                                                      tk_word: "$file"
+                                                                                        lx_normal: 
+                                                                                        lx_parameter:
+                                                                                          tk_word: file
+                                                                                        lx_normal: 
+                                                                                    sx_word:
+                                                                                      tk_word: ]
+                                                                                        lx_normal: ]
+                                                                    sx_compound_list
+                                                                      sx_term \n
+                                                                        sx_and_or
+                                                                          sx_pipe_sequence
+                                                                            sx_cmd
+                                                                              sx_simple_cmd
+                                                                                sx_cmd_prefix
+                                                                                  sx_assword:
+                                                                                    tk_assword: files="$files ${file%.cow}"
+                                                                                      lx_normal: files=
+                                                                                      lx_parameter:
+                                                                                        tk_word: files
+                                                                                      lx_normal:  
+                                                                                      (quoted) lx_parameter:
+                                                                                        tk_word: file%.cow
+                                                                                      lx_normal: 
+                                          sx_term \n
+                                            sx_and_or
+                                              sx_pipe_sequence
+                                                sx_cmd
+                                                  sx_simple_cmd
+                                                    sx_cmd_word:
+                                                      tk_word: wrap
+                                                        lx_normal: wrap
+                                                    sx_cmd_suffix
+                                                      sx_word:
+                                                        tk_word: 80
+                                                          lx_normal: 80
+                                                      sx_word:
+                                                        tk_word: $files
+                                                          lx_normal: 
+                                                          lx_parameter:
+                                                            tk_word: files
+                                                          lx_normal: 
+                      sx_term \n
+                        sx_and_or
+                          sx_pipe_sequence
+                            sx_cmd
+                              sx_simple_cmd
+                                sx_cmd_word:
+                                  tk_word: exit
+                                    lx_normal: exit

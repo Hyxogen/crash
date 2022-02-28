@@ -2,8 +2,8 @@
 
 #include "memory.h"
 
-static void
-	append(t_lexer *lex, char **string, size_t *length, int esc)
+void
+	lex_append(t_lexer *lex, char **string, size_t *length, int esc)
 {
 	if (lex->src->cur == -1)
 		return ;
@@ -34,7 +34,7 @@ void
 		lex = lex->prev;
 		while (lex != NULL)
 		{
-			append(super_lexer, &lex->tok->str, &lex->tok->len, 1);
+			lex_append(super_lexer, &lex->tok->str, &lex->tok->len, 1);
 			lex = lex->prev;
 		}
 		super_lexer->src->cur = tmp;
@@ -44,7 +44,7 @@ void
 void
 	lex_nom_and_skip(t_lexer *lex)
 {
-	append(lex, &lex->tok->str, &lex->tok->len, 1);
+	lex_append(lex, &lex->tok->str, &lex->tok->len, 1);
 	lex_nom(lex, lex->src->cur);
 	lex->src->cur = -1;
 }
@@ -73,12 +73,12 @@ void
 {
 	t_tpart	*part;
 
-	append(lex, &lex->tok->str, &lex->tok->len, 1);
+	lex_append(lex, &lex->tok->str, &lex->tok->len, 1);
 	if (lex->tok->count > 0)
 	{
 		part = &lex->tok->parts[lex->tok->count - 1];
 		if ((part->id == lx_backtick || part->id == lx_normal) && !sep)
-			append(lex, (char**) &part->data, &part->len, 0);
+			lex_append(lex, (char**) &part->data, &part->len, 0);
 	}
 	lex_advance(lex);
 }

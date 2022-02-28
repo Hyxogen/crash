@@ -148,6 +148,7 @@ struct s_lexer
 	int			here_flags;
 };
 
+void		lex_append(t_lexer *lex, char **string, size_t *length, int esc);
 /* read in the next character and also read in next if needed */
 void		src_advance(t_source *src);
 /* check if the end of a heredoc has been reached */
