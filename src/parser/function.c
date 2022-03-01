@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:16:44 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 11:57:29 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 14:32:51 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,21 +22,6 @@ int
 }
 
 int
-	pr_function_body(t_parser *pr, t_snode *parent)
-{
-	t_snode	*node;
-
-	node = snode(sx_function_body);
-	if (pr_compound_cmd(pr, node))
-	{
-		node_add_child(parent, node);
-		return (1);
-	}
-	node_destroy(node);
-	return (0);
-}
-
-int
 	pr_function_def(t_parser *pr, t_snode *parent)
 {
 	t_snode	*node;
@@ -44,13 +29,13 @@ int
 	if (!pr_convert_func_def(pr))
 		return (0);
 	node = snode(sx_function_def);
-	pr_token(pr, node, sx_function_name, tk_name);
+	pr_token_set(pr, node, tk_name);
 	pr_token(pr, NULL, sx_none, op_lparen);
 	if (pr_token(pr, NULL, sx_none, op_rparen))
 	{
 		while (pr_token(pr, NULL, sx_none, tk_newline))
 			continue ;
-		if (pr_function_body(pr, node))
+		if (pr_compound_cmd(pr, node))
 		{
 			node_add_child(parent, node);
 			return (1);

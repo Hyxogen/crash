@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 11:30:58 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 13:25:53 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 15:03:40 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,14 +53,14 @@
 //         command_list
 //     redirect_list
 
-// command_list(token, childs=[and_if | or_if | pipe], flags=SUBSHELL)
+// command_list(token, childs=[term]), flags=SUBSHELL)
+// term(childs=(and_if | or_if | pipe), flags=AND|SEMI|NONE)
 // and_if(childs=(and_if | or_if | pipe, pipe))
 // or_if(childs=(and_if | or_if | pipe, pipe))
 // pipe_sequence(childs=[compound_command | simple_command | function], flags=BANG)
 // compound_command(childs=(command_list | if_clause | for_clause | case_clause | while_clause, redirect_list))
 // simple_command(childs=(word_list, redirect_list, word_list))
-// redirect_list(childs=[io_redirect])
-// io_redirect(childs=(word, less | lessand | great | greatand | dgreat | lessgreat | clobber | io_here))
+// redirect_list(childs=[less | lessand | great | greatand | dgreat | lessgreat | clobber | io_here])
 // if_clause(childs=(command_list, command_list, if_clause | command_list))
 // for_clause(token, childs=(word_list, command_list))
 // case_clause(token, childs=[command_list])
@@ -103,35 +103,20 @@ enum e_syntax_id
 	sx_filename,
 	sx_io_redirect,
 	sx_io_number,
-	sx_cmd_suffix,
-	sx_cmd_prefix,
 	sx_cmd,
 	sx_term,
 	sx_compound_list,
-	sx_subshell,
-	sx_brace_group,
 	sx_compound_cmd,
 	sx_while_clause,
-	sx_until_clause,
-	sx_do_group,
 	sx_if_clause,
-	sx_else_part,
 	sx_function_def,
-	sx_function_body,
-	sx_function_name,
 	sx_case_clause,
-	sx_case_list,
-	sx_case_item,
-	sx_pattern,
 	sx_for_clause,
-	sx_for_name,
 	sx_wordlist,
-	sx_condition,
-	sx_elif_part,
 	sx_io_here,
-	sx_complete_cmdlst,
+	sx_command_list,
 	sx_io_redirect_list,
-	sx_ass_list
+	sx_ass_list,
 };
 
 enum e_node_flag
@@ -143,7 +128,9 @@ enum e_node_flag
 	flag_or_if = 1 << 4,
 	flag_newline = 1 << 5,
 	flag_trim = 1 << 6,
-	flag_quote = 1 << 7
+	flag_quote = 1 << 7,
+	flag_subshell = 1 << 8,
+	flag_until = 1 << 9,
 };
 
 typedef enum e_syntax_id	t_syntax_id;
@@ -186,13 +173,12 @@ int		pr_complete_cmd(t_parser *pr, t_snode *parent);
 t_snode	*snode(t_syntax_id syn_id);
 void	pr_destroy(t_parser *pr);
 
-
 int		pr_and_or(t_parser *pr, t_snode *parent);
 int		pr_case_item(t_parser *pr, t_snode *parent);
-int		pr_case_list(t_parser *pr, t_snode *parent);
+void	pr_case_list(t_parser *pr, t_snode *parent);
 int		pr_case_clause(t_parser *pr, t_snode *parent);
-int		pr_cmd_prefix(t_parser *pr, t_snode *parent, t_snode *red, t_snode *ass);
-int		pr_cmd_suffix(t_parser *pr, t_snode *parent, t_snode *red, t_snode *ass);
+int		pr_cmd_prefix(t_parser *pr, t_snode *red, t_snode *ass, t_snode *cmd);
+void	pr_cmd_suffix(t_parser *pr, t_snode *red, t_snode *ass, t_snode *cmd);
 int		pr_compound_cmd(t_parser *pr, t_snode *parent);
 int		pr_cmd(t_parser *pr, t_snode *parent);
 int		pr_complete_cmd(t_parser *pr, t_snode *parent);
@@ -231,7 +217,7 @@ void	node_destroy(t_snode *node);
 int		pr_brace_group(t_parser *pr, t_snode *parent);
 int		pr_wordlist(t_parser *pr, t_snode *parent);
 int		pr_term(t_parser *pr, t_snode *parent);
-int		pr_pattern(t_parser *pr, t_snode *parent);
+int		pr_pattern(t_parser *pr, t_token **token);
 int		pr_pipe_sequence(t_parser *pr, t_snode *parent);
 int		pr_pipeline(t_parser *pr, t_snode *parent);
 int		pr_convert_io_number(t_parser *pr, t_token *token);
@@ -241,4 +227,5 @@ int		pr_seperator_op(t_parser *pr, t_snode *parent);
 int		pr_sequential_sep(t_parser *pr, t_snode *parent);
 int		pr_subshell(t_parser *pr, t_snode *parent);
 int		pr_bang(t_parser *pr, t_snode *parent);
+int		pr_command_lst(t_parser *pr, t_snode *parent);
 #endif

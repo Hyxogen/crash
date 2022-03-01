@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:12:45 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 13:17:38 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 13:51:19 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,10 @@
 int
 	pr_if_clause(t_parser *pr, t_snode *parent)
 {
-	return (pr_elif_part(pr, parent, kw_if));
+	if (pr_elif_part(pr, parent, kw_if)
+		&& pr_token(pr, NULL, sx_none, kw_fi))
+		return (1);
+	return (0);
 }
 
 int

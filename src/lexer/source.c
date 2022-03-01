@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 11:44:41 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 16:02:00 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 15:37:56 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,10 @@ int
 	int		c;
 	ssize_t	ret;
 
-	if (src->str == NULL)
+	if (src->str == NULL || src->off > src->len)
 	{
+		free(src->str);
+		src->off = 0;
 		ret = _src_next_line(src, &src->str);
 		if (ret < 0)
 			return (-1);
@@ -63,12 +65,7 @@ int
 	c = (unsigned char) src->str[src->off];
 	src->off += 1;
 	if (c == '\0')
-	{
-		free(src->str);
-		src->str = NULL;
-		src->off = 0;
 		return ('\n');
-	}
 	return (c);
 }
 

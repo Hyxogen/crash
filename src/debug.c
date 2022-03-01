@@ -38,35 +38,20 @@ static const char	*g_sx_names[] = {
 	"sx_filename",
 	"sx_io_redirect",
 	"sx_io_number",
-	"sx_cmd_suffix",
-	"sx_cmd_prefix",
 	"sx_cmd",
 	"sx_term",
 	"sx_compound_list",
-	"sx_subshell",
-	"sx_brace_group",
 	"sx_compound_cmd",
 	"sx_while_clause",
-	"sx_until_clause",
-	"sx_do_group",
 	"sx_if_clause",
-	"sx_else_part",
 	"sx_function_def",
-	"sx_function_body",
-	"sx_function_name",
 	"sx_case_clause",
-	"sx_case_list",
-	"sx_case_item",
-	"sx_pattern",
 	"sx_for_clause",
-	"sx_for_name",
 	"sx_wordlist",
-	"sx_condition",
-	"sx_elif_part",
 	"sx_io_here",
-	"sx_complete_cmdlst",
+	"sx_command_list",
 	"sx_io_redirect_list",
-	"sx_ass_list"
+	"sx_ass_list",
 };
 
 static const char	*g_tk_names[] = {
@@ -126,7 +111,10 @@ static const char	*g_sx_fnames[] = {
 	"&&",
 	"||",
 	"\\n",
-	"-"
+	"-",
+	"\"",
+	"()",
+	"until"
 };
 
 void	print_node(t_snode *node, size_t depth);
@@ -138,7 +126,7 @@ void
 	int flag;
 
 	flag = 1;
-	while (flag <= flag_trim)
+	while (flag <= flag_until)
 	{
 		if (node->flags & flag)
 		{
@@ -217,7 +205,7 @@ void
 	}
 	ft_putstr_fd((char*) g_sx_names[node->type], STDOUT_FILENO);
 	print_sflags(node);
-	if (!node->childs_size && node->token && node->token->str)
+	if (node->token && node->token->str)
 	{
 		ft_putchar_fd(':', STDOUT_FILENO);
 		ft_putchar_fd('\n', STDOUT_FILENO);

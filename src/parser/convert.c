@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/16 14:13:22 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 10:19:14 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 14:06:35 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,8 @@ int
 	size_t	len;
 
 	(void) pr;
+	if (token != NULL && token->id == id)
+		return (1);
 	if (token == NULL || token->id != tk_word)
 		return (0);
 	len = ft_strlen(g_keywords[id - kw_if]);

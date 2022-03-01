@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:03:53 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 13:25:11 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 15:18:09 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,9 @@ int
 	pr_token_set(t_parser *pr, t_snode *node, t_token_id tk_id)
 {
 	if (pr->current_ret == 0 || pr->current->id != tk_id)
+	{
 		return (0);
+	}
 	node->token = pr->current;
 	pr_next_token(pr);
 	return (1);

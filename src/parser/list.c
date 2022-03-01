@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:05:42 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 11:27:30 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 15:01:51 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,18 +33,25 @@ int
 	pr_list(t_parser *pr, t_snode *parent)
 {
 	t_snode	*node;
+	t_snode	*term;
 
 	node = snode(sx_list);
-	if (pr_and_or(pr, node))
+	term = snode(sx_term);
+	while (pr_and_or(pr, term))
 	{
 		if (pr_token(pr, NULL, sx_and, op_and))
-			node->flags |= flag_and;
+			term->flags |= flag_and;
 		else if (pr_token(pr, NULL, sx_semicolon, op_semi))
-			node->flags |= flag_semi;
-		pr_list(pr, node);
-		node_add_child(parent, node);
-		return (1);
+			term->flags |= flag_semi;
+		node_add_child(node, term);
+		term = snode(sx_term);
 	}
-	node_destroy(node);
-	return (0);
+	node_destroy(term);
+	if (node->childs_size == 0)
+	{
+		node_destroy(node);
+		return (0);
+	}
+	node_add_child(parent, node);
+	return (1);
 }

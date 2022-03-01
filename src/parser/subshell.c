@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:19:35 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 10:19:44 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 13:54:27 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,20 +15,16 @@
 int
 	pr_subshell(t_parser *pr, t_snode *parent)
 {
-	t_snode	*node;
-
-	node = snode(sx_subshell);
 	if (pr_token(pr, NULL, sx_none, op_lparen))
 	{
-		if (pr_compound_list(pr, node))
+		if (pr_compound_list(pr, parent))
 		{
 			if (pr_token(pr, NULL, sx_none, op_rparen))
 			{
-				node_add_child(parent, node);
+				parent->childs[parent->childs_size - 1]->flags |= flag_subshell;
 				return (1);
 			}
 		}
 	}
-	node_destroy(node);
 	return (0);
 }

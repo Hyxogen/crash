@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:20:35 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 12:04:00 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 15:22:14 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,32 +33,55 @@ int
 int
 	pr_io_redirect(t_parser *pr, t_snode *parent)
 {
-	t_snode	*node;
+	t_token	*token;
 
 	if (!pr->current_ret)
 		return (0);
-	node = snode(sx_io_redirect);
-	pr_token(pr, node, sx_io_number, tk_ionumber);
-	if (pr_io_file(pr, node))
+	token = NULL;
+	if (pr->current->id == tk_ionumber)
 	{
-		node_add_child(parent, node);
+		token = pr->current;
+		pr_next_token(pr);
+	}
+	if (pr_io_file(pr, parent)
+		|| pr_io_here(pr, parent))
+	{
+		parent->childs[parent->childs_size - 1]->token = token;
 		return (1);
 	}
-	else if (pr_io_here(pr, node))
-	{
-		node_add_child(parent, node);
-		return (1);
-	}
-	node_destroy(node);
 	return (0);
 }
+
+
+// int
+// 	pr_io_redirect(t_parser *pr, t_snode *parent)
+// {
+// 	t_snode	*node;
+
+// 	if (!pr->current_ret)
+// 		return (0);
+// 	node = snode(sx_io_redirect);
+// 	pr_token(pr, node, sx_io_number, tk_ionumber);
+// 	if (pr_io_file(pr, node))
+// 	{
+// 		node_add_child(parent, node);
+// 		return (1);
+// 	}
+// 	else if (pr_io_here(pr, node))
+// 	{
+// 		node_add_child(parent, node);
+// 		return (1);
+// 	}
+// 	node_destroy(node);
+// 	return (0);
+// }
 
 int
 	pr_redirect_list(t_parser *pr, t_snode *parent)
 {
 	t_snode	*node;
 
-	node = snode(sx_cmd_suffix);
+	node = snode(sx_io_redirect_list);
 	while (pr_io_redirect(pr, node))
 		continue ;
 	if (node->childs_size != 0)

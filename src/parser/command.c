@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:05:14 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 13:07:26 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 14:46:36 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,22 +40,11 @@ int
 int
 	pr_cmd(t_parser *pr, t_snode *parent)
 {
-	t_snode	*node;
-
-	node = snode(sx_cmd);
-	if (pr_function_def(pr, node))
-		;
-	else if (pr_compound_cmd(pr, node))
-		;
-	else if (pr_simple_cmd(pr, node))
-		;
-	else
-	{
-		node_destroy(node);
-		return (0);
-	}
-	node_add_child(parent, node);
-	return (1);
+	if (pr_function_def(pr, parent)
+		|| pr_compound_cmd(pr, parent)
+		|| pr_simple_cmd(pr, parent))
+		return (1);
+	return (0);
 }
 
 int
@@ -76,7 +65,7 @@ int
 {
 	t_snode	*node;
 
-	node = snode(sx_complete_cmdlst);
+	node = snode(sx_command_list);
 	while (pr->current_ret != -1 && pr_complete_cmd(pr, node))
 	{
 		pr_next_token(pr);
@@ -90,22 +79,27 @@ int
 	pr_simple_cmd(t_parser *pr, t_snode *parent)
 {
 	t_snode	*node;
-	t_snode	*ass;
 	t_snode	*red;
+	t_snode	*ass;
+	t_snode	*cmd;
 
-	node = snode(sx_simple_cmd);
-	ass = snode(sx_ass_list);
 	red = snode(sx_io_redirect_list);
-	node_add_child(node, ass);
-	node_add_child(node, red);
-	if (pr_cmd_prefix(pr, node, red, ass))
-		pr_token(pr, node, sx_cmd_word, tk_word);
-	else if (!pr_token(pr, node, sx_cmd_word, tk_word))
+	ass = snode(sx_ass_list);
+	cmd = snode(sx_wordlist);
+	if (pr_cmd_prefix(pr, red, ass, cmd))
+		pr_token(pr, cmd, sx_word, tk_word);
+	else if (!pr_token(pr, cmd, sx_word, tk_word))
 	{
-		node_destroy(node);
+		node_destroy(red);
+		node_destroy(ass);
+		node_destroy(cmd);
 		return (0);
 	}
-	pr_cmd_suffix(pr, node, red, ass);
+	pr_cmd_suffix(pr, red, ass, cmd);
+	node = snode(sx_simple_cmd);
+	node_add_child(node, cmd);
+	node_add_child(node, red);
+	node_add_child(node, ass);
 	node_add_child(parent, node);
 	return (1);
 }

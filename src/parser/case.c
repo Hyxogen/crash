@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:16:12 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 10:37:25 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 14:24:34 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,43 +15,26 @@
 int
 	pr_case_item(t_parser *pr, t_snode *parent)
 {
-	t_snode	*node;
+	t_token	*token;
 
-	node = snode(sx_case_item);
 	pr_token(pr, NULL, sx_none, op_lparen);
-	if (pr_pattern(pr, node)
+	if (pr_pattern(pr, &token)
 		&& pr_token(pr, NULL, sx_none, op_rparen))
 	{
-		if (!pr_compound_list(pr, node))
+		if (!pr_compound_list(pr, parent))
 		{
 			while (pr_token(pr, NULL, sx_none, tk_newline))
 				continue ;
+			node_add_child(parent, snode(sx_compound_list));
 		}
+		parent->childs[parent->childs_size - 1]->token = token;
 		if (pr_token(pr, NULL, sx_none, op_dsemi))
 		{
 			while (pr_token(pr, NULL, sx_none, tk_newline))
 				continue ;
-			node_add_child(parent, node);
 			return (1);
 		}
 	}
-	node_destroy(node);
-	return (0);
-}
-
-int
-	pr_case_list(t_parser *pr, t_snode *parent)
-{
-	t_snode	*node;
-
-	node = snode(sx_case_list);
-	if (pr_case_item(pr, node))
-	{
-		pr_case_list(pr, node);
-		node_add_child(parent, node);
-		return (1);
-	}
-	node_destroy(node);
 	return (0);
 }
 
@@ -63,7 +46,7 @@ int
 	if (!pr_token(pr, NULL, sx_none, kw_case))
 		return (0);
 	node = snode(sx_case_clause);
-	if (pr_token(pr, node, sx_word, tk_word))
+	if (pr_token_set(pr, node, tk_word))
 	{
 		while (pr_token(pr, NULL, sx_none, tk_newline))
 			continue ;
@@ -72,7 +55,8 @@ int
 		{
 			while (pr_token(pr, NULL, sx_none, tk_newline))
 				continue ;
-			pr_case_list(pr, node);
+			while (pr_case_item(pr, node))
+				continue ;
 			if (pr_token(pr, NULL, sx_none, kw_esac))
 			{
 				node_add_child(parent, node);

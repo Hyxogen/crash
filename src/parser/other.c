@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:22:45 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 10:53:49 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 14:38:49 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,21 +15,10 @@
 int
 	pr_brace_group(t_parser *pr, t_snode *parent)
 {
-	t_snode	*node;
-
-	node = snode(sx_brace_group);
-	if (pr_token(pr, NULL, sx_none, kw_lbrace))
-	{
-		if (pr_compound_list(pr, node))
-		{
-			if (pr_token(pr, NULL, sx_none, kw_rbrace))
-			{
-				node_add_child(parent, node);
-				return (1);
-			}
-		}
-	}
-	node_destroy(node);
+	if (pr_token(pr, NULL, sx_none, kw_lbrace)
+		&& pr_compound_list(pr, parent)
+		&& pr_token(pr, NULL, sx_none, kw_rbrace))
+		return (1);
 	return (0);
 }
 
@@ -56,31 +45,42 @@ int
 	t_snode	*node;
 
 	node = snode(sx_term);
-	if (pr_and_or(pr, node))
+	while (1)
 	{
-		if (pr_token(pr, NULL, sx_and, op_and))
-			node->flags |= flag_and;
-		else if (pr_token(pr, NULL, sx_semicolon, op_semi))
-			node->flags |= flag_semi;
-		while (pr_token(pr, NULL, sx_newline, tk_newline))
-			node->flags |= flag_newline;
-		if (node->flags)
-			pr_term(pr, node);
-		node_add_child(parent, node);
-		return (1);
+		if (pr_and_or(pr, node))
+		{
+			if (pr_token(pr, NULL, sx_and, op_and))
+				node->flags |= flag_and;
+			else if (pr_token(pr, NULL, sx_semicolon, op_semi))
+				node->flags |= flag_semi;
+			while (pr_token(pr, NULL, sx_newline, tk_newline))
+				node->flags |= flag_newline;
+			if (node->flags)
+				pr_term(pr, node);
+		}
+		else
+			break ;
 	}
-	node_destroy(node);
-	return (0);
+	if (node->childs_size == 0)
+	{
+		node_destroy(node);
+		return (0);
+	}
+	node_add_child(parent, node);
+	return (1);
 }
 
 int
-	pr_pattern(t_parser *pr, t_snode *parent)
+	pr_pattern(t_parser *pr, t_token **token)
 {
 	if (!pr->current_ret)
 		return (0);
 	if (pr_convert_keyword(pr, pr->current, kw_esac))
 		return (0);
-	pr_token(pr, parent, sx_pattern, tk_word);
+	if (pr->current->id != tk_word)
+		return (0);
+	*token = pr->current;
+	pr_next_token(pr);
 	return (1);
 }
 
