@@ -18,7 +18,7 @@ int
 	t_snode	*node;
 
 	node = snode(sx_for_clause);
-	if (pr_token(pr, NULL, sx_none, kw_for)
+	if (pr_token_set(pr, node, kw_for)
 		&& pr_convert_name(pr, pr->current))
 	{
 		pr_token(pr, node, sx_for_name, tk_name);

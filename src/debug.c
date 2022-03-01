@@ -64,7 +64,9 @@ static const char	*g_sx_names[] = {
 	"sx_condition",
 	"sx_elif_part",
 	"sx_io_here",
-	"sx_complete_cmdlst"
+	"sx_complete_cmdlst",
+	"sx_io_redirect_list",
+	"sx_ass_list"
 };
 
 static const char	*g_tk_names[] = {

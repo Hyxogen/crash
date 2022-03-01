@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:03:53 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 16:17:11 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 13:25:11 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,21 +54,30 @@ int
 }
 
 int
+	pr_token_set(t_parser *pr, t_snode *node, t_token_id tk_id)
+{
+	if (pr->current_ret == 0 || pr->current->id != tk_id)
+		return (0);
+	node->token = pr->current;
+	pr_next_token(pr);
+	return (1);
+}
+
+int
 	pr_token(t_parser *pr, t_snode *parent,
 		t_syntax_id syn_id, t_token_id tk_id)
 {
 	t_snode	*node;
 
-	if (pr->current_ret == 0 || pr->current->id != tk_id)
-		return (0);
 	node = snode(syn_id);
-	node->token = pr->current;
-	pr_next_token(pr);
-	if (!parent)
+	if (!pr_token_set(pr, node, tk_id))
 	{
 		node_destroy(node);
-		return (1);
+		return (0);
 	}
-	node_add_child(parent, node);
+	if (parent == NULL)
+		node_destroy(node);
+	else
+		node_add_child(parent, node);
 	return (1);
 }

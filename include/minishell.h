@@ -6,13 +6,15 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 10:50:42 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 14:37:59 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 11:09:06 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
-/* Constant Rage Again SHell*/
+
+/* Constant Rage Again SHell */
+/* Can't Rest Again SHell */
 /* https://pubs.opengroup.org/onlinepubs/009656399/toc.pdf */
 
 # ifdef SH_DEBUG

@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:21:00 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 16:06:48 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 11:48:26 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,24 +49,17 @@ int
 int
 	pr_io_file(t_parser *pr, t_snode *parent)
 {
-	t_snode	*node;
-
-	node = snode(sx_io_file);
-	if (pr_token(pr, node, sx_less, op_less)
-		|| pr_token(pr, node, sx_lessand, op_lessand)
-		|| pr_token(pr, node, sx_great, op_great)
-		|| pr_token(pr, node, sx_greatand, op_greatand)
-		|| pr_token(pr, node, sx_dgreat, op_dgreat)
-		|| pr_token(pr, node, sx_lessgreat, op_lessgreat)
-		|| pr_token(pr, node, sx_clobber, op_clobber))
+	if (pr_token(pr, parent, sx_less, op_less)
+		|| pr_token(pr, parent, sx_lessand, op_lessand)
+		|| pr_token(pr, parent, sx_great, op_great)
+		|| pr_token(pr, parent, sx_greatand, op_greatand)
+		|| pr_token(pr, parent, sx_dgreat, op_dgreat)
+		|| pr_token(pr, parent, sx_lessgreat, op_lessgreat)
+		|| pr_token(pr, parent, sx_clobber, op_clobber))
 	{
-		if (pr_token(pr, node, sx_filename, tk_word))
-		{
-			node_add_child(parent, node);
+		if (pr_token(pr, parent->childs[parent->childs_size - 1], sx_filename, tk_word))
 			return (1);
-		}
 	}
-	node_destroy(node);
 	return (0);
 }
 

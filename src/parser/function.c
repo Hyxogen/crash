@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:16:44 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 16:17:38 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 11:57:29 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ int
 	node = snode(sx_function_body);
 	if (pr_compound_cmd(pr, node))
 	{
-		pr_redirect_list(pr, node);
 		node_add_child(parent, node);
 		return (1);
 	}

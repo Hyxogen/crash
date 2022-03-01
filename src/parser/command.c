@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:05:14 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 15:34:27 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 13:07:26 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,25 +15,25 @@
 int
 	pr_compound_cmd(t_parser *pr, t_snode *parent)
 {
-	t_snode	*node;
-
-	node = snode(sx_compound_cmd);
+	t_snode	*red;
+	
 	if (pr->current_ret)
 	{
 		pr_convert_reserved(pr, pr->current);
-		if (pr_brace_group(pr, node)
-			|| pr_subshell(pr, node)
-			|| pr_while_clause(pr, node)
-			|| pr_until_clause(pr, node)
-			|| pr_if_clause(pr, node)
-			|| pr_for_clause(pr, node)
-			|| pr_case_clause(pr, node))
+		if (pr_brace_group(pr, parent)
+			|| pr_subshell(pr, parent)
+			|| pr_while_clause(pr, parent)
+			|| pr_until_clause(pr, parent)
+			|| pr_if_clause(pr, parent)
+			|| pr_for_clause(pr, parent)
+			|| pr_case_clause(pr, parent))
 		{
-			node_add_child(parent, node);
+			red = snode(sx_io_redirect_list);
+			pr_redirect_list(pr, red);
+			node_add_child(parent, red);
 			return (1);
 		}
 	}
-	node_destroy(node);
 	return (0);
 }
 
@@ -46,7 +46,7 @@ int
 	if (pr_function_def(pr, node))
 		;
 	else if (pr_compound_cmd(pr, node))
-		pr_redirect_list(pr, node);
+		;
 	else if (pr_simple_cmd(pr, node))
 		;
 	else
@@ -61,20 +61,13 @@ int
 int
 	pr_complete_cmd(t_parser *pr, t_snode *parent)
 {
-	t_snode	*node;
-
 	if (!pr->current_ret)
 		return (0);
-	node = snode(sx_complete_cmd);
-	if (pr_list(pr, node))
+	if (pr_list(pr, parent))
 	{
 		if (!pr->next_ret)
-		{
-			node_add_child(parent, node);
 			return (1);
-		}
 	}
-	node_destroy(node);
 	return (0);
 }
 
@@ -97,16 +90,22 @@ int
 	pr_simple_cmd(t_parser *pr, t_snode *parent)
 {
 	t_snode	*node;
+	t_snode	*ass;
+	t_snode	*red;
 
 	node = snode(sx_simple_cmd);
-	if (pr_cmd_prefix(pr, node))
+	ass = snode(sx_ass_list);
+	red = snode(sx_io_redirect_list);
+	node_add_child(node, ass);
+	node_add_child(node, red);
+	if (pr_cmd_prefix(pr, node, red, ass))
 		pr_token(pr, node, sx_cmd_word, tk_word);
 	else if (!pr_token(pr, node, sx_cmd_word, tk_word))
 	{
 		node_destroy(node);
 		return (0);
 	}
-	pr_cmd_suffix(pr, node);
+	pr_cmd_suffix(pr, node, red, ass);
 	node_add_child(parent, node);
 	return (1);
 }
