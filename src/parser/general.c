@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:03:53 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 15:18:09 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 16:38:36 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ void
 int
 	pr_next_token(t_parser *pr)
 {
-	pr_check_here(pr);
 	pr->current = pr->next;
 	pr->current_ret = pr->next_ret;
 	pr->next = 0;
@@ -50,6 +49,7 @@ int
 		if (!pr->current)
 			pr_next_token(pr);
 	}
+	pr_check_here(pr);
 	return (pr->current_ret);
 }
 
@@ -60,6 +60,7 @@ int
 	{
 		return (0);
 	}
+	sh_assert(node->token == NULL);
 	node->token = pr->current;
 	pr_next_token(pr);
 	return (1);

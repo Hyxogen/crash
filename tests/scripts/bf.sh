@@ -15,7 +15,6 @@ echo "Done setting up memory!"
 
 # memory="123 456 789"
 
-
 print_current() {
 	debugprint "$str"
 	index=0

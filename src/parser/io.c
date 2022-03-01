@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:21:00 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 15:24:18 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 16:37:36 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,9 @@ int
 		|| pr_token(pr, parent, sx_lessgreat, op_lessgreat)
 		|| pr_token(pr, parent, sx_clobber, op_clobber))
 	{
+		token_destroy(parent->childs[parent->childs_size - 1]->token);
+		free(parent->childs[parent->childs_size - 1]->token);
+		parent->childs[parent->childs_size - 1]->token = NULL;
 		if (pr_token(pr, parent->childs[parent->childs_size - 1], sx_filename, tk_word))
 			return (1);
 	}

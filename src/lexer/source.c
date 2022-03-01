@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 11:44:41 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 15:37:56 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 16:10:30 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ int
 	next = src->lst;
 	while (line && (flags & flag_trim) && *line == '\t')
 		line++;
-	while (line && *line && *str && (*line == *str || *line == '\\'))
+	while (line && *line && *str && (*line == *str || (*(line + 1) == '\0' && *line == '\\')))
 	{
 		if (*line == *str)
 			str++;
@@ -106,7 +106,7 @@ int
 				line = NULL;
 		}
 	}
-	return (!*str);
+	return (!*str && (!line || !*line));
 }
 
 void
