@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:05:59 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 14:52:18 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/22 16:36:53 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,11 @@ int
 			node->type = sx_and_if;
 		else if (pr_token(pr, NULL, sx_or_if, op_orif))
 			node->type = sx_or_if;
-		_pr_nested_and_or(pr, node);
+		if (!_pr_nested_and_or(pr, node))
+		{
+			pr->lexer->error = SH_PR_UNEXTOKEN;
+			return (0);
+		}
 		if (node->childs_size == 1)
 		{
 			node_add_child(parent, node->childs[0]);
