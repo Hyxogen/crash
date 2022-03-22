@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:22:45 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 14:38:49 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/22 15:32:08 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,14 @@
 int
 	pr_brace_group(t_parser *pr, t_snode *parent)
 {
-	if (pr_token(pr, NULL, sx_none, kw_lbrace)
-		&& pr_compound_list(pr, parent)
-		&& pr_token(pr, NULL, sx_none, kw_rbrace))
-		return (1);
+	if (pr_token(pr, NULL, sx_none, kw_lbrace))
+	{
+		if (pr_compound_list(pr, parent)
+			&& pr_token(pr, NULL, sx_none, kw_rbrace))
+			return (1);
+		pr->lexer->error = SH_PR_UNEXTOKEN;
+		
+	}
 	return (0);
 }
 
@@ -97,6 +101,8 @@ int
 			node_add_child(parent, node);
 			return (1);
 		}
+		pr->lexer->error = SH_PR_UNEXTOKEN;
+		
 	}
 	node_destroy(node);
 	return (0);

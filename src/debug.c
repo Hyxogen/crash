@@ -2,8 +2,10 @@
 #include "lexer.h"
 #include "parser.h"
 
+
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 static const char	*g_sx_names[] = {
 	"sx_none",
@@ -263,6 +265,7 @@ int
 	t_snode		*node;
 	t_token		*tmp;
 
+	setbuf(stdout, NULL);
 	input_new(&in, in_readline, NULL);
 	src_init(&src, &in);
 	lex_init(&lex);
@@ -271,8 +274,11 @@ int
 	pr.lexer = &lex;
 	while (1)
 	{
+		pr.lexer->error = 0;
 		if (pr.current_ret != 0)
 		{
+			if (pr.current->id == tk_null)
+				break ;
 			tmp = pr.current;
 			pr_next_token(&pr);
 			token_destroy(tmp);
@@ -280,12 +286,14 @@ int
 		}
 		else
 			pr_next_token(&pr);
-		if (pr.current_ret == 0)
+		if (pr.current_ret == 0 || pr.current->id == tk_null)
 			break ;
 		node = pr_parse(&pr);
 		if (node != NULL)
 			print_node(node, 0);
 		node_destroy(node);
+		if (pr.lexer->error)
+			printf("Syntax error\n");
 	}
 	input_destroy(&in);
 	pr_destroy(&pr);

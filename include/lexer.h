@@ -7,6 +7,10 @@
 
 struct s_snode;
 
+# ifndef SH_PR_UNEXTOKEN
+#  define SH_PR_UNEXTOKEN 1
+# endif
+
 enum e_token_id
 {
 	tk_null,
@@ -143,6 +147,8 @@ struct s_lexer
 	/* end of heredoc */
 	const char	*end;
 	int			here_flags;
+	/* the last error code */
+	int			error;
 };
 
 void		lex_append(t_lexer *lex, char **string, size_t *length, int esc);
@@ -168,6 +174,7 @@ void		lex_arithmetic(t_lexer *lex, t_tpart *part);
 /* updates the states of the lexer and or will call sublexers to process the current special character*/
 int			lex_special(t_lexer *lex);
 
+int			lex_unquote(char *str);
 /* check if the current character is quoted: */
 /* - if it is precded by a backslash */
 /* - if it is inside of a single quoted string literal (except ') */
@@ -176,11 +183,13 @@ int			lex_special(t_lexer *lex);
 /* - - single quotes (') */
 /* - if it is not a \ or ` in a ` string */
 int			lex_quoted(t_lexer *lex);
+int			lex_quoted_int(int quote, int cur);
 /* check if the current character is escaped by \ given context */
 /* - normally: all characters */
 /* - in string or arithmetic expansion: $, `, ", \ */
 /* - in heredoc or ` string: $, `, \ */
 int			lex_bquoted(t_lexer *lex);
+int			lex_bquoted_int(int quote, int cur);
 void		lex_nom(t_lexer *lex, int ch);
 void		lex_nom_and_skip(t_lexer *lex);
 /* read next character using src_advance */

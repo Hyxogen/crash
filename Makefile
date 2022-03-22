@@ -10,7 +10,7 @@ INPUT_FILES		:= \
 PARSER_FILES	:= \
 	and_or.c case.c command_extra.c command.c condition.c convert.c \
 	function.c general.c io.c list.c loop.c node_int.c node.c other.c \
-	pipe.c redirect.c separator.c subshell.c die.c
+	pipe.c redirect.c separator.c subshell.c die.c error.c
 
 FILE_NAMES		:= \
 	$(BASE_FILES) \
@@ -41,8 +41,12 @@ ifndef config
 endif
 
 ifeq ($(config), debug)
-	CFLAGS		+= -DSH_DEBUG=1 -fsanitize=address,undefined -g3 -Og
-	LFLAGS		+= -DSH_DEBUG=1 -fsanitize=address,undefined
+	CFLAGS		+= -DSH_DEBUG=1 -g3 -Og
+	LFLAGS		+= -DSH_DEBUG=1
+	ifndef nsan
+		CFLAGS	+= -fsanitize=address,undefined
+		LFLAGS	+= -fsanitize=address,undefined
+	endif
 else ifeq ($(config), release)
 	CFLAGS		+= -Werror -g3 -O2
 	LFLAGS		+= -Werror

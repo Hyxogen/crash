@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 11:44:41 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 16:10:30 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/22 13:28:37 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ ssize_t
 
 	if (src->lst)
 	{
-		free(src->str);
 		*out = src->lst->content;
 		tmp = src->lst->next;
 		ft_lstdelone(src->lst, sh_nop);
@@ -146,19 +145,21 @@ void
 int
 	src_check_end(t_lexer *lex, const char *end, int flags)
 {
-	ssize_t	ret;
+	ssize_t		ret;
+	const char	*str;
 
 	if (!lex || lex->src->lst || !lex->src->str)
 		return (0);
-	while (!lex->src->str || (!(flags & flag_quote)
-			&& lex->src->len > 0 && lex->src->str[lex->src->len - 1] == '\\'))
+	str = lex->src->str;
+	ret = lex->src->len;
+	while (!str || (!(flags & flag_quote)
+		&& ret > 0 && str[ret - 1] == '\\'))
 	{
-		ret = _src_add_next(lex->src, &lex->src->str);
+		ret = _src_add_next(lex->src, &str);
 		if (ret < 0)
 			return (-1);
 		if (ret == 0)
 			break ;
-		lex->src->len = (size_t) ret;
 	}
 	if (_src_cmp(lex->src, end, flags))
 	{

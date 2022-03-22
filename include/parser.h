@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 11:30:58 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 15:03:40 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/22 13:15:46 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,6 +162,7 @@ struct s_snode
 
 int		pr_convert_reserved(t_parser *pr, t_token *token);
 int		pr_convert_keyword(t_parser *pr, t_token *token, t_token_id id);
+int		pr_error_convert_keyword(t_parser *pr, t_token *token, t_token_id id);
 int		pr_convert_name(t_parser *pr, t_token *token);
 int		pr_convert_ass(t_parser *pr, t_token *token, int first);
 
@@ -172,6 +173,9 @@ int		pr_complete_cmdlst(t_parser *pr, t_snode *parent);
 int		pr_complete_cmd(t_parser *pr, t_snode *parent);
 t_snode	*snode(t_syntax_id syn_id);
 void	pr_destroy(t_parser *pr);
+
+int		pr_token(t_parser *pr, t_snode *parent, t_syntax_id syn_id, t_token_id tk_id);
+int		pr_error_token(t_parser *pr, t_snode *parent, t_syntax_id syn_id, t_token_id tk_id);
 
 int		pr_and_or(t_parser *pr, t_snode *parent);
 int		pr_case_item(t_parser *pr, t_snode *parent);
@@ -197,7 +201,6 @@ int		pr_function_def(t_parser *pr, t_snode *parent);
 void	pr_init(t_parser *pr);
 int		pr_next_token(t_parser *pr);
 int		pr_token_set(t_parser *pr, t_snode *node, t_token_id tk_id);
-int		pr_token(t_parser *pr, t_snode *parent, t_syntax_id syn_id, t_token_id tk_id);
 void	pr_process_here(void *data, void *param);
 int		pr_check_here(t_parser *pr);
 int		pr_io_file(t_parser *pr, t_snode *parent);

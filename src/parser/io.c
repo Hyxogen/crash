@@ -6,32 +6,29 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:21:00 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 16:37:36 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/22 13:31:34 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.h"
 #include "memory.h"
+#include <stdlib.h>
 
 void
 	pr_process_here(void *data, void *param)
 {
 	t_parser	*pr;
 	t_snode		*node;
-	size_t		i;
+	char		*end;
 
 	pr = param;
 	node = data;
-	/* TODO: unquote */
-	i = 0;
-	while (i < node->token->count)
-	{
-		if (node->token->parts[i].quote)
+	end = ft_strdup(node->token->str);
+	if (lex_unquote(end))
 			node->flags |= flag_quote;
-		i += 1;
-	}
 	node->here_content = sh_safe_malloc(sizeof(*node->here_content));
-	lex_here(pr->lexer, node->here_content, node->token->str, node->flags);
+	lex_here(pr->lexer, node->here_content, end, node->flags);
+	free(end);
 }
 
 int
@@ -60,7 +57,7 @@ int
 		token_destroy(parent->childs[parent->childs_size - 1]->token);
 		free(parent->childs[parent->childs_size - 1]->token);
 		parent->childs[parent->childs_size - 1]->token = NULL;
-		if (pr_token(pr, parent->childs[parent->childs_size - 1], sx_filename, tk_word))
+		if (pr_error_token(pr, parent->childs[parent->childs_size - 1], sx_filename, tk_word))
 			return (1);
 	}
 	return (0);
@@ -73,7 +70,7 @@ int
 
 	node = snode(sx_io_here);
 	if (pr_token(pr, NULL, sx_none, op_dless)
-		&& pr_token(pr, node, sx_word, tk_word))
+		&& pr_error_token(pr, node, sx_word, tk_word))
 	{
 		ft_lstadd_back(&pr->here_docs, ft_lstnew(node->childs[0]));
 		node_add_child(parent, node);
@@ -81,7 +78,7 @@ int
 		return (1);
 	}
 	else if (pr_token(pr, NULL, sx_none, op_dlessdash)
-		&& pr_token(pr, node, sx_word, tk_word))
+		&& pr_error_token(pr, node, sx_word, tk_word))
 	{
 		node->childs[0]->flags |= flag_trim;
 		ft_lstadd_back(&pr->here_docs, ft_lstnew(node->childs[0]));

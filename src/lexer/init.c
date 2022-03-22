@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 13:52:28 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/25 10:32:05 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/22 15:20:08 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ void
 	lex->btick = 0;
 	lex->quote = 0;
 	lex->depth = 0;
+	lex->error = 0;
 	lex->end = NULL;
 	lex->here_flags = 0;
 }

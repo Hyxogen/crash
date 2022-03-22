@@ -55,7 +55,11 @@ int
 			return (1);
 		}
 		else
+		{
+			pr->lexer->error = SH_PR_UNEXTOKEN;
+		
 			return (0);
+		}
 	}
 	return (pr_pipe_sequence(pr, parent));
 }

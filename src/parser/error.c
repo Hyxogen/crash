@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   subshell.c                                         :+:    :+:            */
+/*   error.c                                            :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/02/28 10:19:35 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 15:32:08 by dmeijer       ########   odam.nl         */
+/*   Created: 2022/03/22 13:17:19 by dmeijer       #+#    #+#                 */
+/*   Updated: 2022/03/22 15:59:49 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,20 +16,24 @@
 #include <stdio.h>
 
 int
-	pr_subshell(t_parser *pr, t_snode *parent)
+	pr_error_token(t_parser *pr, t_snode *parent,
+		t_syntax_id syn_id, t_token_id tk_id)
 {
-	if (pr_token(pr, NULL, sx_none, op_lparen))
+	t_snode	*node;
+
+	if (pr->lexer->error)
+		return (0);
+	node = snode(syn_id);
+	if (!pr_token_set(pr, node, tk_id))
 	{
-		if (pr_compound_list(pr, parent))
-		{
-			if (pr_token(pr, NULL, sx_none, op_rparen))
-			{
-				parent->childs[parent->childs_size - 1]->flags |= flag_subshell;
-				return (1);
-			}
-		}
+		node_destroy(node);
 		pr->lexer->error = SH_PR_UNEXTOKEN;
-		
+		printf("Unexpected token %s:%d expected:%d got:%d, I'm in mode %d\n", __FILE__, __LINE__, tk_id, pr->current->id, pr->lexer->id);
+		return (0);
 	}
-	return (0);
+	if (parent == NULL)
+		node_destroy(node);
+	else
+		node_add_child(parent, node);
+	return (1);
 }

@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:03:53 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 16:38:36 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/22 16:13:45 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,30 +25,33 @@ void
 	pr->here_docs = NULL;
 }
 
+void
+	pr_read_token(t_parser *pr, t_token **token, int *ret)
+{
+	*token = sh_safe_malloc(sizeof(**token));
+	*ret = lex_lex(pr->lexer, *token);
+	if (*ret)
+		pr_convert_io_number(pr, *token);
+	else
+	{
+		*ret = 1;
+		(*token)->id = tk_null;
+	}
+}
+
 int
 	pr_next_token(t_parser *pr)
 {
 	pr->current = pr->next;
 	pr->current_ret = pr->next_ret;
-	pr->next = 0;
+	pr->next = NULL;
 	pr->next_ret = 0;
-	if (!pr->current || pr->current->id != tk_newline)
-	{
-		pr->next = sh_safe_malloc(sizeof(*pr->next));
-		pr->next_ret = lex_lex(pr->lexer, pr->next);
-		if (pr->next_ret)
-			pr_convert_io_number(pr, pr->next);
-		else
-		{
-			token_destroy(pr->next);
-			free(pr->next);
-			pr->next_ret = 0;
-			pr->next = NULL;
-			return (pr->current_ret);
-		}
-		if (!pr->current)
-			pr_next_token(pr);
-	}
+	if (pr->current == NULL)
+		pr_read_token(pr, &pr->current, &pr->current_ret);
+	if (pr->current != NULL
+		&& pr->current->id != tk_newline
+		&& pr->current->id != tk_null)
+		pr_read_token(pr, &pr->next, &pr->next_ret);
 	pr_check_here(pr);
 	return (pr->current_ret);
 }
@@ -72,6 +75,8 @@ int
 {
 	t_snode	*node;
 
+	if (pr->lexer->error)
+		return (0);
 	node = snode(syn_id);
 	if (!pr_token_set(pr, node, tk_id))
 	{
@@ -84,3 +89,5 @@ int
 		node_add_child(parent, node);
 	return (1);
 }
+
+

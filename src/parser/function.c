@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:16:44 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 14:32:51 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/22 15:32:08 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,8 @@ int
 		return (0);
 	node = snode(sx_function_def);
 	pr_token_set(pr, node, tk_name);
-	pr_token(pr, NULL, sx_none, op_lparen);
-	if (pr_token(pr, NULL, sx_none, op_rparen))
+	pr_error_token(pr, NULL, sx_none, op_lparen);
+	if (pr_error_token(pr, NULL, sx_none, op_rparen))
 	{
 		while (pr_token(pr, NULL, sx_none, tk_newline))
 			continue ;
@@ -40,6 +40,8 @@ int
 			node_add_child(parent, node);
 			return (1);
 		}
+		pr->lexer->error = SH_PR_UNEXTOKEN;
+		
 	}
 	node_destroy(node);
 	return (0);

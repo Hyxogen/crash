@@ -6,17 +6,18 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:05:14 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 14:46:36 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/22 16:13:42 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.h"
+#include <stdlib.h>
 
 int
 	pr_compound_cmd(t_parser *pr, t_snode *parent)
 {
 	t_snode	*red;
-	
+
 	if (pr->current_ret)
 	{
 		pr_convert_reserved(pr, pr->current);
@@ -64,12 +65,15 @@ int
 	pr_complete_cmdlst(t_parser *pr, t_snode *parent)
 {
 	t_snode	*node;
+	t_token	*tmp;
 
 	node = snode(sx_command_list);
 	while (pr->current_ret != -1 && pr_complete_cmd(pr, node))
 	{
+		tmp = pr->current;
 		pr_next_token(pr);
-		continue ;
+		token_destroy(tmp);
+		free(tmp);
 	}
 	node_add_child(parent, node);
 	return (1);
