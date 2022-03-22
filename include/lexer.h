@@ -111,8 +111,6 @@ struct s_source
 	int		cur;
 	/* the next character after cur */
 	int		nex;
-	/* if the previous line read ended with \ TODO check if still needed*/
-	int		esc;
 	/** internal, next lines when current line's newline is escaped*/
 	t_list	*lst;
 	t_input	*in;

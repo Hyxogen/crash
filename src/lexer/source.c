@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 11:44:41 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 13:28:37 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/22 16:25:32 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,7 @@ int
 	src_check_end(t_lexer *lex, const char *end, int flags)
 {
 	ssize_t		ret;
-	const char	*str;
+	char		*str;
 
 	if (!lex || lex->src->lst || !lex->src->str)
 		return (0);
@@ -156,9 +156,7 @@ int
 		&& ret > 0 && str[ret - 1] == '\\'))
 	{
 		ret = _src_add_next(lex->src, &str);
-		if (ret < 0)
-			return (-1);
-		if (ret == 0)
+		if (ret <= 0)
 			break ;
 	}
 	if (_src_cmp(lex->src, end, flags))

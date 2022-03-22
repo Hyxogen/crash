@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:12:45 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 15:32:08 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/22 16:20:27 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ int
 	node = snode(sx_if_clause);
 	if (pr_token(pr, NULL, sx_none, id))
 	{
-		printf("a\n");
 		if (pr_compound_list(pr, node)
 			&& pr_token(pr, NULL, sx_none, kw_then)
 			&& pr_compound_list(pr, node))

@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 10:52:43 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 15:27:41 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/22 16:27:12 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ void
 	if (lexer.src->cur == -1)
 		lex_advance(&lexer);
 	lex_main(&lexer);
-	/* TODO: destroy resources */
 }
 
 void
@@ -60,7 +59,6 @@ void
 	t_parser	parser;
 	t_snode		*node;
 
-	/* TODO: multiple commands in command subst */
 	lex_init(&lexer);
 	lexer.prev = lex;
 	lexer.id = lx_command;
@@ -76,7 +74,6 @@ void
 	part->data = node;
 	part->quote = lex->quote;
 	pr_destroy(&parser);
-	/* TODO: destroy resources */
 }
 
 void
@@ -97,7 +94,6 @@ void
 	if (lexer.src->cur == -1)
 		lex_advance(&lexer);
 	lex_main(&lexer);
-	/* TODO: destroy resources */
 }
 
 void
@@ -117,7 +113,6 @@ void
 	pr_init(&parser);
 	*node = *pr_parse(&parser);
 	pr_destroy(&parser);
-	/* TODO: destroy resources */
 }
 
 void
@@ -140,5 +135,4 @@ void
 	if (lexer.src->cur == -1)
 		lex_advance(&lexer);
 	lex_main(&lexer);
-	/* TODO: destroy resources */
 }

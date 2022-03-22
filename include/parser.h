@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 11:30:58 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 13:15:46 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/22 16:31:52 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,6 +140,7 @@ typedef struct s_snode		t_snode;
 
 struct s_parser
 {
+	/* TODO place current and next on stack */
 	t_token		*current;
 	t_token		*next;
 	int			current_ret;

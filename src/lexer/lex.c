@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 16:03:48 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 14:16:30 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/22 16:27:58 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ int
 	}
 	if (lex->src->cur == -1)
 	{
-		/* TODO: cleanup token */
+		token_destroy(tok);
 		return (0);
 	}
 	status = check_op(lex);
