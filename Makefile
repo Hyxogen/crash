@@ -59,7 +59,6 @@ endif
 
 all: $(NAME) crash
 
-# TODO compile libft using its own makefile
 $(NAME): $(OBJECTS) $(LIBFT_LIB)
 	$(LINK_CMD) -o $@ $(OBJECTS) $(LIBFT_LIB) $(LFLAGS) -lreadline
 
