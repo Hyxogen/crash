@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 16:34:03 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 14:16:36 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 13:47:59 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,18 +30,20 @@ static int
 		return (lex->src->cur == -1 || end);
 	}
 	end = (ft_strchr(sep, lex->src->cur) != NULL && lex->src->cur != '\0');
+	if (lex->id == lx_command)
+		return ((end && !lex_quoted(lex)) && lex->src->cur != -1);
 	return ((end && !lex_quoted(lex)) || lex->src->cur == -1);
 }
 
-void
+int
 	lex_main(t_lexer *lex)
 {
-	/* TODO: error handling */
 	while (!lex_check_end(lex))
 	{
 		if (lex->src->cur == -1)
-			return ;
+			return (-1);
 		if (lex_quoted(lex) || !lex_special(lex))
 			lex_update(lex, 0);
 	}
+	return (1);
 }

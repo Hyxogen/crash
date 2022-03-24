@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 10:50:42 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 13:17:17 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 14:39:00 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,12 +65,6 @@
  * A winner is you
  */
 
-# ifdef SH_DEBUG
-#  define sh_assert(test) sh_assert2(test, #test, __FILE__, __LINE__)
-# else
-#  define sh_assert sh_assert1
-# endif
-
 typedef struct s_minishell	t_minishell;
 
 struct s_minishell
@@ -79,10 +73,7 @@ struct s_minishell
 };
 
 void	pr_debug(void);
-
-void	sh_assert1(int test);
-void	sh_assert2(int test, const char *str, const char *file, int line);
-
+void	sh_assert(int test);
 void	sh_nop(void *ptr);
 
 #endif

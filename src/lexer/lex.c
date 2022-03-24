@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 16:03:48 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 16:27:58 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 13:50:54 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,15 +63,14 @@ int
 	if (lex->src->cur == -1)
 	{
 		token_destroy(tok);
+		if (lex->id == lx_command)
+			return (-1);
 		return (0);
 	}
 	status = check_op(lex);
 	if (tok->id != tk_null)
-	{
 		return (status);
-	}
 	token_add_part(lex->tok, lx_normal);
 	tok->id = tk_word;
-	lex_main(lex);
-	return (1);
+	return (lex_main(lex));
 }

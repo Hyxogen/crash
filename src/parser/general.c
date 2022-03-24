@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:03:53 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/24 10:24:08 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 13:41:00 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,10 @@ void
 	int	ret;
 
 	ret = lex_lex(pr->lexer, token);
-	if (ret)
+	if (ret == 1)
 		pr_convert_io_number(pr, token);
+	else if (ret == -1)
+		pr->lexer->error = SH_PR_UNEXEOF;
 	else
 		token->id = tk_null;
 }
@@ -55,6 +57,8 @@ int
 		return (0);
 	token_move(&node->token, &pr->current);
 	pr_next_token(pr);
+	if (pr->lexer->error)
+		return (0);
 	return (1);
 }
 

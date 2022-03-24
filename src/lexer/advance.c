@@ -68,7 +68,13 @@ void
 	while (1)
 	{
 		lex->src->bslash = 0;
-		src_advance(lex->src);
+		if (lex->error)
+		{
+			lex->src->cur = lex->src->nex;
+			lex->src->nex = -1;
+		}
+		else
+			src_advance(lex->src);
 		if (lex->src->cur == '\\' && !lex_quoted(lex) && lex_bquoted(lex))
 		{
 			lex->src->bslash = 1;

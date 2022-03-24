@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        ::::::::            */
+/*   ft_printf.h                                        :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: csteenvo <csteenvo@student.codam.nl>         +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2022/03/24 14:10:13 by csteenvo      #+#    #+#                 */
+/*   Updated: 2022/03/24 14:10:16 by csteenvo      ########   odam.nl         */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef FT_PRINTF_H
 # define FT_PRINTF_H
 # include <stddef.h>
@@ -44,7 +56,7 @@ int	ft_printf_vxprintf(t_sink *sink, const char *fmt, va_list *args);
 int	ft_printf(const char *fmt, ...);
 
 int	ft_vprintf(const char *fmt, va_list *vlist);
-int ft_fprintf(int fd, const char *fmt, ...);
+int	ft_fprintf(int fd, const char *fmt, ...);
 int	ft_vfprintf(int fd, const char *fmt, va_list *vlist);
 int	ft_sprintf(char *buffer, const char *fmt, ...);
 int	ft_vsprintf(char *buffer, const char *fmt, va_list *vlist);

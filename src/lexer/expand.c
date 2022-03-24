@@ -102,7 +102,7 @@ void
 		lex->error = lexer.error;
 }
 
-// TODO: check errors if ever used
+// NOTE: check errors if ever used
 // void
 // 	lex_normal(t_source *src, struct s_snode *node)
 // {

@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 11:30:58 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/24 11:37:24 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 14:06:18 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,59 +15,6 @@
 
 # include "libft.h"
 # include "lexer.h"
-
-// if [ ! -f "$full" ]; then
-// 	echo "$0: Could not find $cowfile cowfile!"
-// 	exit 1
-// fi
-
-// command_list
-//   pipe
-//     compound_command
-//       if_clause
-//         command_list
-//           pipe
-//             simple_command
-//               word_list
-//                 word: [
-//                 word: -f
-//                 word: "$full"
-//                 word: ]
-//               redirect_list
-//               word_list
-//         command_list
-//           pipe
-//             simple_command
-//               word_list
-//                 word: echo
-//                 word: "$0: Could not find $cowfile cowfile!"
-//               redirect_list
-//               word_list
-//           pipe
-//             simple_command
-//               word_list
-//                 word: exit
-//                 word: 1
-//               redirect_list
-//               word_list
-//         command_list
-//     redirect_list
-
-// command_list(token, childs=[term]), flags=SUBSHELL)
-// term(childs=(and_if | or_if | pipe), flags=AND|SEMI|NONE)
-// and_if(childs=(and_if | or_if | pipe, pipe))
-// or_if(childs=(and_if | or_if | pipe, pipe))
-// pipe_sequence(childs=[compound_command | simple_command | function], flags=BANG)
-// compound_command(childs=(command_list | if_clause | for_clause | case_clause | while_clause, redirect_list))
-// simple_command(childs=(word_list, redirect_list, word_list))
-// redirect_list(childs=[less | lessand | great | greatand | dgreat | lessgreat | clobber | io_here])
-// if_clause(childs=(command_list, command_list, if_clause | command_list))
-// for_clause(token, childs=(word_list, command_list))
-// case_clause(token, childs=[command_list])
-// while_clause(childs=(command_list, command_list), flags=UNTIL)
-// function(token, childs=(compound_command))
-// word_list(childs=[word])
-// word(token?, childs=word?, flags=EXISTS)
 
 enum e_syntax_id
 {
@@ -161,10 +108,11 @@ const char	**pr_get_keywords(void);
 
 int			pr_convert_reserved(t_parser *pr, t_token *token);
 int			pr_convert_keyword(t_parser *pr, t_token *token, t_token_id id);
-int			pr_error_convert_keyword(t_parser *pr, t_token *token, t_token_id id);
+int			pr_error_convert_keyword(t_parser *pr, t_token *token,
+				t_token_id id);
 int			pr_convert_name(t_parser *pr, t_token *token);
 int			pr_convert_ass(t_parser *pr, t_token *token, int first);
-	
+
 t_snode		*pr_parse(t_parser *pr);
 void		pr_init(t_parser *pr);
 int			pr_next_token(t_parser *pr);
@@ -172,16 +120,20 @@ int			pr_complete_cmdlst(t_parser *pr, t_snode *parent);
 int			pr_complete_cmd(t_parser *pr, t_snode *parent);
 t_snode		*snode(t_syntax_id syn_id);
 void		pr_destroy(t_parser *pr);
-	
-int			pr_token(t_parser *pr, t_snode *parent, t_syntax_id syn_id, t_token_id tk_id);
-int			pr_error_token(t_parser *pr, t_snode *parent, t_syntax_id syn_id, t_token_id tk_id);
-	
+
+int			pr_token(t_parser *pr, t_snode *parent, t_syntax_id syn_id,
+				t_token_id tk_id);
+int			pr_error_token(t_parser *pr, t_snode *parent, t_syntax_id syn_id,
+				t_token_id tk_id);
+
 int			pr_and_or(t_parser *pr, t_snode *parent);
 int			pr_case_item(t_parser *pr, t_snode *parent);
 void		pr_case_list(t_parser *pr, t_snode *parent);
 int			pr_case_clause(t_parser *pr, t_snode *parent);
-int			pr_cmd_prefix(t_parser *pr, t_snode *red, t_snode *ass, t_snode *cmd);
-void		pr_cmd_suffix(t_parser *pr, t_snode *red, t_snode *ass, t_snode *cmd);
+int			pr_cmd_prefix(t_parser *pr, t_snode *red, t_snode *ass,
+				t_snode *cmd);
+void		pr_cmd_suffix(t_parser *pr, t_snode *red, t_snode *ass,
+				t_snode *cmd);
 int			pr_compound_cmd(t_parser *pr, t_snode *parent);
 int			pr_cmd(t_parser *pr, t_snode *parent);
 int			pr_complete_cmd(t_parser *pr, t_snode *parent);

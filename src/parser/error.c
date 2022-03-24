@@ -6,13 +6,11 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/22 13:17:19 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/24 11:53:24 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 14:08:52 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.h"
-
-
 #include <stdio.h>
 
 int
@@ -28,7 +26,8 @@ int
 	{
 		node_destroy(node);
 		pr->lexer->error = SH_PR_UNEXTOKEN;
-		printf("Unexpected token %s:%d expected:%d got:%d, I'm in mode %d\n", __FILE__, __LINE__, tk_id, pr->current.id, pr->lexer->id);
+		printf("Unexpected token %s:%d expected:%d got:%d, I'm in mode %d\n",
+			__FILE__, __LINE__, tk_id, pr->current.id, pr->lexer->id);
 		return (0);
 	}
 	if (parent == NULL)
@@ -55,5 +54,6 @@ int
 		return (1);
 	}
 	pr->lexer->error = SH_PR_UNEXTOKEN;
+	printf("Unexpected token %s:%d\n", __FILE__, __LINE__);
 	return (0);
 }

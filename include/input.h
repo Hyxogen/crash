@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   new_input.h                                        :+:    :+:            */
+/*   input.h                                            :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 15:31:06 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/22 14:28:58 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 13:59:16 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@
 # include "minishell.h"
 # include <sys/types.h>
 
-#define SH_INPUT_PROMPT_MORE "> "
-#define SH_INPUT_PROMPT_DEFAULT "$ "
+# define SH_INPUT_PROMPT_MORE "> "
+# define SH_INPUT_PROMPT_DEFAULT "$ "
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 1024
@@ -26,8 +26,7 @@
 # endif
 
 typedef struct s_input	t_input;
-
-typedef ssize_t (*t_read_line_proc)(t_input *, char **);
+typedef ssize_t			(*t_read_line_proc)(t_input *, char **);
 
 typedef enum e_in_mode {
 	in_string,
@@ -56,7 +55,7 @@ void			close_file_handle(t_file_handle *rh);
 
 ssize_t			_input_readline_line_proc(t_input *in, char **lp);
 ssize_t			_input_file_line_proc(t_input *in, char **lp);
-ssize_t 		_input_string_line_proc(t_input *in, char **lp);
+ssize_t			_input_string_line_proc(t_input *in, char **lp);
 
 void			input_new(t_input *in, t_in_mode mode, void *param);
 

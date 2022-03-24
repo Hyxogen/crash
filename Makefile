@@ -18,7 +18,7 @@ FILE_NAMES		:= \
 	$(patsubst %,input/%,$(INPUT_FILES)) \
 	$(patsubst %,parser/%,$(PARSER_FILES))
 
-CC				:= clang
+CC				:= cc
 LINK_CMD		:= $(CC)
 CFLAGS			:= -Wall -Wextra -pedantic
 LFLAGS			:= -Wall -Wextra
