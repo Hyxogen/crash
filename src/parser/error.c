@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/22 13:17:19 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/24 10:08:21 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 11:53:24 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,4 +36,24 @@ int
 	else
 		node_add_child(parent, node);
 	return (1);
+}
+
+int
+	pr_error_convert_keyword(t_parser *pr, t_token *token, t_token_id id)
+{
+	size_t	len;
+
+	(void) pr;
+	if (token != NULL && token->id == id)
+		return (1);
+	if (token == NULL || token->id != tk_word)
+		return (0);
+	len = ft_strlen(pr_get_keywords()[id - kw_if]);
+	if (ft_memcmp(pr_get_keywords()[id - kw_if], token->str, len + 1) == 0)
+	{
+		token->id = id;
+		return (1);
+	}
+	pr->lexer->error = SH_PR_UNEXTOKEN;
+	return (0);
 }

@@ -6,35 +6,13 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/16 14:13:22 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/24 10:07:57 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 11:53:17 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
 #include <libft.h>
-
-
-#include <stdio.h>
-
-static const char	*g_keywords[] = {
-	"if",
-	"then",
-	"else",
-	"elif",
-	"fi",
-	"do",
-	"done",
-	"case",
-	"esac",
-	"while",
-	"until",
-	"for",
-	"{",
-	"}",
-	"!",
-	"in"
-};
 
 static int
 	pr_is_name(const char *str, size_t size)
@@ -52,13 +30,15 @@ static int
 }
 
 /* rule 1 */
+/* NOTE: If for some reason you would want more keywords,
+	you must increase the number in the while loop to the correct count*/
 int
 	pr_convert_reserved(t_parser *pr, t_token *token)
 {
 	size_t	i;
 
 	i = 0;
-	while (i < sizeof(g_keywords) / sizeof(*g_keywords))
+	while (i < 16)
 	{
 		if (pr_convert_keyword(pr, token, kw_if + i))
 			return (1);
@@ -78,8 +58,8 @@ int
 		return (1);
 	if (token == NULL || token->id != tk_word)
 		return (0);
-	len = ft_strlen(g_keywords[id - kw_if]);
-	if (ft_memcmp(g_keywords[id - kw_if], token->str, len + 1) == 0)
+	len = ft_strlen(pr_get_keywords()[id - kw_if]);
+	if (ft_memcmp(pr_get_keywords()[id - kw_if], token->str, len + 1) == 0)
 	{
 		token->id = id;
 		return (1);
@@ -124,26 +104,5 @@ int
 	{
 		pr_convert_reserved(pr, token);
 	}
-	return (0);
-}
-
-int
-	pr_error_convert_keyword(t_parser *pr, t_token *token, t_token_id id)
-{
-	size_t	len;
-
-	(void) pr;
-	if (token != NULL && token->id == id)
-		return (1);
-	if (token == NULL || token->id != tk_word)
-		return (0);
-	len = ft_strlen(g_keywords[id - kw_if]);
-	if (ft_memcmp(g_keywords[id - kw_if], token->str, len + 1) == 0)
-	{
-		token->id = id;
-		return (1);
-	}
-	pr->lexer->error = SH_PR_UNEXTOKEN;
-	printf("Could not convert token\n");
 	return (0);
 }

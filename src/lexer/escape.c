@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 16:04:47 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 12:54:52 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 11:52:27 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,6 @@ int
 	}
 	return (1);
 }
-
 
 int
 	lex_quoted_int(int quote, int cur)

@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 11:30:58 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/24 10:02:49 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 11:37:24 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,75 +157,77 @@ struct s_snode
 	int				flags;
 };
 
-int		pr_convert_reserved(t_parser *pr, t_token *token);
-int		pr_convert_keyword(t_parser *pr, t_token *token, t_token_id id);
-int		pr_error_convert_keyword(t_parser *pr, t_token *token, t_token_id id);
-int		pr_convert_name(t_parser *pr, t_token *token);
-int		pr_convert_ass(t_parser *pr, t_token *token, int first);
+const char	**pr_get_keywords(void);
 
-t_snode	*pr_parse(t_parser *pr);
-void	pr_init(t_parser *pr);
-int		pr_next_token(t_parser *pr);
-int		pr_complete_cmdlst(t_parser *pr, t_snode *parent);
-int		pr_complete_cmd(t_parser *pr, t_snode *parent);
-t_snode	*snode(t_syntax_id syn_id);
-void	pr_destroy(t_parser *pr);
-
-int		pr_token(t_parser *pr, t_snode *parent, t_syntax_id syn_id, t_token_id tk_id);
-int		pr_error_token(t_parser *pr, t_snode *parent, t_syntax_id syn_id, t_token_id tk_id);
-
-int		pr_and_or(t_parser *pr, t_snode *parent);
-int		pr_case_item(t_parser *pr, t_snode *parent);
-void	pr_case_list(t_parser *pr, t_snode *parent);
-int		pr_case_clause(t_parser *pr, t_snode *parent);
-int		pr_cmd_prefix(t_parser *pr, t_snode *red, t_snode *ass, t_snode *cmd);
-void	pr_cmd_suffix(t_parser *pr, t_snode *red, t_snode *ass, t_snode *cmd);
-int		pr_compound_cmd(t_parser *pr, t_snode *parent);
-int		pr_cmd(t_parser *pr, t_snode *parent);
-int		pr_complete_cmd(t_parser *pr, t_snode *parent);
-int		pr_complete_cmdlst(t_parser *pr, t_snode *parent);
-int		pr_simple_cmd(t_parser *pr, t_snode *parent);
-int		pr_if_clause(t_parser *pr, t_snode *parent);
-int		pr_elif_part(t_parser *pr, t_snode *parent, t_token_id id);
-int		pr_else_part(t_parser *pr, t_snode *parent);
-int		pr_convert_reserved(t_parser *pr, t_token *token);
-int		pr_convert_keyword(t_parser *pr, t_token *token, t_token_id id);
-int		pr_convert_name(t_parser *pr, t_token *token);
-int		pr_convert_ass(t_parser *pr, t_token *token, int first);
-int		pr_convert_func_def(t_parser *pr);
-int		pr_function_body(t_parser *pr, t_snode *parent);
-int		pr_function_def(t_parser *pr, t_snode *parent);
-void	pr_init(t_parser *pr);
-int		pr_next_token(t_parser *pr);
-int		pr_token_set(t_parser *pr, t_snode *node, t_token_id tk_id);
-void	pr_process_here(void *data, void *param);
-int		pr_check_here(t_parser *pr);
-int		pr_io_file(t_parser *pr, t_snode *parent);
-int		pr_io_here(t_parser *pr, t_snode *parent);
-int		pr_compound_list(t_parser *pr, t_snode *parent);
-int		pr_list(t_parser *pr, t_snode *parent);
-int		pr_for_clause(t_parser *pr, t_snode *parent);
-int		pr_while_clause(t_parser *pr, t_snode *parent);
-int		pr_until_clause(t_parser *pr, t_snode *parent);
-int		pr_do_group(t_parser *pr, t_snode *parent);
-void	node_resize_childs(t_snode *node, size_t newsize);
-t_snode	*node_init(t_snode *node, t_syntax_id syn_id);
-t_snode	*snode(t_syntax_id syn_id);
-void	node_add_child(t_snode *node, t_snode *child);
-void	node_destroy_childs(t_snode *node);
-void	node_destroy(t_snode *node);
-int		pr_brace_group(t_parser *pr, t_snode *parent);
-int		pr_wordlist(t_parser *pr, t_snode *parent);
-int		pr_term(t_parser *pr, t_snode *parent);
-int		pr_pattern(t_parser *pr, t_token *token);
-int		pr_pipe_sequence(t_parser *pr, t_snode *parent);
-int		pr_pipeline(t_parser *pr, t_snode *parent);
-int		pr_convert_io_number(t_parser *pr, t_token *token);
-int		pr_io_redirect(t_parser *pr, t_snode *parent);
-int		pr_redirect_list(t_parser *pr, t_snode *parent);
-int		pr_seperator_op(t_parser *pr, t_snode *parent);
-int		pr_sequential_sep(t_parser *pr, t_snode *parent);
-int		pr_subshell(t_parser *pr, t_snode *parent);
-int		pr_bang(t_parser *pr, t_snode *parent);
-int		pr_command_lst(t_parser *pr, t_snode *parent);
+int			pr_convert_reserved(t_parser *pr, t_token *token);
+int			pr_convert_keyword(t_parser *pr, t_token *token, t_token_id id);
+int			pr_error_convert_keyword(t_parser *pr, t_token *token, t_token_id id);
+int			pr_convert_name(t_parser *pr, t_token *token);
+int			pr_convert_ass(t_parser *pr, t_token *token, int first);
+	
+t_snode		*pr_parse(t_parser *pr);
+void		pr_init(t_parser *pr);
+int			pr_next_token(t_parser *pr);
+int			pr_complete_cmdlst(t_parser *pr, t_snode *parent);
+int			pr_complete_cmd(t_parser *pr, t_snode *parent);
+t_snode		*snode(t_syntax_id syn_id);
+void		pr_destroy(t_parser *pr);
+	
+int			pr_token(t_parser *pr, t_snode *parent, t_syntax_id syn_id, t_token_id tk_id);
+int			pr_error_token(t_parser *pr, t_snode *parent, t_syntax_id syn_id, t_token_id tk_id);
+	
+int			pr_and_or(t_parser *pr, t_snode *parent);
+int			pr_case_item(t_parser *pr, t_snode *parent);
+void		pr_case_list(t_parser *pr, t_snode *parent);
+int			pr_case_clause(t_parser *pr, t_snode *parent);
+int			pr_cmd_prefix(t_parser *pr, t_snode *red, t_snode *ass, t_snode *cmd);
+void		pr_cmd_suffix(t_parser *pr, t_snode *red, t_snode *ass, t_snode *cmd);
+int			pr_compound_cmd(t_parser *pr, t_snode *parent);
+int			pr_cmd(t_parser *pr, t_snode *parent);
+int			pr_complete_cmd(t_parser *pr, t_snode *parent);
+int			pr_complete_cmdlst(t_parser *pr, t_snode *parent);
+int			pr_simple_cmd(t_parser *pr, t_snode *parent);
+int			pr_if_clause(t_parser *pr, t_snode *parent);
+int			pr_elif_part(t_parser *pr, t_snode *parent, t_token_id id);
+int			pr_else_part(t_parser *pr, t_snode *parent);
+int			pr_convert_reserved(t_parser *pr, t_token *token);
+int			pr_convert_keyword(t_parser *pr, t_token *token, t_token_id id);
+int			pr_convert_name(t_parser *pr, t_token *token);
+int			pr_convert_ass(t_parser *pr, t_token *token, int first);
+int			pr_convert_func_def(t_parser *pr);
+int			pr_function_body(t_parser *pr, t_snode *parent);
+int			pr_function_def(t_parser *pr, t_snode *parent);
+void		pr_init(t_parser *pr);
+int			pr_next_token(t_parser *pr);
+int			pr_token_set(t_parser *pr, t_snode *node, t_token_id tk_id);
+void		pr_process_here(void *data, void *param);
+int			pr_check_here(t_parser *pr);
+int			pr_io_file(t_parser *pr, t_snode *parent);
+int			pr_io_here(t_parser *pr, t_snode *parent);
+int			pr_compound_list(t_parser *pr, t_snode *parent);
+int			pr_list(t_parser *pr, t_snode *parent);
+int			pr_for_clause(t_parser *pr, t_snode *parent);
+int			pr_while_clause(t_parser *pr, t_snode *parent);
+int			pr_until_clause(t_parser *pr, t_snode *parent);
+int			pr_do_group(t_parser *pr, t_snode *parent);
+void		node_resize_childs(t_snode *node, size_t newsize);
+t_snode		*node_init(t_snode *node, t_syntax_id syn_id);
+t_snode		*snode(t_syntax_id syn_id);
+void		node_add_child(t_snode *node, t_snode *child);
+void		node_destroy_childs(t_snode *node);
+void		node_destroy(t_snode *node);
+int			pr_brace_group(t_parser *pr, t_snode *parent);
+int			pr_wordlist(t_parser *pr, t_snode *parent);
+int			pr_term(t_parser *pr, t_snode *parent);
+int			pr_pattern(t_parser *pr, t_token *token);
+int			pr_pipe_sequence(t_parser *pr, t_snode *parent);
+int			pr_pipeline(t_parser *pr, t_snode *parent);
+int			pr_convert_io_number(t_parser *pr, t_token *token);
+int			pr_io_redirect(t_parser *pr, t_snode *parent);
+int			pr_redirect_list(t_parser *pr, t_snode *parent);
+int			pr_seperator_op(t_parser *pr, t_snode *parent);
+int			pr_sequential_sep(t_parser *pr, t_snode *parent);
+int			pr_subshell(t_parser *pr, t_snode *parent);
+int			pr_bang(t_parser *pr, t_snode *parent);
+int			pr_command_lst(t_parser *pr, t_snode *parent);
 #endif

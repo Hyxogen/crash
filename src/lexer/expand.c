@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 10:52:43 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/24 11:10:31 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 11:32:59 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,8 @@ void
 	if (lexer.src->cur == -1)
 		lex_advance(&lexer);
 	lex_main(&lexer);
+	if (lex->error == 0)
+		lex->error = lexer.error;
 }
 
 void
@@ -74,6 +76,8 @@ void
 	part->data = node;
 	part->quote = lex->quote;
 	pr_destroy(&parser);
+	if (lex->error == 0)
+		lex->error = lexer.error;
 }
 
 void
@@ -94,26 +98,29 @@ void
 	if (lexer.src->cur == -1)
 		lex_advance(&lexer);
 	lex_main(&lexer);
+	if (lex->error == 0)
+		lex->error = lexer.error;
 }
 
-void
-	lex_normal(t_source *src, struct s_snode *node)
-{
-	t_parser	parser;
-	t_lexer		lexer;
+// TODO: check errors if ever used
+// void
+// 	lex_normal(t_source *src, struct s_snode *node)
+// {
+// 	t_parser	parser;
+// 	t_lexer		lexer;
 
-	lex_init(&lexer);
-	lexer.prev = NULL;
-	lexer.id = lx_normal;
-	lexer.src = src;
-	lexer.end = NULL;
-	lexer.here_flags = 0;
-	if (lexer.src->cur == -1)
-		lex_advance(&lexer);
-	pr_init(&parser);
-	*node = *pr_parse(&parser);
-	pr_destroy(&parser);
-}
+// 	lex_init(&lexer);
+// 	lexer.prev = NULL;
+// 	lexer.id = lx_normal;
+// 	lexer.src = src;
+// 	lexer.end = NULL;
+// 	lexer.here_flags = 0;
+// 	if (lexer.src->cur == -1)
+// 		lex_advance(&lexer);
+// 	pr_init(&parser);
+// 	*node = *pr_parse(&parser);
+// 	pr_destroy(&parser);
+// }
 
 void
 	lex_parameter(t_lexer *lex, t_tpart *part)
@@ -135,4 +142,6 @@ void
 	if (lexer.src->cur == -1)
 		lex_advance(&lexer);
 	lex_main(&lexer);
+	if (lex->error == 0)
+		lex->error = lexer.error;
 }

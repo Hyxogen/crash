@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:05:59 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/24 09:52:28 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 11:26:59 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ static int
 	return (1);
 }
 
+/* !(pr->lexer->error = SH_PR_UNEXTOKEN)
+	is only written like this because norm */
 int
 	pr_and_or(t_parser *pr, t_snode *parent)
 {
@@ -41,10 +43,7 @@ int
 		else if (pr_token(pr, NULL, sx_or_if, op_orif))
 			node->type = sx_or_if;
 		if (!_pr_nested_and_or(pr, node))
-		{
-			pr->lexer->error = SH_PR_UNEXTOKEN;
-			return (0);
-		}
+			return (!(pr->lexer->error = SH_PR_UNEXTOKEN));
 		if (node->childs_size == 1)
 		{
 			node_add_child(parent, node->childs[0]);

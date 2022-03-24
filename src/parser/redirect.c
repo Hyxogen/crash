@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:20:35 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/24 10:26:16 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 11:31:05 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@ int
 		token_move(&parent->childs[parent->childs_size - 1]->token, &token);
 		return (1);
 	}
-	/* BOOKMARK: Should we move the token back here? */
-	/* or destroy it? */
+	if (token.id != tk_invalid)
+		token_destroy(&token);
 	return (0);
 }
 

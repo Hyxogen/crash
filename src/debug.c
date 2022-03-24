@@ -291,6 +291,7 @@ int
 		node_destroy(node);
 		if (pr.lexer->error)
 			printf("Syntax error\n");
+		sh_assert(!pr.lexer->error);
 	}
 	input_destroy(&in);
 	pr_destroy(&pr);

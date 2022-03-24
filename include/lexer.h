@@ -157,10 +157,15 @@ void		src_advance(t_source *src);
 int			src_check_end(t_lexer *lex, const char *end, int flags);
 ssize_t		_src_add_next(t_source *src, char **out);
 ssize_t		_src_next_line(t_source *src, char **out);
+int			_src_cmp(const t_source *src, const char *str, int flags);
+void		_src_super_nom(t_lexer *lex, const char *str);
+void		_src_nom(void *ele, void *context);
+void		_src_reset(t_source *src);
+ssize_t		_src_add_next(t_source *src, char **out);
 
 /*** all of these functions should construct a sublexer and call it */
 /* NORMAL: construct a normal lexer and call it with a new parser */
-void		lex_normal(t_source *src, struct s_snode *node);
+// void		lex_normal(t_source *src, struct s_snode *node);
 /* HEREDOC: construct a lexer and call lex_main */
 void		lex_here(t_lexer *lex, t_token *tok, const char *end, int flags);
 /* COMMAND: construct a parser and lexer and call the parser */
