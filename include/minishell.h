@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 10:50:42 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/24 14:39:00 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 16:19:42 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,9 @@ typedef struct s_minishell	t_minishell;
 
 struct s_minishell
 {
-	int	warning_silencer;
+	/* TODO: get from environment variables */
+	char	*path;
+	char	**environ;
 };
 
 void	pr_debug(void);

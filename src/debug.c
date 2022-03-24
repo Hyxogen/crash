@@ -2,10 +2,13 @@
 #include "lexer.h"
 #include "parser.h"
 #include "ft_printf.h"
+#include "commander.h"
 
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+extern char **environ;
 
 static const char	*g_sx_names[] = {
 	"sx_none",
@@ -263,6 +266,10 @@ int
 	t_lexer		lex;
 	t_parser	pr;
 	t_snode		*node;
+	t_minishell	sh;
+
+	sh.environ = environ;
+	sh.path = "/bin";
 
 	setbuf(stdout, NULL);
 	input_new(&in, in_readline, NULL);
@@ -287,7 +294,10 @@ int
 			break ;
 		node = pr_parse(&pr);
 		if (node != NULL)
+		{
 			print_node(node, 0);
+			commandeer(&sh, node, NULL);
+		}
 		node_destroy(node);
 		if (pr.lexer->error)
 			printf("Syntax error\n");

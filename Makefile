@@ -11,12 +11,15 @@ PARSER_FILES	:= \
 	and_or.c case.c command_extra.c command.c condition.c convert.c \
 	function.c general.c io.c list.c loop.c node_int.c node.c other.c \
 	pipe.c redirect.c separator.c subshell.c die.c error.c global.c
+COMMANDER_FILES	:= \
+	commander.c execvp.c
 
 FILE_NAMES		:= \
 	$(BASE_FILES) \
 	$(patsubst %,lexer/%,$(LEXER_FILES)) \
 	$(patsubst %,input/%,$(INPUT_FILES)) \
-	$(patsubst %,parser/%,$(PARSER_FILES))
+	$(patsubst %,parser/%,$(PARSER_FILES)) \
+	$(patsubst %,commander/%,$(COMMANDER_FILES))
 
 CC				:= cc
 LINK_CMD		:= $(CC)
