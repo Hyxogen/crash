@@ -21,15 +21,18 @@ int
 		return (write(sink->fd, str, size));
 	else if (sink->type == sink_type_str)
 	{
-		if (sink->str == NULL)
-			return (size);
-		i = 0;
-		while (i < size)
+		if (sink->str != NULL)
 		{
-			*sink->str = str[i];
-			sink->str += 1;
-			i += 1;
-		}	
+			i = 0;
+			while (i < size)
+			{
+				*sink->str = str[i];
+				sink->str += 1;
+				i += 1;
+			}
+			*sink->str = '\0';
+		}
+		return (size);
 	}
 	return (-1);
 }

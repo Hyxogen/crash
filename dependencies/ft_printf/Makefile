@@ -3,7 +3,8 @@ SRC=\
 	ft_printf_parse.c \
 	ft_printf_string.c \
 	ft_printf_integer.c \
-	ft_printf_utils.c
+	ft_printf_utils.c \
+	ft_printf_superfluous.c
 INC=\
 	ft_printf.h
 OBJ=$(SRC:.c=.o)

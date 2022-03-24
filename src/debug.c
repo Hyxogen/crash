@@ -1,7 +1,7 @@
 #include "minishell.h"
 #include "lexer.h"
 #include "parser.h"
-
+#include "ft_printf.h"
 
 #include <unistd.h>
 #include <stdlib.h>

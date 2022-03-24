@@ -87,7 +87,7 @@ endif
 all: $(NAME) crash
 
 $(NAME): $(OBJECTS) $(LIBFT_LIB) $(FT_PRINTF_LIB)
-	$(LINK_CMD) -o $@ $(OBJECTS) $(LIBFT_LIB) $(LFLAGS) -lreadline
+	$(LINK_CMD) -o $@ $(OBJECTS) $(LIBFT_LIB) $(FT_PRINTF_LIB) $(LFLAGS) -lreadline
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(@D)
@@ -105,6 +105,7 @@ crash: $(NAME)
 clean:
 	rm -rf build
 	${MAKE} -C $(LIBFT_DIR) fclean
+	${MAKE} -C $(FT_PRINTF_DIR) fclean
 
 fclean: clean
 	rm -f $(NAME)

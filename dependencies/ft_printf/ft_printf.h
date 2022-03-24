@@ -43,10 +43,10 @@ int	ft_printf_parse(t_flags *flags, const char **fmt, va_list *args);
 int	ft_printf_vxprintf(t_sink *sink, const char *fmt, va_list *args);
 int	ft_printf(const char *fmt, ...);
 
-int	ft_vprintf(const char *fmt, va_list vlist);
+int	ft_vprintf(const char *fmt, va_list *vlist);
 int ft_fprintf(int fd, const char *fmt, ...);
-int	ft_vfprintf(int fd, const char *fmt, va_list vlist);
+int	ft_vfprintf(int fd, const char *fmt, va_list *vlist);
 int	ft_sprintf(char *buffer, const char *fmt, ...);
-int	ft_vsprintf(char *buffer, const char *fmt, va_list vlist);
+int	ft_vsprintf(char *buffer, const char *fmt, va_list *vlist);
 
 #endif
