@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/16 14:13:22 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 15:32:08 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 10:07:57 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,6 @@ int
 		return (1);
 	}
 	pr->lexer->error = SH_PR_UNEXTOKEN;
-		
 	printf("Could not convert token\n");
 	return (0);
 }

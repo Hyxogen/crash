@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 14:51:59 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 15:58:04 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 10:31:17 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,4 +45,15 @@ void
 		i += 1;
 	}
 	free(tok->parts);
+}
+
+void
+	token_move(t_token *dst, t_token *src)
+{
+	*dst = *src;
+	src->id = tk_invalid;
+	src->parts = NULL;
+	src->count = 0;
+	src->str = NULL;
+	src->len = 0;
 }

@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:16:12 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 15:32:12 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 10:16:24 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int
 	pr_case_item(t_parser *pr, t_snode *parent)
 {
-	t_token	*token;
+	t_token	token;
 	int		should_error;
 
 	should_error = pr_token(pr, NULL, sx_none, op_lparen);
@@ -28,7 +28,7 @@ int
 				continue ;
 			node_add_child(parent, snode(sx_compound_list));
 		}
-		parent->childs[parent->childs_size - 1]->token = token;
+		token_move(&parent->childs[parent->childs_size - 1]->token, &token);
 		if (pr_error_token(pr, NULL, sx_none, op_dsemi))
 		{
 			while (pr_token(pr, NULL, sx_none, tk_newline))
@@ -54,7 +54,7 @@ int
 	{
 		while (pr_token(pr, NULL, sx_none, tk_newline))
 			continue ;
-		if (pr_error_convert_keyword(pr, pr->current, kw_in)
+		if (pr_error_convert_keyword(pr, &pr->current, kw_in)
 			&& pr_error_token(pr, NULL, sx_none, kw_in))
 		{
 			while (pr_token(pr, NULL, sx_none, tk_newline))

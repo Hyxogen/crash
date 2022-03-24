@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:05:14 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 16:13:42 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 10:23:20 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,9 @@ int
 {
 	t_snode	*red;
 
-	if (pr->current_ret)
+	if (pr->current.id != tk_invalid)
 	{
-		pr_convert_reserved(pr, pr->current);
+		pr_convert_reserved(pr, &pr->current);
 		if (pr_brace_group(pr, parent)
 			|| pr_subshell(pr, parent)
 			|| pr_while_clause(pr, parent)
@@ -51,11 +51,11 @@ int
 int
 	pr_complete_cmd(t_parser *pr, t_snode *parent)
 {
-	if (!pr->current_ret)
+	if (pr->current.id == tk_invalid)
 		return (0);
 	if (pr_list(pr, parent))
 	{
-		if (!pr->next_ret)
+		if (pr->next.id == tk_invalid)
 			return (1);
 	}
 	return (0);
@@ -65,15 +65,12 @@ int
 	pr_complete_cmdlst(t_parser *pr, t_snode *parent)
 {
 	t_snode	*node;
-	t_token	*tmp;
 
 	node = snode(sx_command_list);
-	while (pr->current_ret != -1 && pr_complete_cmd(pr, node))
+	while (pr_complete_cmd(pr, node))
 	{
-		tmp = pr->current;
+		token_destroy(&pr->current);
 		pr_next_token(pr);
-		token_destroy(tmp);
-		free(tmp);
 	}
 	node_add_child(parent, node);
 	return (1);

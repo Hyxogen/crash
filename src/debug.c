@@ -207,17 +207,17 @@ void
 	}
 	ft_putstr_fd((char*) g_sx_names[node->type], STDOUT_FILENO);
 	print_sflags(node);
-	if (node->token && node->token->str)
+	if (node->token.id != tk_invalid && node->token.str)
 	{
 		ft_putchar_fd(':', STDOUT_FILENO);
 		ft_putchar_fd('\n', STDOUT_FILENO);
-		print_token(node->token, depth + 1);
+		print_token(&node->token, depth + 1);
 	}
 	else
 	{
 		ft_putchar_fd('\n', STDOUT_FILENO);
 	}
-	if (node->here_content != NULL)
+	if (node->here_content.id != tk_invalid)
 	{
 		i = 0;
 		while (i < depth + 1)
@@ -226,7 +226,7 @@ void
 			i += 1;
 		}
 		ft_putstr_fd((char*) "HERE CONTENT:\n", STDOUT_FILENO);
-		print_token(node->here_content, depth + 2);
+		print_token(&node->here_content, depth + 2);
 	}
 	i = 0;
 	while (i < node->childs_size)
@@ -263,7 +263,6 @@ int
 	t_lexer		lex;
 	t_parser	pr;
 	t_snode		*node;
-	t_token		*tmp;
 
 	setbuf(stdout, NULL);
 	input_new(&in, in_readline, NULL);
@@ -275,18 +274,16 @@ int
 	while (1)
 	{
 		pr.lexer->error = 0;
-		if (pr.current_ret != 0)
+		if (pr.current.id != tk_invalid)
 		{
-			if (pr.current->id == tk_null)
+			if (pr.current.id == tk_null)
 				break ;
-			tmp = pr.current;
+			token_destroy(&pr.current);
 			pr_next_token(&pr);
-			token_destroy(tmp);
-			free(tmp);
 		}
 		else
 			pr_next_token(&pr);
-		if (pr.current_ret == 0 || pr.current->id == tk_null)
+		if (pr.current.id == tk_invalid || pr.current.id == tk_null)
 			break ;
 		node = pr_parse(&pr);
 		if (node != NULL)

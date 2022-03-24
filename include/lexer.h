@@ -13,6 +13,7 @@ struct s_snode;
 
 enum e_token_id
 {
+	tk_invalid = -1,
 	tk_null,
 	tk_word,
 	tk_assword,
@@ -214,6 +215,7 @@ void		src_init(t_source *src, t_input *in);
 void		token_init(t_token *tok);
 
 void		token_destroy(t_token *tok);
+void		token_move(t_token *dst, t_token *src);
 
 /* adds a token part to an existing token */
 t_tpart		*token_add_part(t_token *tok, t_lexer_id id);

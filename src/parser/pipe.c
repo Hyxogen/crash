@@ -1,4 +1,4 @@
- /* ************************************************************************** */
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
 /*   pipe.c                                             :+:    :+:            */
@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:06:29 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 15:09:34 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 10:19:46 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,8 @@ int
 int
 	pr_pipeline(t_parser *pr, t_snode *parent)
 {
-	if (pr->current_ret != 0
-		&& pr_convert_reserved(pr, pr->current)
+	if (pr->current.id != tk_invalid
+		&& pr_convert_reserved(pr, &pr->current)
 		&& pr_token(pr, NULL, sx_none, kw_bang))
 	{
 		if (pr_pipe_sequence(pr, parent))
@@ -57,7 +57,6 @@ int
 		else
 		{
 			pr->lexer->error = SH_PR_UNEXTOKEN;
-		
 			return (0);
 		}
 	}

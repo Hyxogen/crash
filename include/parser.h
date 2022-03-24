@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 11:30:58 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 16:31:52 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 10:02:49 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,11 +140,8 @@ typedef struct s_snode		t_snode;
 
 struct s_parser
 {
-	/* TODO place current and next on stack */
-	t_token		*current;
-	t_token		*next;
-	int			current_ret;
-	int			next_ret;
+	t_token		current;
+	t_token		next;
 	t_lexer		*lexer;
 	t_list		*here_docs;
 };
@@ -154,10 +151,9 @@ struct s_snode
 	t_syntax_id		type;
 	size_t			childs_capacity;
 	size_t			childs_size;
-	struct s_snode	*parent;
 	struct s_snode	**childs;
-	t_token			*token;
-	t_token			*here_content;
+	t_token			token;
+	t_token			here_content;
 	int				flags;
 };
 
@@ -221,7 +217,7 @@ void	node_destroy(t_snode *node);
 int		pr_brace_group(t_parser *pr, t_snode *parent);
 int		pr_wordlist(t_parser *pr, t_snode *parent);
 int		pr_term(t_parser *pr, t_snode *parent);
-int		pr_pattern(t_parser *pr, t_token **token);
+int		pr_pattern(t_parser *pr, t_token *token);
 int		pr_pipe_sequence(t_parser *pr, t_snode *parent);
 int		pr_pipeline(t_parser *pr, t_snode *parent);
 int		pr_convert_io_number(t_parser *pr, t_token *token);

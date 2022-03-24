@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:22:45 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 15:32:08 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 10:02:49 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ int
 			&& pr_token(pr, NULL, sx_none, kw_rbrace))
 			return (1);
 		pr->lexer->error = SH_PR_UNEXTOKEN;
-		
 	}
 	return (0);
 }
@@ -75,13 +74,13 @@ int
 }
 
 int
-	pr_pattern(t_parser *pr, t_token **token)
+	pr_pattern(t_parser *pr, t_token *token)
 {
-	if (!pr->current_ret)
+	if (pr->current.id == tk_invalid)
 		return (0);
-	if (pr_convert_keyword(pr, pr->current, kw_esac))
+	if (pr_convert_keyword(pr, &pr->current, kw_esac))
 		return (0);
-	if (pr->current->id != tk_word)
+	if (pr->current.id != tk_word)
 		return (0);
 	*token = pr->current;
 	pr_next_token(pr);
@@ -102,7 +101,6 @@ int
 			return (1);
 		}
 		pr->lexer->error = SH_PR_UNEXTOKEN;
-		
 	}
 	node_destroy(node);
 	return (0);

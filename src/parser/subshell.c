@@ -6,14 +6,11 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:19:35 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 15:32:08 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 10:01:08 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.h"
-
-
-#include <stdio.h>
 
 int
 	pr_subshell(t_parser *pr, t_snode *parent)
@@ -29,7 +26,6 @@ int
 			}
 		}
 		pr->lexer->error = SH_PR_UNEXTOKEN;
-		
 	}
 	return (0);
 }

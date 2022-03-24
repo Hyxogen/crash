@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:03:53 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 16:13:45 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 10:24:08 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,54 +17,43 @@
 void
 	pr_init(t_parser *pr)
 {
-	pr->current = NULL;
-	pr->next = NULL;
-	pr->current_ret = 0;
-	pr->next_ret = 0;
+	pr->current.id = tk_invalid;
+	pr->next.id = tk_invalid;
 	pr->lexer = NULL;
 	pr->here_docs = NULL;
 }
 
 void
-	pr_read_token(t_parser *pr, t_token **token, int *ret)
+	pr_read_token(t_parser *pr, t_token *token)
 {
-	*token = sh_safe_malloc(sizeof(**token));
-	*ret = lex_lex(pr->lexer, *token);
-	if (*ret)
-		pr_convert_io_number(pr, *token);
+	int	ret;
+
+	ret = lex_lex(pr->lexer, token);
+	if (ret)
+		pr_convert_io_number(pr, token);
 	else
-	{
-		*ret = 1;
-		(*token)->id = tk_null;
-	}
+		token->id = tk_null;
 }
 
 int
 	pr_next_token(t_parser *pr)
 {
-	pr->current = pr->next;
-	pr->current_ret = pr->next_ret;
-	pr->next = NULL;
-	pr->next_ret = 0;
-	if (pr->current == NULL)
-		pr_read_token(pr, &pr->current, &pr->current_ret);
-	if (pr->current != NULL
-		&& pr->current->id != tk_newline
-		&& pr->current->id != tk_null)
-		pr_read_token(pr, &pr->next, &pr->next_ret);
+	token_move(&pr->current, &pr->next);
+	if (pr->current.id == tk_invalid)
+		pr_read_token(pr, &pr->current);
+	if (pr->current.id != tk_newline
+		&& pr->current.id != tk_null)
+		pr_read_token(pr, &pr->next);
 	pr_check_here(pr);
-	return (pr->current_ret);
+	return (pr->current.id != tk_invalid);
 }
 
 int
 	pr_token_set(t_parser *pr, t_snode *node, t_token_id tk_id)
 {
-	if (pr->current_ret == 0 || pr->current->id != tk_id)
-	{
+	if (pr->current.id != tk_id)
 		return (0);
-	}
-	sh_assert(node->token == NULL);
-	node->token = pr->current;
+	token_move(&node->token, &pr->current);
 	pr_next_token(pr);
 	return (1);
 }
@@ -89,5 +78,3 @@ int
 		node_add_child(parent, node);
 	return (1);
 }
-
-

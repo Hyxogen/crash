@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 13:52:28 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 16:29:44 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 10:43:54 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void
 void
 	token_init(t_token *tok)
 {
-	tok->id = 0;
+	tok->id = tk_invalid;
 	tok->parts = NULL;
 	tok->count = 0;
 	tok->str = NULL;

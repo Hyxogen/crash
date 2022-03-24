@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:05:59 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 16:36:53 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 09:52:28 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ static int
 	return (1);
 }
 
-/*Todo test if something like "echo Hallo && || cmd" doesn't work*/
 int
 	pr_and_or(t_parser *pr, t_snode *parent)
 {

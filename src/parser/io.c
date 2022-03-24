@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:21:00 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 13:31:34 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 10:35:07 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,18 +23,17 @@ void
 
 	pr = param;
 	node = data;
-	end = ft_strdup(node->token->str);
+	end = ft_strdup(node->token.str);
 	if (lex_unquote(end))
-			node->flags |= flag_quote;
-	node->here_content = sh_safe_malloc(sizeof(*node->here_content));
-	lex_here(pr->lexer, node->here_content, end, node->flags);
+		node->flags |= flag_quote;
+	lex_here(pr->lexer, &node->here_content, end, node->flags);
 	free(end);
 }
 
 int
 	pr_check_here(t_parser *pr)
 {
-	if (pr->current_ret && pr->current->id == tk_newline
+	if (pr->current.id == tk_newline
 		&& ft_lstsize(pr->here_docs))
 	{
 		ft_lstforeach(pr->here_docs, pr_process_here, pr);
@@ -54,9 +53,8 @@ int
 		|| pr_token(pr, parent, sx_lessgreat, op_lessgreat)
 		|| pr_token(pr, parent, sx_clobber, op_clobber))
 	{
-		token_destroy(parent->childs[parent->childs_size - 1]->token);
-		free(parent->childs[parent->childs_size - 1]->token);
-		parent->childs[parent->childs_size - 1]->token = NULL;
+		token_destroy(&parent->childs[parent->childs_size - 1]->token);
+		parent->childs[parent->childs_size - 1]->token.id = tk_invalid;
 		if (pr_error_token(pr, parent->childs[parent->childs_size - 1], sx_filename, tk_word))
 			return (1);
 	}

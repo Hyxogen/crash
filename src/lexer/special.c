@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/22 14:07:12 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 15:27:51 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 11:20:51 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,45 @@ int
 	return (1);
 }
 
+/* Aka super/extra special parameter */
+int
+	lex_peculiar_parameter(t_lexer *lex)
+{
+	t_token	*tmp;
+
+	if (lex->src->nex == '*'
+		|| lex->src->nex == '@'
+		|| lex->src->nex == '#'
+		|| lex->src->nex == '?'
+		|| lex->src->nex == '-'
+		|| lex->src->nex == '$'
+		|| lex->src->nex == '!'
+		|| lex->src->nex == '0')
+	{
+		lex_update(lex, 1);
+		tmp = lex->tok;
+		token_add_part(tmp, lx_parameter);
+		lex->tok = sh_safe_malloc(sizeof(t_token));
+		token_init(lex->tok);
+		lex->tok->id = tk_word;
+		tmp->parts[tmp->count - 1].data = lex->tok;
+		lex_append(lex, &tmp->str, &tmp->len, 1);
+		lex_update(lex, 0);
+		lex->tok = tmp;
+		token_add_part(lex->tok, lx_normal);
+		return (1);
+	}
+	return (0);
+}
+
 int
 	lex_special_parameter(t_lexer *lex)
 {
 	t_token	*tmp;
 
-	if ((ft_isalnum(lex->src->nex) || lex->src->cur == '_')
+	if (lex_peculiar_parameter(lex))
+		return (1);
+	if ((ft_isalnum(lex->src->nex) || lex->src->nex == '_')
 		&& !lex->btick)
 	{
 		lex_update(lex, 1);

@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:15:17 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/28 14:51:05 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 10:41:13 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,42 +29,8 @@ t_snode
 void
 	node_add_child(t_snode *node, t_snode *child)
 {
-	child->parent = node;
 	if (node->childs_size == node->childs_capacity)
 		node_resize_childs(node, node->childs_capacity + SH_DEF_CHILD_SIZE);
 	node->childs[node->childs_size] = child;
 	node->childs_size++;
-}
-
-void
-	node_destroy_childs(t_snode *node)
-{
-	size_t	index;
-
-	index = 0;
-	while (index < node->childs_size)
-	{
-		node_destroy(node->childs[index]);
-		index++;
-	}
-	free(node->childs);
-}
-
-void
-	node_destroy(t_snode *node)
-{
-	if (!node)
-		return ;
-	node_destroy_childs(node);
-	if (node->token != NULL)
-	{
-		token_destroy(node->token);
-		free(node->token);
-	}
-	if (node->here_content != NULL)
-	{
-		token_destroy(node->here_content);
-		free(node->here_content);
-	}
-	free(node);
 }

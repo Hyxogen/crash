@@ -6,11 +6,12 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/28 10:20:35 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/22 14:55:25 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/24 10:26:16 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.h"
+#include <stdlib.h>
 
 int
 	pr_convert_io_number(t_parser *pr, t_token *token)
@@ -33,22 +34,24 @@ int
 int
 	pr_io_redirect(t_parser *pr, t_snode *parent)
 {
-	t_token	*token;
+	t_token	token;
 
-	if (!pr->current_ret)
+	if (pr->current.id == tk_invalid)
 		return (0);
-	token = NULL;
-	if (pr->current->id == tk_ionumber)
+	token.id = tk_invalid;
+	if (pr->current.id == tk_ionumber)
 	{
-		token = pr->current;
+		token_move(&token, &pr->current);
 		pr_next_token(pr);
 	}
 	if (pr_io_file(pr, parent)
 		|| pr_io_here(pr, parent))
 	{
-		parent->childs[parent->childs_size - 1]->token = token;
+		token_move(&parent->childs[parent->childs_size - 1]->token, &token);
 		return (1);
 	}
+	/* BOOKMARK: Should we move the token back here? */
+	/* or destroy it? */
 	return (0);
 }
 
