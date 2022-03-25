@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 15:31:06 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/24 13:59:16 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/25 14:53:52 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,10 @@ ssize_t			_input_readline_line_proc(t_input *in, char **lp);
 ssize_t			_input_file_line_proc(t_input *in, char **lp);
 ssize_t			_input_string_line_proc(t_input *in, char **lp);
 
+/* param is one of these: 
+	*) Pointer to a c string
+	*) A fd to a open file
+	*) Nothing for readline */
 void			input_new(t_input *in, t_in_mode mode, void *param);
 
 void			input_destroy(t_input *in);

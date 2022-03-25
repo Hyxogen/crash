@@ -1,7 +1,6 @@
 #include "minishell.h"
 #include "lexer.h"
 #include "parser.h"
-#include "ft_printf.h"
 #include "commander.h"
 
 #include <unistd.h>
@@ -259,7 +258,7 @@ t_snode
 }
 
 int
-	main(void)
+	main(int argc, char **argv, char **envp)
 {
 	t_input		in;
 	t_source	src;
@@ -267,10 +266,13 @@ int
 	t_parser	pr;
 	t_snode		*node;
 	t_minishell	sh;
+	char		*tmp;
 
-	sh.environ = environ;
-	sh.path = "/bin";
-
+	(void) argc;
+	tmp = getcwd(NULL, 0);
+	sh.self = sh_join_path(tmp, argv[0]);
+	free(tmp);
+	sh_env_init(&sh, envp);
 	setbuf(stdout, NULL);
 	input_new(&in, in_readline, NULL);
 	src_init(&src, &in);

@@ -6,7 +6,7 @@
 /*   By: csteenvo <csteenvo@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/01/18 13:30:52 by csteenvo      #+#    #+#                 */
-/*   Updated: 2022/02/22 11:22:26 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/25 14:20:31 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ int		ft_strncmp(const char *str1, const char *str2, size_t len);
 char	*ft_strnstr(const char *str1, const char *str2, size_t len);
 char	*ft_strstr(const char *str1, const char *str2);
 int		ft_atoi(const char *str);
+long	ft_atol(const char *str);
+int		ft_strcmp(const char *str1, const char *str2);
 
 /* memory */
 void	*ft_memset(void *ptr, int ch, size_t size);

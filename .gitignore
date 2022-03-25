@@ -3,3 +3,5 @@
 /minishell
 /crash
 bashtop
+*.dSYM
+segfault

@@ -6,12 +6,15 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 10:50:42 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/24 16:19:42 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/25 15:33:02 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
+
+# include <stddef.h>
+# include <sys/types.h>
 
 /* Constant Rage Again SHell */
 /* Can't Rest Again SHell */
@@ -65,17 +68,65 @@
  * A winner is you
  */
 
-typedef struct s_minishell	t_minishell;
+# define SH_ENV_EXPORT 1
+# define SH_ENV_READONLY 2
 
-struct s_minishell
+# ifdef SH_DEBUG
+#  include <assert.h>
+#  define sh_assert assert
+# else
+#  define sh_assert sh_assert_impl
+# endif
+
+typedef struct s_minishell	t_minishell;
+typedef struct s_envvar		t_envvar;
+typedef struct s_builtin	t_builtin;
+typedef void				(*t_builtin_proc)(t_minishell *sh, char **argv);
+
+struct s_envvar
 {
-	/* TODO: get from environment variables */
-	char	*path;
-	char	**environ;
+	char	*key;
+	char	*value;
+	int		attr;
 };
 
-void	pr_debug(void);
-void	sh_assert(int test);
-void	sh_nop(void *ptr);
+struct s_builtin
+{
+	const char		*key;
+	t_builtin_proc	fn;
+};
+
+/* TODO: locals */
+struct s_minishell
+{
+	t_envvar	*vars;
+	size_t		vars_size;
+	t_builtin	*builtins;
+	size_t		builtins_size;
+	char		*self;
+};
+
+char		*sh_join2(char *lhs, char delim, char *rhs);
+void		sh_split2(char *str, char delim, char **lhs, char **rhs);
+char		*sh_join_path(char *lhs, char *rhs);
+
+t_envvar	*sh_getenv(t_minishell *sh, const char *key);
+t_envvar	*sh_setenv(t_minishell *sh, char *key, char *value);
+char		**sh_env(t_minishell *sh);
+void		sh_env_init(t_minishell *sh, char **env);
+
+void		pr_debug(void);
+void		sh_assert_impl(int test);
+void		sh_check(int test, const char *s);
+void		sh_abort(void);
+void		sh_nop(void *ptr);
+
+pid_t		sh_fork(void);
+int			sh_execve(const char *path, char *const argv[], char *const envp[]);
+int			sh_waitpid(pid_t pid, int *stat_loc, int options);
+int			sh_pipe(int fildes[2]);
+int			sh_dup2(int fildes, int fildes2);
+int			sh_close(int fildes);
+int			sh_open(const char *path, int oflag, mode_t mode);
 
 #endif

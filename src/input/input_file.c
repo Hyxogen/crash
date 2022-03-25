@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 15:50:21 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/24 15:24:47 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/25 15:06:42 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ ssize_t
 		if (tmp)
 		{
 			read_size = tmp - &fh->buf[fh->beg];
-			*lp = ft_strndup(&fh->buf[fh->beg], read_size - 1);
+			*lp = ft_strndup(&fh->buf[fh->beg], read_size);
 			fh->beg += (tmp - &fh->buf[fh->beg]) + 1;
 			return (read_size);
 		}

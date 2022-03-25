@@ -7,7 +7,8 @@ SRC=\
 	ft_strdup.c 	ft_striteri.c 	ft_strjoin.c 	ft_strlcat.c	\
 	ft_strlcpy.c 	ft_strlen.c 	ft_strmapi.c 	ft_strncmp.c	\
 	ft_strnstr.c 	ft_strrchr.c 	ft_strtrim.c 	ft_substr.c		\
-	ft_tolower.c 	ft_toupper.c	shft_strndup.c
+	ft_tolower.c 	ft_toupper.c	shft_strndup.c	shft_atol.c		\
+	shft_strcmp.c
 SRC_BONUS=\
 	ft_lstadd_back_bonus.c 	ft_lstadd_front_bonus.c	\
 	ft_lstclear_bonus.c 	ft_lstdelone_bonus.c	\

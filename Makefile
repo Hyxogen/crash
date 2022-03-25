@@ -1,7 +1,15 @@
 NAME			:= minishell
 
-BASE_FILES		:= \
-	debug.c memory.c assert.c op.c
+BASE_FILES		:=
+
+ifndef debug
+	BASE_FILES	+= \
+		main.c
+else
+	BASE_FILES	+= \
+		debug.c
+endif
+
 LEXER_FILES		:= \
 	expand.c init.c add.c lex.c operator.c escape.c advance.c main.c \
 	special.c source.c source_extra.c die.c
@@ -12,14 +20,17 @@ PARSER_FILES	:= \
 	function.c general.c io.c list.c loop.c node_int.c node.c other.c \
 	pipe.c redirect.c separator.c subshell.c die.c error.c global.c
 COMMANDER_FILES	:= \
-	commander.c execvp.c
+	commander.c execvp.c pipe_sequence.c env.c redirect.c expand.c
+UTIL_FILES		:= \
+	die.c memory.c op.c util.c wrap.c
 
 FILE_NAMES		:= \
 	$(BASE_FILES) \
 	$(patsubst %,lexer/%,$(LEXER_FILES)) \
 	$(patsubst %,input/%,$(INPUT_FILES)) \
 	$(patsubst %,parser/%,$(PARSER_FILES)) \
-	$(patsubst %,commander/%,$(COMMANDER_FILES))
+	$(patsubst %,commander/%,$(COMMANDER_FILES)) \
+	$(patsubst %,util/%,$(UTIL_FILES))
 
 CC				:= cc
 LINK_CMD		:= $(CC)
@@ -33,10 +44,8 @@ DEP_DIR			:= build
 
 LIBFT_DIR		:= $(LIB_DIR)/libft
 LIBFT_LIB		:= $(LIBFT_DIR)/libft.a
-FT_PRINTF_DIR	:= $(LIB_DIR)/ft_printf
-FT_PRINTF_LIB	:= $(FT_PRINTF_DIR)/libftprintf.a
 
-INC_DIR			:= include $(LIBFT_DIR) $(FT_PRINTF_DIR)
+INC_DIR			:= include $(LIBFT_DIR)
 
 SOURCES			:= $(patsubst %.c,$(SRC_DIR)/%.c,$(FILE_NAMES))
 OBJECTS			:= $(patsubst %.c,$(OBJ_DIR)/%.o,$(FILE_NAMES))
@@ -89,8 +98,8 @@ endif
 
 all: $(NAME) crash
 
-$(NAME): $(OBJECTS) $(LIBFT_LIB) $(FT_PRINTF_LIB)
-	$(LINK_CMD) -o $@ $(OBJECTS) $(LIBFT_LIB) $(FT_PRINTF_LIB) $(LFLAGS) -lreadline
+$(NAME): $(OBJECTS) $(LIBFT_LIB)
+	$(LINK_CMD) -o $@ $(OBJECTS) $(LIBFT_LIB) $(LFLAGS) -lreadline
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(@D)
@@ -99,16 +108,12 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 $(LIBFT_LIB):
 	${MAKE} -C $(LIBFT_DIR) bonus
 
-$(FT_PRINTF_LIB):
-	${MAKE} -C $(FT_PRINTF_DIR) bonus
-
 crash: $(NAME)
 	ln -s $(NAME) $@
 
 clean:
 	rm -rf build
 	${MAKE} -C $(LIBFT_DIR) fclean
-	${MAKE} -C $(FT_PRINTF_DIR) fclean
 
 fclean: clean
 	rm -f $(NAME)
