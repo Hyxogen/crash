@@ -5,3 +5,4 @@
 bashtop
 *.dSYM
 segfault
+compile_commands.json
