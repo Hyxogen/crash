@@ -91,3 +91,13 @@ int
 		perror("CraSH");
 	return (ret);
 }
+
+int
+	sh_sigaction(int sig, const struct sigaction *act, struct sigaction *oact)
+{
+	int	ret;
+
+	ret = sigaction(sig, act, oact);
+	sh_check(ret >= 0, "sigaction");
+	return (ret);
+}

@@ -32,20 +32,41 @@ static int
 	return (WEXITSTATUS(status_code));
 }
 
-char **_word_list_to_array(t_snode *word_list)
+char **_array_add(char **array, char *value)
+{
+	size_t	i;
+
+	i = 0;
+	while (array[i] != NULL)
+		i += 1;
+	array = sh_safe_realloc(array, sizeof(*array) * (i + 1), sizeof(*array) * (i + 2));
+	array[i] = value;
+	array[i + 1] = NULL;
+	return (array);
+}
+
+char **_word_list_to_array(t_minishell *sh, t_snode *word_list)
 {
 	char	**ret;
-	size_t	index;
+	char	**tmp;
+	size_t	i;
+	size_t	j;
 
 	sh_assert(word_list->type == sx_wordlist);
-	index = word_list->childs_size;
-	ret = sh_safe_malloc(sizeof(*ret) * (index + 1));
-	ret[index] = 0;
-	index -= 1;
-	while (index + 1)
+	ret = sh_safe_malloc(sizeof(*ret));
+	ret[0] = NULL;
+	i = 0;
+	while (i < word_list->childs_size)
 	{
-		ret[index] = word_list->childs[index]->token.str;
-		index--;
+		tmp = cm_expand(sh, &word_list->childs[i]->token);
+		j = 0;
+		while (tmp[j] != NULL)
+		{
+			ret = _array_add(ret, tmp[j]);
+			j += 1;
+		}
+		free(tmp);
+		i += 1;
 	}
 	return (ret);
 }
@@ -71,28 +92,55 @@ void
 	}   
 }
 
-pid_t
-	cm_simple_cmd_command(t_minishell *sh, t_snode *cmd_node, int fd_in, int fd_out)
+static pid_t
+	_cm_simple_builtin_cmd(t_simple_cmd_ctx *ctx, t_builtin_proc proc)
+{
+	(void) ctx;
+	(void) proc;
+	/* TODO execute builtin */
+	return (0);
+}
+
+static pid_t
+	_cm_simple_extern_cmd(t_simple_cmd_ctx *ctx)
 {
 	pid_t	pid;
-	char	**args;
-
-	(void) cmd_node;
+	
 	pid = sh_fork();
 	if (pid == 0)
 	{
-		args = _word_list_to_array(cmd_node->childs[0]);
-		dup2(fd_in, STDIN_FILENO);
-		dup2(fd_out, STDOUT_FILENO);
-		_cm_setup_redirects(sh, cmd_node->childs[1]);
-		if (fd_in != STDIN_FILENO)
-			close(fd_in);
-		if (fd_out != STDOUT_FILENO)
-			close(fd_out);
-		sh_execvp(sh, args);
-		_sh_execvp_error_handler(args[0], errno);
+		dup2(ctx->fd_in, STDIN_FILENO);
+		dup2(ctx->fd_out, STDOUT_FILENO);
+		_cm_setup_redirects(ctx->sh, ctx->cmd_node->childs[1]);
+		if (ctx->fd_in != STDIN_FILENO)
+			close(ctx->fd_in);
+		if (ctx->fd_out != STDOUT_FILENO)
+			close(ctx->fd_out);
+		sh_execvp(ctx->sh, ctx->args);
+		_sh_execvp_error_handler(ctx->args[0], errno);
 	}
 	return (pid);
+}
+
+pid_t
+	cm_simple_cmd_command(t_minishell *sh, t_snode *cmd_node, int fd_in, int fd_out)
+{
+	size_t				i;
+	t_simple_cmd_ctx	ctx;
+
+	ctx.args = _word_list_to_array(sh, cmd_node->childs[0]);
+	ctx.fd_in = fd_in;
+	ctx.fd_out = fd_out;
+	ctx.cmd_node = cmd_node;
+	ctx.sh = sh;
+	i = 0;
+	while (i < sh->builtins_size)
+	{
+		if (!ft_strcmp(ctx.args[0], sh->builtins[i].key))
+			return (_cm_simple_builtin_cmd(&ctx, sh->builtins[i].fn));
+		i += 1;
+	}
+	return (_cm_simple_extern_cmd(&ctx));
 }
 
 int
@@ -103,38 +151,6 @@ int
 	sh_assert(waitpid(pid, &status, WUNTRACED) > 0);
 	return (_get_exit_code(status));
 }
-/*
-int
-	_commandeer_pipe_sequence(t_minishell *sh, t_snode *seq_node, int fd_out)
-{
-	size_t	index;
-	size_t	count;
-	int		io[2];
-	int		prev_out;
-
-	index = 0;
-	prev_out = STDIN_FILENO;
-	count = seq_node->childs_size;
-	while (index < count)
-	{
-		if (index < (count - 1))
-		{
-			sh_pipe(io);
-			commandeer_simple_cmd(sh, seq_node->childs[index], prev_out, io[1]);
-			sh_close(io[1]);
-		}
-		else
-			commandeer_simple_cmd(sh, seq_node->childs[index], prev_out, fd_out);
-		if (prev_out != STDIN_FILENO)
-			sh_close(prev_out);
-		prev_out = io[0];
-		index++;
-	}
-	if (fd_out != STDOUT_FILENO)
-		sh_close(fd_out);
-	return (0);
-}
-*/
 
 static const t_cmd_base
 	*_get_commandeer_cmd_procs(void)
@@ -172,38 +188,6 @@ int
 	return (-1);
 }
 
-/*
-int
-	commandeer_pipe_sequence(t_minishell *sh, t_snode *seq_node, void *data)
-{
-	size_t	index;
-	size_t	count;
-	int		io[2];
-	int		prev_out;
-
-	index = 0;
-	prev_out = STDIN_FILENO;
-	count = seq_node->childs_size;
-	while (index < count)
-	{
-		if (index < (count -1))
-		{
-			sh_pipe(io);
-			_get_commandeer_cmd_procs()[seq_node->childs[index]->type](sh,
-					seq_node->childs[index], prev_out, io[1]);
-		}
-		else
-			_get_commandeer_cmd_procs()[seq_node->childs[index]->type](sh,
-					seq_node->childs[index], prev_out, STDOUT_FILENO);
-		if (prev_out != STDIN_FILENO)
-			sh_close(prev_out);
-		prev_out = io[0];
-		index++;
-	}
-	return (0);
-}
-*/
-
 static int
 	_commandeer_pipe_sequence_iter(t_minishell *sh, t_snode  *seq_node, t_pipe_seq_ctx ctx, size_t index)
 {
@@ -234,17 +218,21 @@ static int
 	return (cmd->wait(pid));
 }
 
-/* TODO disable child reaper signal handler before executing command and enabling it again afterwards */
+/* TODO fork the entire pipe sequence when it runs in the background */
 int
 	commandeer_pipe_sequence(t_minishell *sh, t_snode *seq_node, void *data)
 {
 	t_pipe_seq_ctx	ctx;
 	int				run_in_background;
+	int				rc;
 
 	if (seq_node->childs_size == 0)
 		return (0);
 	run_in_background = !!(long) data;
 	ctx.run_in_background = run_in_background;
 	ctx.prev_out_fd = STDIN_FILENO;
-	return (_commandeer_pipe_sequence_iter(sh, seq_node, ctx, seq_node->childs_size));
+	cm_disable_reaper(sh);
+	rc = _commandeer_pipe_sequence_iter(sh, seq_node, ctx, seq_node->childs_size);
+	cm_enable_reaper(sh);
+	return (rc);
 }

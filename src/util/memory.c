@@ -25,14 +25,18 @@ void
 
 void
 	*sh_safe_realloc(void *ptr, size_t old_size, size_t new_size) {
+	size_t			size;
 	unsigned char	*ret;
 
 	ret = sh_safe_malloc(new_size);
 	if (!ret)
 		return (NULL);
+	size = old_size;
+	if (new_size < old_size)
+		size = new_size;
 	if (ptr)
 	{
-		ft_memcpy(ret, ptr, old_size);
+		ft_memcpy(ret, ptr, size);
 		free(ptr);
 	}
 	return (ret);

@@ -13,7 +13,6 @@
 #include "parser.h"
 #include "memory.h"
 
-/*shrinking is undefined*/
 void
 	node_resize_childs(t_snode *node, size_t newsize)
 {

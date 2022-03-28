@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 10:50:42 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/25 15:33:02 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/28 10:13:27 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <stddef.h>
 # include <sys/types.h>
+# include <signal.h>
 
 /* Constant Rage Again SHell */
 /* Can't Rest Again SHell */
@@ -99,11 +100,14 @@ struct s_builtin
 /* TODO: locals */
 struct s_minishell
 {
-	t_envvar	*vars;
-	size_t		vars_size;
-	t_builtin	*builtins;
-	size_t		builtins_size;
-	char		*self;
+	t_envvar				*vars;
+	size_t					vars_size;
+	t_builtin				*builtins;
+	size_t					builtins_size;
+	char					*self;
+	char					**args;
+	int						interactive;
+	struct		sigaction	child_reaper;
 };
 
 char		*sh_join2(char *lhs, char delim, char *rhs);
@@ -128,5 +132,6 @@ int			sh_pipe(int fildes[2]);
 int			sh_dup2(int fildes, int fildes2);
 int			sh_close(int fildes);
 int			sh_open(const char *path, int oflag, mode_t mode);
+int			sh_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
 
 #endif

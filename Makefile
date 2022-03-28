@@ -20,7 +20,8 @@ PARSER_FILES	:= \
 	function.c general.c io.c list.c loop.c node_int.c node.c other.c \
 	pipe.c redirect.c separator.c subshell.c die.c error.c global.c
 COMMANDER_FILES	:= \
-	commander.c execvp.c pipe_sequence.c env.c redirect.c expand.c
+	commander.c execvp.c pipe_sequence.c env.c redirect.c expand.c \
+	signal.c param.c
 UTIL_FILES		:= \
 	die.c memory.c op.c util.c wrap.c
 

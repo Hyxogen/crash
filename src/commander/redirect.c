@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   redirect.c                                         :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: csteenvo <csteenvo@student.codam.n>          +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2022/03/25 16:22:27 by csteenvo      #+#    #+#                 */
-/*   Updated: 2022/03/28 10:34:52 by dmeijer       ########   odam.nl         */
+/*                                                           :      .         */
+/*   redirect.c                                       -=-:::+*+:-+*#.         */
+/*                                                :-:::+#***********----:     */
+/*   By: csteenvo <csteenvo@student.codam.n>        .:-*#************#-       */
+/*                                                 :=+*+=+*********####+:     */
+/*   Created: 2022/03/25 16:22:30 by csteenvo     ..     +**=-=***-           */
+/*   Updated: 2022/03/25 16:22:30 by csteenvo            :      ..            */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ int
 			return (0);
 		}
 	}
-	filen = cm_expand(sh, &file_node->token);
+	filen = cm_expand(sh, &file_node->token); /* TODO Implement new expand system */
 	target_fd = (target_fd != -1) * target_fd + (redi_node->type != sx_less);
 	if (redi_node->type == sx_less)
 		return (_cm_open_file_in(filen, target_fd) < 0);

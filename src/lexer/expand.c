@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                           :      .         */
-/*   expand.c                                         -=-:::+*+:-+*#.         */
-/*                                                :-:::+#***********----:     */
-/*   By: csteenvo <csteenvo@student.codam.n>        .:-*#************#-       */
-/*                                                 :=+*+=+*********####+:     */
-/*   Created: 2022/03/25 16:22:44 by csteenvo     ..     +**=-=***-           */
-/*   Updated: 2022/03/25 16:22:44 by csteenvo            :      ..            */
+/*                                                        ::::::::            */
+/*   expand.c                                           :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: csteenvo <csteenvo@student.codam.n>          +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2022/03/25 16:22:44 by csteenvo      #+#    #+#                 */
+/*   Updated: 2022/03/28 10:38:25 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,6 +131,7 @@ void
 	part->data = sh_safe_malloc(sizeof(t_token));
 	part->quote = lex->quote;
 	token_init(part->data);
+	token_add_part(part->data, lx_normal);
 	lex_init(&lexer);
 	lexer.tok = part->data;
 	lexer.tok->id = tk_word;

@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 11:30:58 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/24 14:06:18 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/28 10:47:49 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,12 @@ enum e_syntax_id
 	sx_word,
 	sx_assword,
 	sx_simple_cmd,
+	sx_if_clause,
+	sx_function_def,
+	sx_case_clause,
+	sx_for_clause,
+	sx_while_clause,
+	sx_compound_cmd,
 	sx_pipe_sequence,
 	sx_pipeline,
 	sx_list,
@@ -53,12 +59,6 @@ enum e_syntax_id
 	sx_cmd,
 	sx_term,
 	sx_compound_list,
-	sx_compound_cmd,
-	sx_while_clause,
-	sx_if_clause,
-	sx_function_def,
-	sx_case_clause,
-	sx_for_clause,
 	sx_wordlist,
 	sx_io_here,
 	sx_command_list,

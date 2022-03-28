@@ -5,8 +5,8 @@
 /*                                                :-:::+#***********----:     */
 /*   By: csteenvo <csteenvo@student.codam.n>        .:-*#************#-       */
 /*                                                 :=+*+=+*********####+:     */
-/*   Created: 2022/03/25 16:22:57 by csteenvo     ..     +**=-=***-           */
-/*   Updated: 2022/03/25 16:22:57 by csteenvo            :      ..            */
+/*   Created: 2022/03/25 16:22:30 by csteenvo     ..     +**=-=***-           */
+/*   Updated: 2022/03/25 16:22:30 by csteenvo            :      ..            */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,12 +83,16 @@ int
 	sh.self = sh_join_path(tmp, argv[0]);
 	sh.builtins = NULL;
 	sh.builtins_size = 0;
+	sh.args = argv + argc;
+	sh.interactive = 1;
 	free(tmp);
 	sh_env_init(&sh, envp);
+	cm_enable_reaper(&sh);
 	if (argc >= 2)
 	{
 		fd = open(argv[1], O_RDONLY);
-		/* TODO: pass arguments */
+		sh.args = argv + 2;
+		sh.interactive = 0;
 		input_new(&in, in_file, (void*)(unsigned long long) fd);
 	}
 	else

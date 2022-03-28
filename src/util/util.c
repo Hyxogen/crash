@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                           :      .         */
-/*   util.c                                           -=-:::+*+:-+*#.         */
-/*                                                :-:::+#***********----:     */
-/*   By: csteenvo <csteenvo@student.codam.n>        .:-*#************#-       */
-/*                                                 :=+*+=+*********####+:     */
-/*   Created: 2022/03/25 16:23:39 by csteenvo     ..     +**=-=***-           */
-/*   Updated: 2022/03/25 16:23:39 by csteenvo            :      ..            */
+/*                                                        ::::::::            */
+/*   util.c                                             :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: csteenvo <csteenvo@student.codam.n>          +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2022/03/25 16:23:39 by csteenvo      #+#    #+#                 */
+/*   Updated: 2022/03/28 10:26:22 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ char
 
 /* TODO: what to do if delim not found */
 /* TODO: safe malloc not always used, also check for other functions */
+/* TODO: other functions like ft_strdup() */
 void
 	sh_split2(char *str, char delim, char **lhs, char **rhs)
 {
