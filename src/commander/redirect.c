@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                           :      .         */
-/*   redirect.c                                       -=-:::+*+:-+*#.         */
-/*                                                :-:::+#***********----:     */
-/*   By: csteenvo <csteenvo@student.codam.n>        .:-*#************#-       */
-/*                                                 :=+*+=+*********####+:     */
-/*   Created: 2022/03/25 16:22:27 by csteenvo     ..     +**=-=***-           */
-/*   Updated: 2022/03/25 16:22:27 by csteenvo            :      ..            */
+/*                                                        ::::::::            */
+/*   redirect.c                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: csteenvo <csteenvo@student.codam.n>          +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2022/03/25 16:22:27 by csteenvo      #+#    #+#                 */
+/*   Updated: 2022/03/28 10:34:52 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int
 }
 
 int
-	_cm_handle_redi_node(t_snode *redi_node)
+	_cm_handle_redi_node(t_minishell *sh, t_snode *redi_node)
 {
 	int			target_fd;
 	const char	*filen;
@@ -56,32 +56,21 @@ int
 
 	target_fd = -1;
 	file_node = redi_node->childs[0];
-	if (redi_node->childs_size >= 2)
+	if (redi_node->token.id == tk_ionumber)
 	{
-		target_fd = ft_atol(redi_node->childs[0]->token.str);
+		target_fd = ft_atol(redi_node->token.str);
 		if (target_fd < 0 || target_fd >= INT_MAX)
 		{
 			fprintf(stderr, "CraSH: Invalid file descriptor\n");
 			return (0);
 		}
-		file_node = redi_node->childs[1];
-		filen = cm_expand(&redi_node->childs[1]->token);
 	}
-	filen = cm_expand(&file_node->token);
+	filen = cm_expand(sh, &file_node->token);
+	target_fd = (target_fd != -1) * target_fd + (redi_node->type != sx_less);
 	if (redi_node->type == sx_less)
-	{
-		if (target_fd == -1)
-				target_fd = 0;
 		return (_cm_open_file_in(filen, target_fd) < 0);
-	}
 	else if (redi_node->type == sx_great)
-	{
-		if (target_fd == -1)
-			target_fd = 1;
 		return (_cm_open_file_out(filen, target_fd, 0) < 0);
-	}
-	if (target_fd == -1)
-			target_fd = 1;
 	return (_cm_open_file_out(filen, target_fd, 1) < 0);
 }
 
@@ -99,7 +88,7 @@ int
 	while (index < size)
 	{
 		node = redi_list->childs[index];
-		rc  = _cm_handle_redi_node(node);
+		rc  = _cm_handle_redi_node(sh, node);
 		if (rc)
 		{
 			fprintf(stdout, "CraSH: Failed to setup redirect\n");
