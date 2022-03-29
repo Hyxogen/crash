@@ -152,20 +152,20 @@ int
 	return (_get_exit_code(status));
 }
 
-static const t_cmd_base
+static t_cm_cmd_proc
 	*_get_commandeer_cmd_procs(void)
 {
-	static const t_cmd_base	cmds[] = {
-		{cm_simple_cmd_command, cm_simple_cmd_wait},
-		{cm_unimplemented_cmd_command, cm_unimplemented_cmd_wait},
-		{cm_unimplemented_cmd_command, cm_unimplemented_cmd_wait},
-		{cm_unimplemented_cmd_command, cm_unimplemented_cmd_wait},
-		{cm_unimplemented_cmd_command, cm_unimplemented_cmd_wait},
-		{cm_unimplemented_cmd_command, cm_unimplemented_cmd_wait},
-		{cm_unimplemented_cmd_command, cm_unimplemented_cmd_wait}
+	static const t_cm_cmd_proc procs[] = {
+		cm_simple_cmd_command,
+		cm_unimplemented_cmd_command,
+		cm_unimplemented_cmd_command,
+		cm_unimplemented_cmd_command,
+		cm_unimplemented_cmd_command,
+		cm_unimplemented_cmd_command,
+		cm_unimplemented_cmd_command
 	};
 
-	return (cmds);
+	return (procs);
 }
 
 pid_t
@@ -194,28 +194,29 @@ static int
 	pid_t				pid;
 	int					io[2];
 	t_snode				*cmd_node;
-	const t_cmd_base	*cmd;
-
+	int					exit_code;
 
 	cmd_node = seq_node->childs[seq_node->childs_size - index];
-	cmd = &_get_commandeer_cmd_procs()[sx_simple_cmd - cmd_node->type];
 	if (index == 1)
-		pid = cmd->on_command(sh,
+	{
+		pid = _get_commandeer_cmd_procs()[sx_simple_cmd - cmd_node->type](sh,
 				cmd_node, ctx.prev_out_fd, STDOUT_FILENO);
+		sh_waitpid(pid, &exit_code, 0);
+		return (_get_exit_code(exit_code));
+	}
 	else
 	{
 		sh_pipe(io);
-		pid = cmd->on_command(sh,
+		pid = _get_commandeer_cmd_procs()[sx_simple_cmd - cmd_node->type](sh,
 				cmd_node, ctx.prev_out_fd, io[1]);
 		sh_close(io[1]);
 		if (ctx.prev_out_fd != STDIN_FILENO)
 			sh_close(ctx.prev_out_fd);
 		ctx.prev_out_fd = io[0];
-		return (_commandeer_pipe_sequence_iter(sh, seq_node, ctx, index - 1));		
+		exit_code = _commandeer_pipe_sequence_iter(sh, seq_node, ctx, index - 1);
+		sh_waitpid(pid, NULL, WUNTRACED);
+		return (exit_code);
 	}
-	if (ctx.run_in_background)
-		return (0);
-	return (cmd->wait(pid));
 }
 
 /* TODO fork the entire pipe sequence when it runs in the background */
