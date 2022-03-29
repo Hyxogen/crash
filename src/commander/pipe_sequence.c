@@ -180,16 +180,8 @@ pid_t
 	return (-1);
 }
 
-int
-	cm_unimplemented_cmd_wait(pid_t pid)
-{
-	(void) pid;
-	fprintf(stderr, "Waiting for this command type is not implemented yet\n");
-	return (-1);
-}
-
 static int
-	_commandeer_pipe_sequence_iter(t_minishell *sh, t_snode  *seq_node, t_pipe_seq_ctx ctx, size_t index)
+	_commandeer_pipe_sequence_iter(t_minishell *sh, t_snode  *seq_node, int prev_out_fd, size_t index)
 {
 	pid_t				pid;
 	int					io[2];
@@ -198,42 +190,37 @@ static int
 
 	cmd_node = seq_node->childs[seq_node->childs_size - index];
 	if (index == 1)
-	{
 		pid = _get_commandeer_cmd_procs()[sx_simple_cmd - cmd_node->type](sh,
-				cmd_node, ctx.prev_out_fd, STDOUT_FILENO);
-		sh_waitpid(pid, &exit_code, 0);
-		return (_get_exit_code(exit_code));
-	}
+				cmd_node, prev_out_fd, STDOUT_FILENO);
 	else
 	{
 		sh_pipe(io);
 		pid = _get_commandeer_cmd_procs()[sx_simple_cmd - cmd_node->type](sh,
-				cmd_node, ctx.prev_out_fd, io[1]);
+				cmd_node, prev_out_fd, io[1]);
 		sh_close(io[1]);
-		if (ctx.prev_out_fd != STDIN_FILENO)
-			sh_close(ctx.prev_out_fd);
-		ctx.prev_out_fd = io[0];
-		exit_code = _commandeer_pipe_sequence_iter(sh, seq_node, ctx, index - 1);
+		if (prev_out_fd != STDIN_FILENO)
+			sh_close(prev_out_fd);
+		prev_out_fd = io[0];
+		exit_code = _commandeer_pipe_sequence_iter(sh, seq_node, prev_out_fd, index - 1);
 		sh_waitpid(pid, NULL, WUNTRACED);
 		return (exit_code);
 	}
+	sh_waitpid(pid, &exit_code, 0);
+	return (_get_exit_code(exit_code));
 }
 
 /* TODO fork the entire pipe sequence when it runs in the background */
 int
 	commandeer_pipe_sequence(t_minishell *sh, t_snode *seq_node, void *data)
 {
-	t_pipe_seq_ctx	ctx;
 	int				run_in_background;
 	int				rc;
 
 	if (seq_node->childs_size == 0)
 		return (0);
 	run_in_background = !!(long) data;
-	ctx.run_in_background = run_in_background;
-	ctx.prev_out_fd = STDIN_FILENO;
 	cm_disable_reaper(sh);
-	rc = _commandeer_pipe_sequence_iter(sh, seq_node, ctx, seq_node->childs_size);
+	rc = _commandeer_pipe_sequence_iter(sh, seq_node, STDIN_FILENO, seq_node->childs_size);
 	cm_enable_reaper(sh);
 	return (rc);
 }
