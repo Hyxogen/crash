@@ -38,7 +38,7 @@ void
 	part->data = sh_safe_malloc(sizeof(t_token));
 	part->quote = lex->quote;
 	token_init(part->data);
-	token_add_part(part->data, lx_normal);
+	token_add_part(part->data, lx_normal, 0);
 	lex_init(&lexer);
 	lexer.tok = part->data;
 	lexer.tok->id = tk_word;
@@ -93,7 +93,7 @@ void
 	lexer.here_flags = flags;
 	lexer.tok = tok;
 	token_init(lexer.tok);
-	token_add_part(lexer.tok, lx_normal);
+	token_add_part(lexer.tok, lx_normal, 0);
 	lexer.tok->id = tk_word;
 	if (lexer.src->cur == -1)
 		lex_advance(&lexer);
@@ -131,7 +131,7 @@ void
 	part->data = sh_safe_malloc(sizeof(t_token));
 	part->quote = lex->quote;
 	token_init(part->data);
-	token_add_part(part->data, lx_normal);
+	token_add_part(part->data, lx_normal, 0);
 	lex_init(&lexer);
 	lexer.tok = part->data;
 	lexer.tok->id = tk_word;

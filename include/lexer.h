@@ -170,6 +170,6 @@ void		token_init(t_token *tok);
 void		token_destroy(t_token *tok);
 void		token_move(t_token *dst, t_token *src);
 
-t_tpart		*token_add_part(t_token *tok, t_lexer_id id);
+t_tpart		*token_add_part(t_token *tok, t_lexer_id id, int quote);
 
 #endif

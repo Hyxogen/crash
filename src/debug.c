@@ -279,6 +279,7 @@ int
 	t_snode		*node;
 	t_minishell	sh;
 	char		*tmp;
+	int			std_io[3];
 
 	(void) argc;
 	tmp = getcwd(NULL, 0);
@@ -292,6 +293,9 @@ int
 	pr_init(&pr);
 	lex.src = &src;
 	pr.lexer = &lex;
+	std_io[SH_STDIN_INDEX] = STDIN_FILENO;
+	std_io[SH_STDOUT_INDEX] = STDOUT_FILENO;
+	std_io[SH_STDERR_INDEX] = STDERR_FILENO;
 	while (1)
 	{
 		pr.lexer->error = 0;
@@ -310,7 +314,7 @@ int
 		if (node != NULL)
 		{
 			print_node(node, 0);
-			commandeer(&sh, node, NULL);
+			commandeer(&sh, node, std_io);
 		}
 		node_destroy(node);
 		if (pr.lexer->error)

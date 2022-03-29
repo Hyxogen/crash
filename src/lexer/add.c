@@ -15,14 +15,14 @@
 #include "memory.h"
 
 t_tpart
-	*token_add_part(t_token *tok, t_lexer_id id)
+	*token_add_part(t_token *tok, t_lexer_id id, int quote)
 {
 	t_tpart	part;
 
 	part.id = id;
 	part.data = NULL;
 	part.len = 0;
-	part.quote = 0;
+	part.quote = quote != 0;
 	tok->parts = sh_safe_realloc(tok->parts, tok->count * sizeof(part),
 			(tok->count + 1) * sizeof(part));
 	tok->parts[tok->count] = part;

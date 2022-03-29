@@ -30,6 +30,17 @@ t_envvar
 	return (NULL);
 }
 
+char
+	*sh_getenv_default(t_minishell *sh, const char *key, char *def)
+{
+	t_envvar	*env;
+
+	env = sh_getenv(sh, key);
+	if (env == NULL)
+		return (def);
+	return (env->value);
+}
+
 /* TODO: check readonly attribute */
 t_envvar
 	*sh_setenv(t_minishell *sh, char *key, char *value)

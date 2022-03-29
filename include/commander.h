@@ -28,9 +28,9 @@
 #  define SH_STDERR_INDEX 2
 # endif
 
-typedef int	(*t_commandeer_proc)(t_minishell*, t_snode*, const int[3]);
-typedef pid_t (*t_cm_cmd_proc)(t_minishell*, t_snode*, const int[3]);
-typedef int (*t_cm_cmd_wait)(pid_t pid);
+typedef int						(*t_commandeer_proc)(t_minishell*, t_snode*, const int[3]);
+typedef pid_t					(*t_cm_cmd_proc)(t_minishell*, t_snode*, const int[3]);
+typedef int						(*t_cm_cmd_wait)(pid_t pid);
 typedef struct s_pipe_seq_ctx	t_pipe_seq_ctx;
 typedef struct s_cmd_base		t_cmd_base;
 typedef struct s_simple_cmd_ctx	t_simple_cmd_ctx;

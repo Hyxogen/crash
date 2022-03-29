@@ -27,6 +27,7 @@ static t_commandeer_proc
 
 	procs[sx_list] = commandeer_inner;
 	procs[sx_term] = commandeer_inner;
+	procs[sx_command_list] = commandeer_inner;
 	procs[sx_pipe_sequence] = commandeer_pipe_sequence;
 	return (procs);
 }

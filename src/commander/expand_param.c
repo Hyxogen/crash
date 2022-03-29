@@ -89,6 +89,7 @@ char
 			return (ft_strdup("0"));
 		return ft_itoa(ft_strlen(var->value));
 	}
+	// TODO: disallow empty key?
 	key = ft_strdup(token->str);
 	key[i] = '\0';
 	str = param_subst(sh, token, key, i);

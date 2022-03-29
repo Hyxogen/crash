@@ -70,7 +70,7 @@ int
 	status = check_op(lex);
 	if (tok->id != tk_null)
 		return (status);
-	token_add_part(lex->tok, lx_normal);
+	token_add_part(lex->tok, lx_normal, lex->quote);
 	tok->id = tk_word;
 	return (lex_main(lex));
 }

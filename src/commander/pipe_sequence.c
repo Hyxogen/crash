@@ -121,11 +121,11 @@ static pid_t
 		sh_dup2(ctx->io[SH_STDERR_INDEX], STDERR_FILENO);
 		_cm_setup_redirects(ctx->sh, ctx->cmd_node->childs[1]);
 		if (ctx->io[SH_STDIN_INDEX] != STDIN_FILENO)
-			close(ctx->io[SH_STDIN_INDEX]);
+			sh_close(ctx->io[SH_STDIN_INDEX]);
 		if (ctx->io[SH_STDOUT_INDEX] != STDOUT_FILENO)
-			close(ctx->io[SH_STDOUT_INDEX]);
+			sh_close(ctx->io[SH_STDOUT_INDEX]);
 		if (ctx->io[SH_STDERR_INDEX] != STDERR_FILENO)
-			close(ctx->io[SH_STDERR_INDEX]);
+			sh_close(ctx->io[SH_STDERR_INDEX]);
 		sh_execvp(ctx->sh, ctx->args);
 		_sh_execvp_error_handler(ctx->args[0], errno);
 	}
@@ -147,7 +147,6 @@ pid_t
 	i = 0;
 	while (i < sh->builtins_size)
 	{
-		printf("%zu;%zu %s %s\n", i, sh->builtins_size, ctx.args[0], sh->builtins[i].key);
 		if (!ft_strcmp(ctx.args[0], sh->builtins[i].key))
 			return (_cm_simple_builtin_cmd(sh, &ctx, sh->builtins[i].fn));
 		i += 1;
@@ -191,40 +190,6 @@ pid_t
 	return (-1);
 }
 
-/*
-static int
-	_commandeer_pipe_sequence_rec(t_minishell *sh, t_snode  *seq_node, int io[3], size_t index)
-{
-	pid_t				pid;
-	int					pipe_io[2];
-	int					cmd_io[3];
-	t_snode				*cmd_node;
-	int					exit_code;
-
-	cmd_node = seq_node->childs[seq_node->childs_size - index];
-	if (index == 1)
-		pid = _get_commandeer_cmd_procs()[sx_simple_cmd - cmd_node->type](sh,
-				cmd_node, cmd_io);
-	else
-	{
-		sh_pipe(pipe_io);
-		pid = _get_commandeer_cmd_procs()[sx_simple_cmd - cmd_node->type](sh,
-				cmd_node, cmd_io]);
-		sh_close(pipe_io[1]);
-		if (prev_out_fd != STDIN_FILENO)
-			sh_close(prev_out_fd);
-		prev_out_fd = pipe_io[0];
-		exit_code = _commandeer_pipe_sequence_rec(sh, seq_node, prev_out_fd, index - 1);
-		sh_waitpid(pid, NULL, WUNTRACED);
-		return (exit_code);
-	}
-	if (pid < 0)
-		return (-pid + 1);
-	sh_waitpid(pid, &exit_code, 0);
-	return (_get_exit_code(exit_code));
-}
-*/
-
 static void
 	_cm_close_nostd(int fd)
 {
@@ -249,14 +214,15 @@ static int
 	{
 		sh_pipe(pipe_io);
 		cmd_io[SH_STDOUT_INDEX] = pipe_io[1];
+		cmd_io[SH_STDIN_INDEX] = prev_out_fd;
 		pid = proc(sh, cmd_node, cmd_io); /* TODO make sure pipe_io[0] fd is closed in child */
 		_cm_close_nostd(prev_out_fd);
 		ex_code = _commandeer_pipe_sequence_rec(sh, ctx, pipe_io[0], index - 1);
 		sh_waitpid(pid, NULL, 0);
 		return (ex_code);
 	}
-	_cm_close_nostd(cmd_io[STDIN_FILENO]);
 	pid = proc(sh, cmd_node, cmd_io);
+	_cm_close_nostd(cmd_io[STDIN_FILENO]);
 	waitpid(pid, &ex_code, 0);
 	return (_get_exit_code(ex_code));
 }

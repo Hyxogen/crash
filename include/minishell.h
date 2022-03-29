@@ -116,6 +116,7 @@ void		sh_split2(char *str, char delim, char **lhs, char **rhs);
 char		*sh_join_path(char *lhs, char *rhs);
 
 t_envvar	*sh_getenv(t_minishell *sh, const char *key);
+char		*sh_getenv_default(t_minishell *sh, const char *key, char *def);
 t_envvar	*sh_setenv(t_minishell *sh, char *key, char *value);
 char		**sh_env(t_minishell *sh);
 void		sh_env_init(t_minishell *sh, char **env);

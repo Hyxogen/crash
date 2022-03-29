@@ -24,18 +24,18 @@ int
 	{
 		lex_update(lex, 1);
 		lex_nom_and_skip(lex);
-		part = token_add_part(lex->tok, lx_arithmetic);
+		part = token_add_part(lex->tok, lx_arithmetic, lex->quote);
 		lex_arithmetic(lex, part);
 		lex_update(lex, 1);
 	}
 	else
 	{
 		lex_nom_and_skip(lex);
-		part = token_add_part(lex->tok, lx_command);
+		part = token_add_part(lex->tok, lx_command, lex->quote);
 		lex_command(lex, part);
 	}
 	lex_update(lex, 1);
-	part = token_add_part(lex->tok, lx_normal);
+	part = token_add_part(lex->tok, lx_normal, lex->quote);
 	return (1);
 }
 
@@ -56,7 +56,7 @@ int
 	{
 		lex_update(lex, 1);
 		tmp = lex->tok;
-		token_add_part(tmp, lx_parameter);
+		token_add_part(tmp, lx_parameter, lex->quote);
 		lex->tok = sh_safe_malloc(sizeof(t_token));
 		token_init(lex->tok);
 		lex->tok->id = tk_word;
@@ -64,7 +64,7 @@ int
 		lex_append(lex, &tmp->str, &tmp->len, 1);
 		lex_update(lex, 0);
 		lex->tok = tmp;
-		token_add_part(lex->tok, lx_normal);
+		token_add_part(lex->tok, lx_normal, lex->quote);
 		return (1);
 	}
 	return (0);
@@ -82,7 +82,7 @@ int
 	{
 		lex_update(lex, 1);
 		tmp = lex->tok;
-		token_add_part(tmp, lx_parameter);
+		token_add_part(tmp, lx_parameter, lex->quote);
 		lex->tok = sh_safe_malloc(sizeof(t_token));
 		token_init(lex->tok);
 		lex->tok->id = tk_word;
@@ -94,7 +94,7 @@ int
 			lex_update(lex, 0);
 		}
 		lex->tok = tmp;
-		token_add_part(lex->tok, lx_normal);
+		token_add_part(lex->tok, lx_normal, lex->quote);
 		return (1);
 	}
 	return (0);
@@ -106,17 +106,15 @@ int
 	t_tpart	*part;
 
 	if (lex->src->nex == '(')
-	{
 		return (lex_special_lparen(lex));
-	}
 	else if (lex->src->nex == '{')
 	{
 		lex_update(lex, 1);
 		lex_nom_and_skip(lex);
-		part = token_add_part(lex->tok, lx_parameter);
+		part = token_add_part(lex->tok, lx_parameter, lex->quote);
 		lex_parameter(lex, part);
 		lex_update(lex, 1);
-		part = token_add_part(lex->tok, lx_normal);
+		part = token_add_part(lex->tok, lx_normal, lex->quote);
 		return (1);
 	}
 	return (lex_special_parameter(lex));
@@ -131,20 +129,20 @@ int
 			lex->quote = 1 - lex->quote;
 		else
 			lex->quote = 2 - lex->quote;
+		if (lex->quote)
+			lex->tok->parts[lex->tok->count - 1].quote = 1;
 		lex_update(lex, 1);
 		return (1);
 	}
 	else if (lex->src->cur == '$')
-	{
 		return (lex_special_dollar(lex));
-	}
 	else if (lex->src->cur == '`')
 	{
 		lex_update(lex, 1);
 		if (lex->btick)
-			token_add_part(lex->tok, lx_normal);
+			token_add_part(lex->tok, lx_normal, lex->quote);
 		else
-			token_add_part(lex->tok, lx_backtick);
+			token_add_part(lex->tok, lx_backtick, lex->quote);
 		lex->btick = !lex->btick;
 		return (1);
 	}

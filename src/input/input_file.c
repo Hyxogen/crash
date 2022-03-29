@@ -56,10 +56,9 @@ static int
 }
 
 ssize_t
-	_read_line(t_file_handle *fh, char **lp)
+	_read_line(t_file_handle *fh, char **lp, ssize_t read_size)
 {
 	char	buffer[BUFFER_SIZE];
-	ssize_t	read_size;
 	char	*tmp;
 
 	while (1)
@@ -73,19 +72,20 @@ ssize_t
 			return (read_size);
 		}
 		read_size = read(fh->fd, &buffer[0], BUFFER_SIZE);
-		if (read_size < 0)
+		if (read_size < 0 || (read_size == 0 && fh->beg == fh->end))
 			return (-1);
 		_push_strn(fh, &buffer[0], read_size);
 		if (read_size == 0)
 		{
-			tmp = ft_strndup(&fh->buf[fh->beg], fh->end - fh->beg);
-			*lp = tmp;
-			return (-1);
+			read_size = fh->end - fh->beg;
+			*lp = ft_strndup(&fh->buf[fh->beg], read_size);
+			fh->beg = fh->end;
+			return (read_size);
 		}
 	}
 }
 
 ssize_t	_input_file_line_proc(t_input *in, char **lp)
 {
-	return (_read_line(in->file_handle, lp));
+	return (_read_line(in->file_handle, lp, 0));
 }

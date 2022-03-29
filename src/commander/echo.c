@@ -11,7 +11,6 @@ int
 	const char	*delim;
 	size_t		i;
 
-	printf("BUILTIN ECHO\n");
 	(void) sh;
 	suffix = "\n";
 	delim = "";
