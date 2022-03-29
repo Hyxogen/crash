@@ -93,11 +93,18 @@ void
 }
 
 static pid_t
-	_cm_simple_builtin_cmd(t_simple_cmd_ctx *ctx, t_builtin_proc proc)
+	_cm_simple_builtin_cmd(t_minishell *sh, t_simple_cmd_ctx *ctx, t_builtin_proc proc)
 {
-	(void) ctx;
-	(void) proc;
 	/* TODO execute builtin */
+	/*
+	while (i < sh->builtins_size)
+	{
+		if (ft_strcmp(argv[0], sh->builtins[i].key) == 0)
+			return (sh->builtins[i].fn(sh, argv), 0);
+		i += 1;
+	}
+	*/
+	proc(sh, ctx->args, ctx->io);
 	return (0);
 }
 
@@ -109,13 +116,16 @@ static pid_t
 	pid = sh_fork();
 	if (pid == 0)
 	{
-		dup2(ctx->fd_in, STDIN_FILENO);
-		dup2(ctx->fd_out, STDOUT_FILENO);
+		sh_dup2(ctx->io[SH_STDIN_INDEX], STDIN_FILENO);
+		sh_dup2(ctx->io[SH_STDOUT_INDEX], STDOUT_FILENO);
+		sh_dup2(ctx->io[SH_STDERR_INDEX], STDERR_FILENO);
 		_cm_setup_redirects(ctx->sh, ctx->cmd_node->childs[1]);
-		if (ctx->fd_in != STDIN_FILENO)
-			close(ctx->fd_in);
-		if (ctx->fd_out != STDOUT_FILENO)
-			close(ctx->fd_out);
+		if (ctx->io[SH_STDIN_INDEX] != STDIN_FILENO)
+			close(ctx->io[SH_STDIN_INDEX]);
+		if (ctx->io[SH_STDOUT_INDEX] != STDOUT_FILENO)
+			close(ctx->io[SH_STDOUT_INDEX]);
+		if (ctx->io[SH_STDERR_INDEX] != STDERR_FILENO)
+			close(ctx->io[SH_STDERR_INDEX]);
 		sh_execvp(ctx->sh, ctx->args);
 		_sh_execvp_error_handler(ctx->args[0], errno);
 	}
@@ -123,21 +133,23 @@ static pid_t
 }
 
 pid_t
-	cm_simple_cmd_command(t_minishell *sh, t_snode *cmd_node, int fd_in, int fd_out)
+	cm_simple_cmd_command(t_minishell *sh, t_snode *cmd_node, const int io[3])
 {
 	size_t				i;
 	t_simple_cmd_ctx	ctx;
 
 	ctx.args = _word_list_to_array(sh, cmd_node->childs[0]);
-	ctx.fd_in = fd_in;
-	ctx.fd_out = fd_out;
+	ctx.io[SH_STDIN_INDEX] = io[SH_STDIN_INDEX];
+	ctx.io[SH_STDOUT_INDEX] = io[SH_STDOUT_INDEX];
+	ctx.io[SH_STDERR_INDEX] = io[SH_STDERR_INDEX]; // TODO
 	ctx.cmd_node = cmd_node;
 	ctx.sh = sh;
 	i = 0;
 	while (i < sh->builtins_size)
 	{
+		printf("%zu;%zu %s %s\n", i, sh->builtins_size, ctx.args[0], sh->builtins[i].key);
 		if (!ft_strcmp(ctx.args[0], sh->builtins[i].key))
-			return (_cm_simple_builtin_cmd(&ctx, sh->builtins[i].fn));
+			return (_cm_simple_builtin_cmd(sh, &ctx, sh->builtins[i].fn));
 		i += 1;
 	}
 	return (_cm_simple_extern_cmd(&ctx));
@@ -155,7 +167,7 @@ int
 static t_cm_cmd_proc
 	*_get_commandeer_cmd_procs(void)
 {
-	static const t_cm_cmd_proc procs[] = {
+	static t_cm_cmd_proc procs[] = {
 		cm_simple_cmd_command,
 		cm_unimplemented_cmd_command,
 		cm_unimplemented_cmd_command,
@@ -169,58 +181,100 @@ static t_cm_cmd_proc
 }
 
 pid_t
-	cm_unimplemented_cmd_command(t_minishell *sh, t_snode *node, int fd_in, int fd_out)
+	cm_unimplemented_cmd_command(t_minishell *sh, t_snode *node, const int io[3])
 {
 	(void) sh;
 	(void) node;
-	(void) fd_in;
-	(void) fd_out;
+	(void) io;
 
 	fprintf(stderr, "Executing this command type is not implemented yet\n");
 	return (-1);
 }
 
+/*
 static int
-	_commandeer_pipe_sequence_iter(t_minishell *sh, t_snode  *seq_node, int prev_out_fd, size_t index)
+	_commandeer_pipe_sequence_rec(t_minishell *sh, t_snode  *seq_node, int io[3], size_t index)
 {
 	pid_t				pid;
-	int					io[2];
+	int					pipe_io[2];
+	int					cmd_io[3];
 	t_snode				*cmd_node;
 	int					exit_code;
 
 	cmd_node = seq_node->childs[seq_node->childs_size - index];
 	if (index == 1)
 		pid = _get_commandeer_cmd_procs()[sx_simple_cmd - cmd_node->type](sh,
-				cmd_node, prev_out_fd, STDOUT_FILENO);
+				cmd_node, cmd_io);
 	else
 	{
-		sh_pipe(io);
+		sh_pipe(pipe_io);
 		pid = _get_commandeer_cmd_procs()[sx_simple_cmd - cmd_node->type](sh,
-				cmd_node, prev_out_fd, io[1]);
-		sh_close(io[1]);
+				cmd_node, cmd_io]);
+		sh_close(pipe_io[1]);
 		if (prev_out_fd != STDIN_FILENO)
 			sh_close(prev_out_fd);
-		prev_out_fd = io[0];
-		exit_code = _commandeer_pipe_sequence_iter(sh, seq_node, prev_out_fd, index - 1);
+		prev_out_fd = pipe_io[0];
+		exit_code = _commandeer_pipe_sequence_rec(sh, seq_node, prev_out_fd, index - 1);
 		sh_waitpid(pid, NULL, WUNTRACED);
 		return (exit_code);
 	}
+	if (pid < 0)
+		return (-pid + 1);
 	sh_waitpid(pid, &exit_code, 0);
 	return (_get_exit_code(exit_code));
 }
+*/
+
+static void
+	_cm_close_nostd(int fd)
+{
+	if (fd != STDIN_FILENO && fd != STDOUT_FILENO && fd != STDERR_FILENO)
+		sh_close(fd);
+}
+
+static int
+	_commandeer_pipe_sequence_rec(t_minishell *sh, const t_pipe_ctx *ctx, int prev_out_fd, size_t index)
+{
+	pid_t			pid;
+	int				cmd_io[3];
+	int				pipe_io[2];
+	t_snode			*cmd_node;
+	t_cm_cmd_proc	proc;
+	int				ex_code;
+
+	ft_memcpy(cmd_io, ctx->io, sizeof(int) * 3);
+	cmd_node = ctx->pipe_node->childs[ctx->pipe_node->childs_size - index];
+	proc = _get_commandeer_cmd_procs()[sx_simple_cmd - cmd_node->type];
+	if (index != 1)
+	{
+		sh_pipe(pipe_io);
+		cmd_io[SH_STDOUT_INDEX] = pipe_io[1];
+		pid = proc(sh, cmd_node, cmd_io); /* TODO make sure pipe_io[0] fd is closed in child */
+		_cm_close_nostd(prev_out_fd);
+		ex_code = _commandeer_pipe_sequence_rec(sh, ctx, pipe_io[0], index - 1);
+		sh_waitpid(pid, NULL, 0);
+		return (ex_code);
+	}
+	_cm_close_nostd(cmd_io[STDIN_FILENO]);
+	pid = proc(sh, cmd_node, cmd_io);
+	waitpid(pid, &ex_code, 0);
+	return (_get_exit_code(ex_code));
+}
+
 
 /* TODO fork the entire pipe sequence when it runs in the background */
 int
-	commandeer_pipe_sequence(t_minishell *sh, t_snode *seq_node, void *data)
+	commandeer_pipe_sequence(t_minishell *sh, t_snode *seq_node, const int io[3])
 {
-	int				run_in_background;
-	int				rc;
+	t_pipe_ctx	ctx;
+	int			rc;
 
 	if (seq_node->childs_size == 0)
 		return (0);
-	run_in_background = !!(long) data;
+	ctx.pipe_node = seq_node;
+	ft_memcpy(ctx.io, io, sizeof(int) * 3);
 	cm_disable_reaper(sh);
-	rc = _commandeer_pipe_sequence_iter(sh, seq_node, STDIN_FILENO, seq_node->childs_size);
+	rc = _commandeer_pipe_sequence_rec(sh, &ctx, io[STDIN_FILENO], seq_node->childs_size);
 	cm_enable_reaper(sh);
 	return (rc);
 }

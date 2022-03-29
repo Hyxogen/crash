@@ -82,7 +82,8 @@
 typedef struct s_minishell	t_minishell;
 typedef struct s_envvar		t_envvar;
 typedef struct s_builtin	t_builtin;
-typedef void				(*t_builtin_proc)(t_minishell *sh, char **argv);
+/* return code should be: -return_code - 1 */
+typedef int					(*t_builtin_proc)(t_minishell *sh, char **argv, const int io[3]);
 
 struct s_envvar
 {
@@ -133,5 +134,7 @@ int			sh_dup2(int fildes, int fildes2);
 int			sh_close(int fildes);
 int			sh_open(const char *path, int oflag, mode_t mode);
 int			sh_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
+
+int			sh_echo(t_minishell *sh, char **argv, const int io[3]);
 
 #endif

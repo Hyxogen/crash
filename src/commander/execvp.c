@@ -69,16 +69,9 @@ int
 	char	*name;
 	int		ret;
 
+	/* TODO: some of this needs to move before builtin check */
 	if (ft_strchr(argv[0], '/') != NULL)
 		return (sh_exec(sh, argv[0], argv));
-	/* TODO: builtins should not be forked */
-	i = 0;
-	while (i < sh->builtins_size)
-	{
-		if (ft_strcmp(argv[0], sh->builtins[i].key) == 0)
-			return (sh->builtins[i].fn(sh, argv), 0);
-		i += 1;
-	}
 	/* TODO: check if splitting by : is correct */
 	/* TODO: sh_safe_malloc is not used */
 	/* TODO: what if PATH is unset */

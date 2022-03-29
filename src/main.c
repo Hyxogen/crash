@@ -46,12 +46,16 @@ void
 	t_lexer		lex;
 	t_parser	pr;
 	t_snode		*node;
+	int			std_io[3];
 
 	src_init(&src, in);
 	lex_init(&lex);
 	pr_init(&pr);
 	lex.src = &src;
 	pr.lexer = &lex;
+	std_io[SH_STDIN_INDEX] = STDIN_FILENO;
+	std_io[SH_STDOUT_INDEX] = STDOUT_FILENO;
+	std_io[SH_STDERR_INDEX] = STDERR_FILENO;
 	while (!pr.lexer->error)
 	{
 		pr.lexer->error = 0;
@@ -62,7 +66,7 @@ void
 			break ;
 		node = pr_parse(&pr);
 		if (node != NULL)
-			commandeer(sh, node, NULL);
+			commandeer(sh, node, std_io);
 		node_destroy(node);
 		if (pr.lexer->error)
 			printf("Syntax error\n");
@@ -77,12 +81,15 @@ int
 	t_input		in;
 	char		*tmp;
 	int			fd;
+	t_builtin	builtins[1];
 
 	(void) argc;
+	builtins[0].key = "echo";
+	builtins[0].fn = sh_echo;
 	tmp = getcwd(NULL, 0);
 	sh.self = sh_join_path(tmp, argv[0]);
-	sh.builtins = NULL;
-	sh.builtins_size = 0;
+	sh.builtins = builtins;
+	sh.builtins_size = 1;
 	sh.args = argv + argc;
 	sh.interactive = 1;
 	free(tmp);

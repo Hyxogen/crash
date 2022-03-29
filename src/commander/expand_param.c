@@ -18,17 +18,6 @@ static char
 }
 
 static char
-	*param_pattern(t_minishell *sh, t_token *token, const char *str, size_t i)
-{
-	(void) sh;
-	(void) token;
-	(void) str;
-	(void) i;
-	// TODO: implement
-	sh_assert(0);
-}
-
-static char
 	*param_error(t_minishell *sh, t_token *token, const char *key, size_t i)
 {
 	(void) sh;
@@ -40,22 +29,29 @@ static char
 }
 
 static char
-	*param_subst(t_minishell *sh, t_token *token, char *key, size_t i)
+	*param_get(t_minishell *sh, t_token *token, char *key, size_t i)
 {
 	t_envvar	*var;
+	
+	var = sh_getenv(sh, key);
+	if (var != NULL && (token->str[i] != ':' || var->value[0] != '\0'))
+		return (var->value);
+	return (NULL);
+}
+
+static char
+	*param_subst(t_minishell *sh, t_token *token, char *key, size_t i)
+{
 	char		*str;
 
-	var = sh_getenv(sh, key);
-	str = NULL;
-	if (var != NULL && (token->str[i] != ':' || var->value[0] != '\0'))
-		str = var->value;
+	str = param_get(sh, token, key, i);
 	if (token->str[i] == '\0' && str != NULL)
 		return (ft_strdup(str));
 	if (token->str[i] == '\0')
 		return (ft_strdup(""));
-	i += token->str[i] == ':';
 	if (token->str[i] == '%' || token->str[i] == '#')
 		return (param_pattern(sh, token, str, i));
+	i += token->str[i] == ':';
 	if (token->str[i] == '+' && str != NULL)
 		return (param_expand(sh, token, i + 1));
 	if (token->str[i] == '+')

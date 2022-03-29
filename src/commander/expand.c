@@ -54,6 +54,10 @@ static char
 	}
 	if (part->id == lx_parameter)
 		return (cm_expand_param(sh, part->data));
+	if (part->id == lx_command)
+		return (cm_expand_command(sh, part->data));
+	if (part->id == lx_backtick)
+		return (cm_expand_backtick(sh, part->data));
 	sh_assert(0);
 }
 
@@ -107,7 +111,7 @@ static int
 	return (0);
 }
 
-/* TODO: properly expand token */
+// TODO: assignments should not be split
 char
 	**cm_expand(t_minishell *sh, t_token *token)
 {

@@ -40,7 +40,7 @@ t_envvar
 	if (env != NULL)
 	{
 		free(env->value);
-		env->value = value;
+		env->value = ft_strdup(value);
 	}
 	else
 	{
@@ -49,8 +49,8 @@ t_envvar
 			sizeof(*sh->vars) * (sh->vars_size + 1));
 		env = &sh->vars[sh->vars_size];
 		sh->vars_size += 1;
-		env->key = key;
-		env->value = value;
+		env->key = ft_strdup(key);
+		env->value = ft_strdup(value);
 	}
 	env->attr = 0;
 	return (env);

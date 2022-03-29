@@ -21,7 +21,7 @@ PARSER_FILES	:= \
 	pipe.c redirect.c separator.c subshell.c die.c error.c global.c
 COMMANDER_FILES	:= \
 	commander.c execvp.c pipe_sequence.c env.c redirect.c expand.c \
-	signal.c param.c
+	signal.c expand_param.c expand_command.c expand_pattern.c echo.c
 UTIL_FILES		:= \
 	die.c memory.c op.c util.c wrap.c
 
