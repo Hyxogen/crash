@@ -73,4 +73,6 @@ pid_t	cm_unimplemented_cmd_command(t_minishell *sh, t_snode *node, const int io[
 int		cm_enable_reaper(t_minishell *sh);
 int		cm_disable_reaper(t_minishell *sh);
 
+int		sh_cm_run(t_minishell *sh, t_input *in);
+
 #endif

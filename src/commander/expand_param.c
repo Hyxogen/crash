@@ -1,6 +1,8 @@
 #include "commander.h"
 #include <stdlib.h>
 
+// TODO: expand special things
+
 static char
 	*param_expand(t_minishell *sh, t_token *token, size_t i)
 {

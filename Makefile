@@ -22,7 +22,7 @@ PARSER_FILES	:= \
 COMMANDER_FILES	:= \
 	commander.c execvp.c pipe_sequence.c env.c redirect_process.c expand.c \
 	signal.c expand_param.c expand_command.c expand_pattern.c echo.c \
-	redirect_builtin.c exit.c
+	redirect_builtin.c exit.c run.c colon.c dot.c
 UTIL_FILES		:= \
 	die.c memory.c op.c util.c wrap.c
 

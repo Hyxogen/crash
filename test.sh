@@ -1,1 +1,1 @@
-FUCK=1
+. test2.sh c

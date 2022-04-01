@@ -20,59 +20,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-t_snode
-	*pr_parse(t_parser *pr)
-{
-	t_snode	*node;
-	t_snode	*child;
-
-	node = snode(sx_none);
-	if (!pr_complete_cmd(pr, node))
-	{
-		node_destroy(node);
-		return (NULL);
-	}
-	sh_assert(node->childs_size == 1);
-	child = node->childs[0];
-	node->childs_size = 0;
-	node_destroy(node);
-	return (child);
-}
-
-void
-	run(t_minishell *sh, t_input *in)
-{
-	t_source	src;
-	t_lexer		lex;
-	t_parser	pr;
-	t_snode		*node;
-	int			std_io[3];
-
-	src_init(&src, in);
-	lex_init(&lex);
-	pr_init(&pr);
-	lex.src = &src;
-	pr.lexer = &lex;
-	std_io[SH_STDIN_INDEX] = STDIN_FILENO;
-	std_io[SH_STDOUT_INDEX] = STDOUT_FILENO;
-	std_io[SH_STDERR_INDEX] = STDERR_FILENO;
-	while (!pr.lexer->error)
-	{
-		pr.lexer->error = 0;
-		if (pr.current.id != tk_invalid)
-			token_destroy(&pr.current);
-		pr_next_token(&pr);
-		if (pr.current.id == tk_invalid || pr.current.id == tk_null)
-			break ;
-		node = pr_parse(&pr);
-		if (node != NULL)
-			commandeer(sh, node, std_io);
-		node_destroy(node);
-		if (pr.lexer->error)
-			printf("Syntax error\n");
-	}
-	pr_destroy(&pr);
-}
+/* TODO fix ": $(echo hallo)" */
 
 int
 	main(int argc, char **argv, char **envp)
@@ -81,17 +29,21 @@ int
 	t_input		in;
 	char		*tmp;
 	int			fd;
-	t_builtin	builtins[2];
+	t_builtin	builtins[4];
 
 	(void) argc;
 	builtins[0].key = "echo";
 	builtins[0].fn = sh_echo;
 	builtins[1].key = "exit";
 	builtins[1].fn = sh_exit;
+	builtins[2].key = ".";
+	builtins[2].fn = sh_dot;
+	builtins[3].key = ":";
+	builtins[3].fn = sh_colon;
 	tmp = getcwd(NULL, 0);
 	sh.self = sh_join_path(tmp, argv[0]);
 	sh.builtins = builtins;
-	sh.builtins_size = 2;
+	sh.builtins_size = 4;
 	sh.args = argv + argc;
 	sh.interactive = 1;
 	free(tmp);
@@ -100,11 +52,11 @@ int
 	if (argc >= 2)
 	{
 		fd = open(argv[1], O_RDONLY);
-		sh.args = argv + 2;
+		sh.args = argv + 1;
 		sh.interactive = 0;
 		input_new(&in, in_file, (void*)(unsigned long long) fd);
 	}
 	else
 		input_new(&in, in_readline, NULL);
-	return (run(&sh, &in), EXIT_SUCCESS);
+	return (sh_cm_run(&sh, &in), EXIT_SUCCESS);
 }
