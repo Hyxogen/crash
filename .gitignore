@@ -7,3 +7,7 @@ bashtop
 segfault
 compile_commands.json
 *.out
+fdcheck
+stdall
+*.txt
+*.diff

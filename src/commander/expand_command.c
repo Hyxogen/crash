@@ -1,5 +1,6 @@
 #include "commander.h"
 #include "memory.h"
+#include "parser.h"
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -22,10 +23,32 @@ static char
 		if (ret >= 0)
 			size += ret;
 	}
+	while (size > 0 && str[size - 1] == '\n')
+		size -= 1;
 	str[size] = '\0';
 	sh_close(fd);
 	sh_waitpid(pid, NULL, 0);
 	return (str);
+}
+
+static char
+	*expand_backtick_int(t_minishell *sh, t_lexer *lex)
+{
+	t_parser	pr;
+	t_snode		*node;
+	char		*result;
+
+	pr_init(&pr);
+	pr.lexer = lex;
+	pr_next_token(&pr);
+	node = snode(sx_none);
+	pr_complete_cmdlst(&pr, node);
+	// TODO: more than 1 child?
+	sh_assert(node->childs_size == 1);
+	result = cm_expand_command(sh, node->childs[0]);
+	node_destroy(node);
+	pr_destroy(&pr);
+	return (result);
 }
 
 // TODO: verify
@@ -59,7 +82,16 @@ char
 char
 	*cm_expand_backtick(t_minishell *sh, char *str)
 {
-	(void) sh;
-	(void) str;
-	return ft_strdup("Segmentation success");
+	t_input		in;
+	t_source	src;
+	t_lexer		lex;
+	char		*result;
+
+	input_new(&in, in_string, str);
+	src_init(&src, &in);
+	lex_init(&lex);
+	lex.src = &src;
+	result = expand_backtick_int(sh, &lex);
+	// TODO: check error
+	return (result);
 }

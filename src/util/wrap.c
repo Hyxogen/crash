@@ -27,6 +27,16 @@ int
 }
 
 int
+	sh_dup(int fildes)
+{
+	int	ret;
+
+	ret = dup(fildes);
+	sh_check(ret >= 0, "dup");
+	return (ret);
+}
+
+int
 	sh_pipe(int fildes[2])
 {
 	int	ret;

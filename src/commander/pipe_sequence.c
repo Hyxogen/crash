@@ -23,6 +23,8 @@
 
 /* for perror */
 #include <stdio.h>
+#include <fcntl.h>
+#include <limits.h>
 
 static int
 	_get_exit_code(int status_code)
@@ -119,7 +121,7 @@ static pid_t
 		sh_dup2(ctx->io[SH_STDIN_INDEX], STDIN_FILENO);
 		sh_dup2(ctx->io[SH_STDOUT_INDEX], STDOUT_FILENO);
 		sh_dup2(ctx->io[SH_STDERR_INDEX], STDERR_FILENO);
-		_cm_setup_redirects(ctx->sh, ctx->cmd_node->childs[1]);
+		_cm_setup_process_redirects(ctx->sh, ctx->cmd_node->childs[1]);
 		if (ctx->io[SH_STDIN_INDEX] != STDIN_FILENO)
 			sh_close(ctx->io[SH_STDIN_INDEX]);
 		if (ctx->io[SH_STDOUT_INDEX] != STDOUT_FILENO)
@@ -139,9 +141,11 @@ pid_t
 	t_simple_cmd_ctx	ctx;
 
 	ctx.args = _word_list_to_array(sh, cmd_node->childs[0]);
+	if (!ctx.args[0])
+		return (-1); /* TODO Should this be handled differenlty? */
 	ctx.io[SH_STDIN_INDEX] = io[SH_STDIN_INDEX];
 	ctx.io[SH_STDOUT_INDEX] = io[SH_STDOUT_INDEX];
-	ctx.io[SH_STDERR_INDEX] = io[SH_STDERR_INDEX]; // TODO
+	ctx.io[SH_STDERR_INDEX] = io[SH_STDERR_INDEX];
 	ctx.cmd_node = cmd_node;
 	ctx.sh = sh;
 	i = 0;
@@ -197,6 +201,25 @@ static void
 		sh_close(fd);
 }
 
+static void
+	_cm_debug_print_open_fd(void)
+{
+	int	i;
+	int count;
+	
+	count = 0;
+	for (i = 0; i < OPEN_MAX; i++) {
+		if (fcntl(i, F_GETFD) < 0) {
+			if (errno != EBADF)
+				fprintf(stderr, "Error\n");
+		} else {
+			fprintf(stderr, "%d OPEN; ", i);
+			count++;
+		}
+	}
+	fprintf(stderr, "\n%d/%d open\n", count, OPEN_MAX);
+}
+
 static int
 	_commandeer_pipe_sequence_rec(t_minishell *sh, const t_pipe_ctx *ctx, int prev_out_fd, size_t index)
 {
@@ -209,14 +232,15 @@ static int
 
 	ft_memcpy(cmd_io, ctx->io, sizeof(int) * 3);
 	cmd_node = ctx->pipe_node->childs[ctx->pipe_node->childs_size - index];
+	cmd_io[SH_STDIN_INDEX] = prev_out_fd;
 	proc = _get_commandeer_cmd_procs()[sx_simple_cmd - cmd_node->type];
 	if (index != 1)
 	{
 		sh_pipe(pipe_io);
 		cmd_io[SH_STDOUT_INDEX] = pipe_io[1];
-		cmd_io[SH_STDIN_INDEX] = prev_out_fd;
 		pid = proc(sh, cmd_node, cmd_io); /* TODO make sure pipe_io[0] fd is closed in child */
 		_cm_close_nostd(prev_out_fd);
+		_cm_close_nostd(pipe_io[1]);
 		ex_code = _commandeer_pipe_sequence_rec(sh, ctx, pipe_io[0], index - 1);
 		sh_waitpid(pid, NULL, 0);
 		return (ex_code);

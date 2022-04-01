@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 static int
 	_cm_open_file(const char *filen, int fd, int flags, int mode)
@@ -50,58 +51,44 @@ static int
 	}
 	return (from_fd);
 }
-/*
-int
-	_cm_handle_redi_node(t_minishell *sh, t_snode *redi_node)
-{
-	int			target_fd;
-	const char	**filen;
-	t_snode		*file_node;
 
-	target_fd = -1;
+/* TODO check if correct */
+static int
+	_cm_handle_lessand_redi(t_minishell *sh, t_snode *redi_node, int from_fd, char *word)
+{
+	t_snode	*file_node;
+	long	target_fd;
+
+	(void) redi_node;
+	(void) sh;
+	if (from_fd < 0)
+		from_fd = STDIN_FILENO;
 	file_node = redi_node->childs[0];
-	if (redi_node->token.id == tk_ionumber)
-	{
-		target_fd = ft_atol(redi_node->token.str);
-		if (target_fd < 0 || target_fd >= INT_MAX)
-		{
-			fprintf(stderr, "CraSH: Invalid file descriptor\n");
-			return (0);
-		}
-	}
-	filen = cm_expand(sh, &file_node->token); // TODO Implement new expand system
-	if (!filen || !*filen || *(filen + 1))
-	{
-		fprintf(stderr, "CraSH: Ambigious redirect\n");
-		return (0);
-	}
-	target_fd = (target_fd != -1) * target_fd + (redi_node->type != sx_less);
-	if (redi_node->type == sx_less)
-		return (_cm_open_file_in(filen, target_fd) < 0);
-	else if (redi_node->type == sx_great)
-		return (_cm_open_file_out(filen, target_fd, 0) < 0);
-	return (_cm_open_file_out(filen, target_fd, 1) < 0);
-}
-*/
-
-/* TODO implement */
-static int
-	_cm_handle_lessand_redi(t_minishell *sh, t_snode *redi_node, int from_fd)
-{
-	(void) sh;
-	(void) redi_node;
-	(void) from_fd;
-	return (0);
+	if (!ft_strcmp("-", word))
+		return (sh_close(from_fd), 0);
+	target_fd = ft_atol(word);
+	if (target_fd < 0 || target_fd >= INT_MAX)
+		return (fprintf(stderr, "CraSH: Invalid file descriptor\n"), -1);
+	return (sh_dup2(from_fd, target_fd) < 0);
 }
 
-/* TODO implement */
 static int
-	_cm_handle_greatand_redi(t_minishell *sh, t_snode *redi_node, int from_fd)
+	_cm_handle_greatand_redi(t_minishell *sh, t_snode *redi_node, int from_fd, char *word)
 {
-	(void) sh;
+	t_snode	*file_node;
+	long	target_fd;
+
 	(void) redi_node;
-	(void) from_fd;
-	return (0);
+	(void) sh;
+	if (from_fd < 0)
+		from_fd = STDOUT_FILENO;
+	file_node = redi_node->childs[0];
+	if (!ft_strcmp("-", word))
+		return (sh_close(from_fd), 0);
+	target_fd = ft_atol(word);
+	if (target_fd < 0 || target_fd >= INT_MAX)
+		return (fprintf(stderr, "CraSH: Invalid file descriptor\n"), -1);
+	return (sh_dup2(target_fd, from_fd) < 0);
 }
 
 /* TODO implement */
@@ -122,6 +109,8 @@ static int
 		return (O_WRONLY | O_APPEND | O_CREAT);
 	if (type == sx_less)
 		return (O_RDONLY);
+	if (type == sx_lessgreat)
+		return (O_RDWR | O_TRUNC | O_CREAT);
 	return (0);
 }
 
@@ -134,38 +123,38 @@ static int
 	return (0);
 }
 
+/* TODO properly implement heredocs */
 static int
 	_cm_handle_redi_node(t_minishell *sh, t_snode *redi_node)
 {
 	int		from_fd;
 	char	**filen;
 
+	from_fd = _cm_redi_get_from(sh, redi_node);
 	if (redi_node->type == sx_io_here)
 		return (_cm_handle_here_redi(sh, redi_node));
-	from_fd = _cm_redi_get_from(sh, redi_node);
-	if (redi_node->type == sx_lessand)
-		return (_cm_handle_lessand_redi(sh, redi_node, from_fd));
-	if (redi_node->type == sx_greatand)
-		return (_cm_handle_greatand_redi(sh, redi_node, from_fd));
 	if (redi_node->childs_size == 0)
-		return (fprintf(stderr, "CraSH: no file specified\n"), 1);
+		return (fprintf(stderr, "CraSH: No file specified\n"), 1);
 	filen = cm_expand(sh, &redi_node->childs[0]->token);
 	if (!filen || !*filen || *(filen + 1))
-		return (fprintf(stderr, "CraSH: ambigious redirect\n"), 1);
-	from_fd = (from_fd != -1) * from_fd + ((redi_node->type != sx_less) && (redi_node->type != sx_lessgreat));
+		return (fprintf(stderr, "CraSH: Ambigious redirect\n"), 1);
+	if (redi_node->type == sx_lessand)
+		return (_cm_handle_lessand_redi(sh, redi_node, from_fd, *filen));
+	if (redi_node->type == sx_greatand)
+		return (_cm_handle_greatand_redi(sh, redi_node, from_fd, *filen));
 	if (redi_node->type == sx_clobber || redi_node->type == sx_lessgreat)
 		return (_cm_open_file(*filen, from_fd, _cm_get_redi_flags(redi_node->type), 0644) < 0);
 	if (redi_node->type == sx_less)
 		return (_cm_open_file(*filen, from_fd, _cm_get_redi_flags(redi_node->type), 0) < 0);
 	if (_cm_check_clobber(sh, *filen))
-		return (fprintf(stderr, "CraSH: cannot overwrite existing file"), 1);
+		return (fprintf(stderr, "CraSH: Cannot overwrite existing file"), 1);
 	if (redi_node->type == sx_great || redi_node->type == sx_dgreat)
 		return (_cm_open_file(*filen, from_fd, _cm_get_redi_flags(redi_node->type), 0644) < 0);
 	return (-1);
 }
 
 int
-	_cm_setup_redirects(t_minishell *sh, t_snode *redi_list)
+	_cm_setup_process_redirects(t_minishell *sh, t_snode *redi_list)
 {
 	t_snode	*node;
 	size_t	size;

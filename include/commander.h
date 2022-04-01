@@ -60,8 +60,8 @@ int		commandeer(t_minishell *sh, t_snode *node, const int io[3]);
 
 int		sh_execvp(t_minishell *sh, char **argv);
 
-int		_cm_setup_redirects(t_minishell *sh, t_snode *redi_list);
-int		_cm_setup_redirects(t_minishell *sh, t_snode *redi_list);
+int		_cm_setup_process_redirects(t_minishell *sh, t_snode *redi_list);
+int		_cm_setup_builtin_redirects(t_minishell *sh, t_snode *redi_list, int io[3]);
 char	**cm_expand(t_minishell *sh, t_token *token);
 char	*cm_expand_command(t_minishell *sh, t_snode *node);
 char	*cm_expand_backtick(t_minishell *sh, char *str);
@@ -72,4 +72,5 @@ pid_t	cm_unimplemented_cmd_command(t_minishell *sh, t_snode *node, const int io[
 
 int		cm_enable_reaper(t_minishell *sh);
 int		cm_disable_reaper(t_minishell *sh);
+
 #endif

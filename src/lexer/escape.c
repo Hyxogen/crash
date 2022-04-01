@@ -45,13 +45,13 @@ int
 {
 	if (lex->quote || lex->btick || lex->end != NULL)
 	{
-		if (lex->src->cur == '$')
+		if (lex->src->nex == '$')
 			return (1);
-		if (lex->src->cur == '`')
+		if (lex->src->nex == '`')
 			return (1);
-		if (lex->src->cur == '"' && !lex->btick && lex->end == NULL)
+		if (lex->src->nex == '"' && !lex->btick && lex->end == NULL)
 			return (1);
-		if (lex->src->cur == '\\')
+		if (lex->src->nex == '\\')
 			return (1);
 		return (0);
 	}
@@ -79,17 +79,17 @@ int
 }
 
 int
-	lex_bquoted_int(int quote, int cur)
+	lex_bquoted_int(int quote, int nex)
 {
 	if (quote)
 	{
-		if (cur == '$')
+		if (nex == '$')
 			return (1);
-		if (cur == '`')
+		if (nex == '`')
 			return (1);
-		if (cur == '"')
+		if (nex == '"')
 			return (1);
-		if (cur == '\\')
+		if (nex == '\\')
 			return (1);
 		return (0);
 	}

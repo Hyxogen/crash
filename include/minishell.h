@@ -132,6 +132,7 @@ int			sh_execve(const char *path, char *const argv[], char *const envp[]);
 int			sh_waitpid(pid_t pid, int *stat_loc, int options);
 int			sh_pipe(int fildes[2]);
 int			sh_dup2(int fildes, int fildes2);
+int			sh_dup(int fildes);
 int			sh_close(int fildes);
 int			sh_open(const char *path, int oflag, mode_t mode);
 int			sh_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);

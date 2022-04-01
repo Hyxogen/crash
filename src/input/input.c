@@ -20,7 +20,7 @@ void
 	if (mode == in_string)
 	{
 		in->string_handle = param;
-		in->line_proc = _input_file_line_proc;
+		in->line_proc = _input_string_line_proc;
 	}
 	else if (mode == in_file)
 	{
