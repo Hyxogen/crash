@@ -15,6 +15,7 @@
 #include "commander.h"
 #include "libft.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 static void
 	expand_add(char ***list, int *new, int tmp)
@@ -58,6 +59,7 @@ static char
 		return (cm_expand_command(sh, part->data));
 	if (part->id == lx_backtick)
 		return (cm_expand_backtick(sh, part->data));
+	// TODO: arithmetic expansion
 	sh_assert(0);
 }
 
@@ -90,7 +92,7 @@ static void
 }
 
 static int
-	expand_int(t_minishell *sh, t_token *token, char ***list, char **fields)
+	expand_int(t_minishell *sh, t_token *token, char ***list, int nosplit)
 {
 	size_t	i;
 	size_t	j;
@@ -99,17 +101,18 @@ static int
 
 	new = 2;
 	i = 0;
-	ifs = sh_getenv_default(sh, "IFS", " \t\n");
+	ifs = sh_getenv(sh, "IFS", " \t\n");
 	while (i < token->count)
 	{
 		j = 0;
 		if (token->parts[i].quote)
-			expand_add(list, &new, 0);
-		if (token->parts[i].quote || token->parts[i].id == lx_normal)
-			while (fields[i][j] != '\0')
-				expand_add(list, &new, fields[i][j++]);
+			expand_add(&list[1], &new, 0);
+		if (token->parts[i].quote || token->parts[i].id == lx_normal
+			|| nosplit)
+			while (list[0][i][j] != '\0')
+				expand_add(&list[1], &new, list[0][i][j++]);
 		else
-			expand_split(list, &new, fields[i], ifs);
+			expand_split(&list[1], &new, list[0][i], ifs);
 		i += 1;
 	}
 	return (0);
@@ -117,31 +120,30 @@ static int
 
 // TODO: assignments should not be split
 char
-	**cm_expand(t_minishell *sh, t_token *token)
+	**cm_expand(t_minishell *sh, t_token *token, int nosplit)
 {
-	char	**list;
-	char	**fields;
+	char	**list[2];
 	size_t	i;
 	size_t	j;
 
-	fields = sh_safe_malloc(sizeof(*fields) * token->count);
-	list = NULL;
+	list[0] = sh_safe_malloc(sizeof(*list[0]) * token->count);
+	list[1] = NULL;
 	i = 0;
 	while (i < token->count)
 	{
-		fields[i] = expand_part(sh, &token->parts[i]);
-		if (fields[i++] == NULL)
+		list[0][i] = expand_part(sh, &token->parts[i]);
+		if (list[0][i++] == NULL)
 			break;
 	}
 	if (i == token->count)
 	{
-		list = sh_safe_malloc(sizeof(*list));
-		list[0] = NULL;
-		expand_int(sh, token, &list, fields);
+		list[1] = sh_safe_malloc(sizeof(*list[1]));
+		list[1][0] = NULL;
+		expand_int(sh, token, list, nosplit);
 	}
 	j = 0;
 	while (j < i)
-		free(fields[j++]);
-	free(fields);
-	return (list);
+		free(list[0][j++]);
+	free(list[0]);
+	return (list[1]);
 }

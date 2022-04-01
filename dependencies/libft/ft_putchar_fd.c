@@ -13,8 +13,8 @@
 #include "libft.h"
 #include <unistd.h>
 
-void
+int
 	ft_putchar_fd(char ch, int fd)
 {
-	write(fd, &ch, 1);
+	return (write(fd, &ch, 1));
 }

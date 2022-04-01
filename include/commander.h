@@ -62,7 +62,7 @@ int		sh_execvp(t_minishell *sh, char **argv);
 
 int		_cm_setup_process_redirects(t_minishell *sh, t_snode *redi_list);
 int		_cm_setup_builtin_redirects(t_minishell *sh, t_snode *redi_list, int io[3]);
-char	**cm_expand(t_minishell *sh, t_token *token);
+char	**cm_expand(t_minishell *sh, t_token *token, int nosplit);
 char	*cm_expand_command(t_minishell *sh, t_snode *node);
 char	*cm_expand_backtick(t_minishell *sh, char *str);
 char	*cm_expand_param(t_minishell *sh, t_token *token);

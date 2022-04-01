@@ -1,5 +1,4 @@
-printf \"%s\"\\n $PATH${IFS=: }
-
+IFS=": "
 printf \"%s\"\\n ${CRASH-}${CRASH-}A${CRASH-}""${CRASH-}
 printf \"%s\"\\n ${CRASH- }${CRASH- }A${CRASH- }""${CRASH- }
 printf \"%s\"\\n "${CRASH-}""${CRASH-}"A"${CRASH-}""""${CRASH-}"

@@ -50,6 +50,7 @@ int
 	return (!!ret);
 }
 
+/* TODO fork the entire term when it runs in the background */
 int
 	commandeer(t_minishell *sh, t_snode *node, const int io[3])
 {

@@ -26,6 +26,13 @@
 #include <fcntl.h>
 #include <limits.h>
 
+static void
+	_cm_close_nostd(int fd)
+{
+	if (fd != STDIN_FILENO && fd != STDOUT_FILENO && fd != STDERR_FILENO)
+		sh_close(fd);
+}
+
 static int
 	_get_exit_code(int status_code)
 {
@@ -60,7 +67,7 @@ char **_word_list_to_array(t_minishell *sh, t_snode *word_list)
 	i = 0;
 	while (i < word_list->childs_size)
 	{
-		tmp = cm_expand(sh, &word_list->childs[i]->token);
+		tmp = cm_expand(sh, &word_list->childs[i]->token, 0);
 		j = 0;
 		while (tmp[j] != NULL)
 		{
@@ -83,7 +90,7 @@ void
 	}
 	else if (error == EACCES)
 	{
-		fprintf(stderr, "CraSH: \"%s\" Permission denied\n", name);
+		fprintf(stderr, "CraSH: \"%s\" permission denied\n", name);
 		exit(127);
 	}
 	else
@@ -97,17 +104,14 @@ void
 static pid_t
 	_cm_simple_builtin_cmd(t_minishell *sh, t_simple_cmd_ctx *ctx, t_builtin_proc proc)
 {
-	/* TODO execute builtin */
-	/*
-	while (i < sh->builtins_size)
-	{
-		if (ft_strcmp(argv[0], sh->builtins[i].key) == 0)
-			return (sh->builtins[i].fn(sh, argv), 0);
-		i += 1;
-	}
-	*/
-	proc(sh, ctx->args, ctx->io);
-	return (0);
+	int	rc;
+
+	_cm_setup_builtin_redirects(sh, ctx->cmd_node->childs[1], ctx->io);
+	rc = proc(sh, ctx->args, ctx->io);
+	_cm_close_nostd(ctx->io[SH_STDIN_INDEX]);
+	_cm_close_nostd(ctx->io[SH_STDOUT_INDEX]);
+	_cm_close_nostd(ctx->io[SH_STDERR_INDEX]);
+	return (-(rc + 1));
 }
 
 static pid_t
@@ -134,13 +138,42 @@ static pid_t
 	return (pid);
 }
 
+void
+	_do_assignments(t_minishell *sh, t_snode *ass_list, int is_tmp)
+{
+	size_t	i;
+	size_t	j;
+	char	**tmp;
+
+	i = 0;
+	while (i < ass_list->childs_size)
+	{
+		j = 0;
+		while (ass_list->childs[i]->token.str[j] != '=')
+			j += 1;
+		tmp = cm_expand(sh, &ass_list->childs[i]->token, 1);
+		// TODO: handle errors (tmp == NULL)
+		sh_assert(tmp[0] != NULL);
+		sh_assert(tmp[1] == NULL);
+		tmp[0][j] = '\0';
+		// TODO: maybe also errors for readonly stuff?
+		// TODO: temporary if there is a command name after
+		sh_setenv(sh, tmp[0], tmp[0] + j + 1, is_tmp);
+		free(tmp[0]);
+		free(tmp);
+		i += 1;
+	}
+}	
+
 pid_t
 	cm_simple_cmd_command(t_minishell *sh, t_snode *cmd_node, const int io[3])
 {
 	size_t				i;
 	t_simple_cmd_ctx	ctx;
+	pid_t				ret;
 
 	ctx.args = _word_list_to_array(sh, cmd_node->childs[0]);
+	_do_assignments(sh, cmd_node->childs[2], !!ctx.args[0]);
 	if (!ctx.args[0])
 		return (-1); /* TODO Should this be handled differenlty? */
 	ctx.io[SH_STDIN_INDEX] = io[SH_STDIN_INDEX];
@@ -152,10 +185,16 @@ pid_t
 	while (i < sh->builtins_size)
 	{
 		if (!ft_strcmp(ctx.args[0], sh->builtins[i].key))
-			return (_cm_simple_builtin_cmd(sh, &ctx, sh->builtins[i].fn));
+		{
+			ret = _cm_simple_builtin_cmd(sh, &ctx, sh->builtins[i].fn);
+			sh_env_clean(sh);
+			return (ret);
+		}
 		i += 1;
 	}
-	return (_cm_simple_extern_cmd(&ctx));
+	ret = _cm_simple_extern_cmd(&ctx);
+	sh_env_clean(sh);
+	return (ret);
 }
 
 int
@@ -194,32 +233,6 @@ pid_t
 	return (-1);
 }
 
-static void
-	_cm_close_nostd(int fd)
-{
-	if (fd != STDIN_FILENO && fd != STDOUT_FILENO && fd != STDERR_FILENO)
-		sh_close(fd);
-}
-
-static void
-	_cm_debug_print_open_fd(void)
-{
-	int	i;
-	int count;
-	
-	count = 0;
-	for (i = 0; i < OPEN_MAX; i++) {
-		if (fcntl(i, F_GETFD) < 0) {
-			if (errno != EBADF)
-				fprintf(stderr, "Error\n");
-		} else {
-			fprintf(stderr, "%d OPEN; ", i);
-			count++;
-		}
-	}
-	fprintf(stderr, "\n%d/%d open\n", count, OPEN_MAX);
-}
-
 static int
 	_commandeer_pipe_sequence_rec(t_minishell *sh, const t_pipe_ctx *ctx, int prev_out_fd, size_t index)
 {
@@ -242,17 +255,20 @@ static int
 		_cm_close_nostd(prev_out_fd);
 		_cm_close_nostd(pipe_io[1]);
 		ex_code = _commandeer_pipe_sequence_rec(sh, ctx, pipe_io[0], index - 1);
-		sh_waitpid(pid, NULL, 0);
+		if (pid > 0)
+			sh_waitpid(pid, NULL, 0);
 		return (ex_code);
 	}
 	pid = proc(sh, cmd_node, cmd_io);
 	_cm_close_nostd(cmd_io[STDIN_FILENO]);
-	waitpid(pid, &ex_code, 0);
-	return (_get_exit_code(ex_code));
+	if (pid > 0)
+	{
+		waitpid(pid, &ex_code, 0);
+		return (_get_exit_code(ex_code));
+	}
+	return (-pid + 1);
 }
 
-
-/* TODO fork the entire pipe sequence when it runs in the background */
 int
 	commandeer_pipe_sequence(t_minishell *sh, t_snode *seq_node, const int io[3])
 {

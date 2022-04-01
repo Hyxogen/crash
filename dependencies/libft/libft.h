@@ -71,9 +71,9 @@ char	*ft_strmapi(const char *str, char (*func)(unsigned int, char));
 void	ft_striteri(char *str, void (*func)(unsigned int, char*));
 
 /* io */
-void	ft_putchar_fd(char ch, int fd);
-void	ft_putstr_fd(char *str, int fd);
-void	ft_putendl_fd(char *str, int fd);
+int		ft_putchar_fd(char ch, int fd);
+int		ft_putstr_fd(const char *str, int fd);
+int		ft_putendl_fd(const char *str, int fd);
 void	ft_putnbr_fd(int num, int fd);
 
 /* lists */

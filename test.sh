@@ -1,3 +1,1 @@
-echo Hallo
-echo Daar
-echo Zeg
+FUCK=1

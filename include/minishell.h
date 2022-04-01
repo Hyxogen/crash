@@ -89,6 +89,7 @@ struct s_envvar
 {
 	char	*key;
 	char	*value;
+	char	*tmp_value;
 	int		attr;
 };
 
@@ -101,24 +102,26 @@ struct s_builtin
 /* TODO: locals */
 struct s_minishell
 {
-	t_envvar				*vars;
-	size_t					vars_size;
-	t_builtin				*builtins;
-	size_t					builtins_size;
-	char					*self;
-	char					**args;
-	int						interactive;
-	struct		sigaction	child_reaper;
+	t_envvar			*vars;
+	size_t				vars_size;
+	t_builtin			*builtins;
+	size_t				builtins_size;
+	char				*self;
+	char				**args;
+	int					interactive;
+	struct sigaction	child_reaper;
 };
 
 char		*sh_join2(char *lhs, char delim, char *rhs);
 void		sh_split2(char *str, char delim, char **lhs, char **rhs);
 char		*sh_join_path(char *lhs, char *rhs);
 
-t_envvar	*sh_getenv(t_minishell *sh, const char *key);
-char		*sh_getenv_default(t_minishell *sh, const char *key, char *def);
-t_envvar	*sh_setenv(t_minishell *sh, char *key, char *value);
+t_envvar	*sh_setenv_int(t_minishell *sh, const char *key);
+t_envvar	*sh_getenv_int(t_minishell *sh, const char *key, int create);
+char		*sh_getenv(t_minishell *sh, const char *key, const char *def);
+t_envvar	*sh_setenv(t_minishell *sh, const char *key, const char *value, int tmp);
 char		**sh_env(t_minishell *sh);
+void		sh_env_clean(t_minishell *sh);
 void		sh_env_init(t_minishell *sh, char **env);
 
 void		pr_debug(void);
@@ -136,6 +139,8 @@ int			sh_dup(int fildes);
 int			sh_close(int fildes);
 int			sh_open(const char *path, int oflag, mode_t mode);
 int			sh_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
+
+int			sh_exists(const char *filen);
 
 int			sh_echo(t_minishell *sh, char **argv, const int io[3]);
 

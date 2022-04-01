@@ -4,7 +4,7 @@ for file in $dir/tests/*.sh; do
 	bash_out=${file%.sh}_bash.txt
 	crash_out=${file%.sh}_crash.txt
 	diff_out=${file%.sh}.diff
-	/bin/sh $file > $bash_out
+	bash $file > $bash_out
 	$dir/../minishell $file > $crash_out
 	diff $bash_out $crash_out > $diff_out
 	if [ -s $diff_out ]; then

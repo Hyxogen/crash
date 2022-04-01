@@ -7,10 +7,11 @@ static char
 	char	**tmp;
 	char	*str;
 
-	tmp = cm_expand(sh, token);
+	tmp = cm_expand(sh, token, 1);
 	if (tmp == NULL)
 		return (NULL);
-	// TODO: what happens if fields are split?
+	sh_assert(tmp[0] != NULL);
+	sh_assert(tmp[1] == NULL);
 	str = ft_strdup(tmp[0] + i);
 	free(tmp[0]);
 	free(tmp);
@@ -31,11 +32,11 @@ static char
 static char
 	*param_get(t_minishell *sh, t_token *token, char *key, size_t i)
 {
-	t_envvar	*var;
+	char	*var;
 	
-	var = sh_getenv(sh, key);
-	if (var != NULL && (token->str[i] != ':' || var->value[0] != '\0'))
-		return (var->value);
+	var = sh_getenv(sh, key, NULL);
+	if (var != NULL && (token->str[i] != ':' || var[0] != '\0'))
+		return (var);
 	return (NULL);
 }
 
@@ -65,17 +66,17 @@ static char
 	if (token->str[i] == '?')
 		return (param_error(sh, token, key, i + 1));
 	str = param_expand(sh, token, i + 1);
-	sh_setenv(sh, ft_strdup(key), ft_strdup(str));
+	sh_setenv(sh, ft_strdup(key), ft_strdup(str), 0);
 	return (str);
 }
 
 char
 	*cm_expand_param(t_minishell *sh, t_token *token)
 {
-	t_envvar	*var;
-	size_t		i;
-	char		*key;
-	char		*str;
+	char	*var;
+	size_t	i;
+	char	*key;
+	char	*str;
 
 	i = token->str[0] == '#';
 	while (ft_isalnum(token->str[i]) || token->str[i] == '_')
@@ -84,10 +85,10 @@ char
 	{
 		if (token->str[i] != '\0')
 			return (NULL);
-		var = sh_getenv(sh, token->str + 1);
+		var = sh_getenv(sh, token->str + 1, NULL);
 		if (var == NULL)
 			return (ft_strdup("0"));
-		return ft_itoa(ft_strlen(var->value));
+		return ft_itoa(ft_strlen(var));
 	}
 	// TODO: disallow empty key?
 	key = ft_strdup(token->str);

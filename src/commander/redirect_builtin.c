@@ -1,5 +1,6 @@
 #include "commander.h"
 
+#include "minishell.h"
 #include <libft.h>
 #include <stdio.h>
 #include <limits.h>
@@ -86,10 +87,11 @@ static int
 
 /* TODO implement */
 static int
-	_cm_handle_here_redi(t_minishell *sh, t_snode *redi_node)
+	_cm_handle_here_redi(t_minishell *sh, t_snode *redi_node, int io[3])
 {
 	(void) sh;
 	(void) redi_node;
+	(void) io;
 	return (0);
 }
 
@@ -109,47 +111,57 @@ static int
 
 /* TODO: implement clobber check */
 static int
-	_cm_check_clobber(t_minishell *sh, const char *filen)
+	_cm_check_clobber(t_minishell *sh)
 {
 	(void) sh;
-	(void) filen;
 	return (0);
+}
+
+static int
+	_cm_handle_redi_node_noerr(t_minishell *sh, t_snode *redi_node, char *filen, int io[3])
+{
+	int		io_index;
+
+	io_index = _cm_redi_get_from_index(redi_node);
+	if (io_index < -1 || io_index == 3)
+		return ((io_index < -1) * -1);
+	if (redi_node->type == sx_lessand)
+		return (_cm_handle_lessand_redi(redi_node, io_index, filen, io));
+	if (redi_node->type == sx_greatand)
+		return (_cm_handle_greatand_redi(redi_node, io_index, filen, io));
+	if (redi_node->type == sx_io_here)
+		return (_cm_handle_here_redi(sh, redi_node, io));
+	if (redi_node->type == sx_less || redi_node->type == sx_clobber || redi_node->type == sx_lessgreat)
+	{
+		if (io_index == -1)
+			io_index = SH_STDIN_INDEX;
+		return  ((io[io_index] = _cm_open_file(filen,
+			_cm_get_redi_flags(redi_node->type),
+			0644 * (redi_node->type == sx_clobber || redi_node->type == sx_lessgreat)), 0) < 0);
+	}
+	if (sh_exists(filen) && _cm_check_clobber(sh))
+		return (fprintf(stderr, "CraSH: Cannot overwrite existing file"), -1);
+	if (io_index == -1)
+		io_index = SH_STDOUT_INDEX;
+	return ((io[io_index] = _cm_open_file(filen,
+		_cm_get_redi_flags(redi_node->type), 0644)) < 0);
 }
 
 static int
 	_cm_handle_redi_node(t_minishell *sh, t_snode *redi_node, int io[3])
 {
-	int		io_index;
 	char	**filen;
 
-	io_index = _cm_redi_get_from_index(redi_node);
-	if (io_index < -1 || io_index == 3)
-		return ((io_index < -1) * -1)
 	if (redi_node->childs_size == 0)
 		return (fprintf(stderr, "CraSH: No file specified\n"), 1);
-	filen = cm_expand(sh, &redi_node->childs[0]->token);
+	filen = cm_expand(sh, &redi_node->childs[0]->token, 0);
 	if (!filen || !*filen || *(filen + 1))
 		return (fprintf(stderr, "CraSH: Ambigious redirect\n"), 1);
-	if (redi_node->type == sx_lessand)
-		return (_cm_handle_lessand_redi(redi_node, io_index, *filen, io));
-	if (redi_node->type == sx_greatand)
-		return (_cm_handle_greatand_redi(redi_node, from_fd, *filen, io));
-	io_index = (io_index != -1) * from_fd + (((redi_node->type != sx_less) * ) && (redi_node->type != sx_lessgreat));
-	if (redi_node->type == sx_clobber || redi_node->type == sx_lessgreat)
-		return (io[io_index] = _cm_open_file(*filen, _cm_get_redi_flags(redi_node->type), 0644) < 0);
-	if (redi_node->type == sx_io_here)
-		return (io[io_index] = - 1, 0);
-	if (redi_node->type == sx_less)
-		return (io[io_index] = _cm_open_file(*filen, _cm_get_redi_flags(redi_node->type), 0) < 0);
-	if (_cm_check_clobber(sh, *filen))
-		return (fprintf(stderr, "CraSH: Cannot overwrite existing file"), 1);
-	if (redi_node->type == sx_great || redi_node->type == sx_dgreat)
-		return (io[io_index] = _cm_open_file(*filen, _cm_get_redi_flags(redi_node->type), 0644) < 0);
-	return (-1);
+	return (_cm_handle_redi_node_noerr(sh, redi_node, *filen, io));
 }
 
 int
-	_cm_setup_process_redirects(t_minishell *sh, t_snode *redi_list, int io[3])
+	_cm_setup_builtin_redirects(t_minishell *sh, t_snode *redi_list, int io[3])
 {
 	t_snode	*node;
 	size_t	size;

@@ -16,7 +16,24 @@
 #include <stdlib.h>
 
 t_envvar
-	*sh_getenv(t_minishell *sh, const char *key)
+	*sh_setenv_int(t_minishell *sh, const char *key)
+{
+	t_envvar	*var;
+
+	sh->vars = sh_safe_realloc(sh->vars,
+		sizeof(*sh->vars) * sh->vars_size,
+		sizeof(*sh->vars) * (sh->vars_size + 1));
+	var = &sh->vars[sh->vars_size];
+	sh->vars_size += 1;
+	var->key = ft_strdup(key);
+	var->attr = 0;
+	var->value = NULL;
+	var->tmp_value = NULL;
+	return (var);
+}
+
+t_envvar
+	*sh_getenv_int(t_minishell *sh, const char *key, int create)
 {
 	size_t	i;
 
@@ -27,71 +44,86 @@ t_envvar
 			return (&sh->vars[i]);
 		i += 1;
 	}
+	if (create)
+		return (sh_setenv_int(sh, key));
 	return (NULL);
 }
 
 char
-	*sh_getenv_default(t_minishell *sh, const char *key, char *def)
+	*sh_getenv(t_minishell *sh, const char *key, const char *def)
 {
-	t_envvar	*env;
+	t_envvar	*var;
 
-	env = sh_getenv(sh, key);
-	if (env == NULL)
-		return (def);
-	return (env->value);
+	var = sh_getenv_int(sh, key, 0);
+	if (var == NULL)
+		return ((char*) def);
+	if (var->tmp_value != NULL)
+		return (var->tmp_value);
+	if (var->value == NULL)
+		return ((char*) def);
+	return (var->value);
 }
 
-/* TODO: check readonly attribute */
 t_envvar
-	*sh_setenv(t_minishell *sh, char *key, char *value)
+	*sh_setenv(t_minishell *sh, const char *key, const char *value, int tmp)
 {
-	t_envvar	*env;
+	t_envvar	*var;
 
-	env = sh_getenv(sh, key);
-	if (env != NULL)
+	var = sh_getenv_int(sh, key, 1);
+	if (var->attr & SH_ENV_READONLY)
 	{
-		free(env->value);
-		env->value = ft_strdup(value);
+		// TODO: error
 	}
+	if (tmp)
+		var->tmp_value = ft_strdup(value);
 	else
-	{
-		sh->vars = sh_safe_realloc(sh->vars,
-			sizeof(*sh->vars) * sh->vars_size,
-			sizeof(*sh->vars) * (sh->vars_size + 1));
-		env = &sh->vars[sh->vars_size];
-		sh->vars_size += 1;
-		env->key = ft_strdup(key);
-		env->value = ft_strdup(value);
-	}
-	env->attr = 0;
-	return (env);
+		var->value = ft_strdup(value);
+	return (var);
 }
 
-/* TODO: check export attribute */
 char
 	**sh_env(t_minishell *sh)
 {
-	char	**result;
+	char	**out;
+	size_t	i;
+	size_t	j;
+
+	out = sh_safe_malloc(sizeof(*out) * (sh->vars_size + 1));
+	i = 0;
+	j = 0;
+	while (i < sh->vars_size)
+	{
+		if (sh->vars[i].tmp_value != NULL)
+			out[j++] = sh_join2(sh->vars[i].key, '=', sh->vars[i].tmp_value);
+		else if ((sh->vars[i].attr & SH_ENV_EXPORT))
+			out[j++] = sh_join2(sh->vars[i].key, '=', sh->vars[i].value);
+		i += 1;
+	}
+	out[j] = NULL;
+	return (out);
+}
+
+void
+	sh_env_clean(t_minishell *sh)
+{
 	size_t	i;
 
-	result = sh_safe_malloc(sizeof(*result) * (sh->vars_size + 1));
 	i = 0;
 	while (i < sh->vars_size)
 	{
-		result[i] = sh_join2(sh->vars[i].key, '=', sh->vars[i].value);
+		free(sh->vars[i].tmp_value);
+		sh->vars[i].tmp_value = NULL;
 		i += 1;
 	}
-	result[i] = NULL;
-	return (result);
 }
 
-/* TODO: set export attribute? */
 void
 	sh_env_init(t_minishell *sh, char **env)
 {
-	char	*key;
-	char	*value;
-	size_t	i;
+	char		*key;
+	char		*value;
+	size_t		i;
+	t_envvar	*var;
 
 	i = 0;
 	sh->vars = NULL;
@@ -99,7 +131,10 @@ void
 	while (env[i] != NULL)
 	{
 		sh_split2(env[i], '=', &key, &value);
-		sh_setenv(sh, key, value);
+		var = sh_setenv(sh, key, value, 0);
+		var->attr |= SH_ENV_EXPORT;
+		free(key);
+		free(value);
 		i += 1;
 	}
 }

@@ -13,6 +13,8 @@
 #include "minishell.h"
 #include "memory.h"
 #include "libft.h"
+#include <sys/stat.h>
+#include <errno.h>
 
 char
 	*sh_join2(char *lhs, char delim, char *rhs)
@@ -33,7 +35,6 @@ char
 }
 
 /* TODO: what to do if delim not found */
-/* TODO: safe malloc not always used, also check for other functions */
 /* TODO: other functions like ft_strdup() */
 void
 	sh_split2(char *str, char delim, char **lhs, char **rhs)
@@ -55,4 +56,15 @@ char
 	if (rhs[0] == '/')
 		return (ft_strdup(rhs));
 	return (sh_join2(lhs, '/', rhs));
+}
+
+int
+	sh_exists(const char *filen)
+{
+	struct stat	info;
+
+	if (!stat(filen, &info))
+		return (1);
+	sh_assert(errno == ENOENT);
+	return (0);	
 }

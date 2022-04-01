@@ -66,28 +66,28 @@ int
 {
 	size_t	i;
 	char	**path;
-	char	*name;
+	char	*strings[2];
 	int		ret;
 
 	/* TODO: some of this needs to move before builtin check */
-	if (ft_strchr(argv[0], '/') != NULL)
+	strings[0] = sh_getenv(sh, "PATH", NULL);
+	if (ft_strchr(argv[0], '/') != NULL || strings[0] == NULL)
 		return (sh_exec(sh, argv[0], argv));
 	/* TODO: check if splitting by : is correct */
-	/* TODO: sh_safe_malloc is not used */
 	/* TODO: what if PATH is unset */
-	path = ft_split(sh_getenv(sh, "PATH")->value, ':');
+	path = ft_split(strings[0], ':');
 	i = 0;
 	while (path[i] != NULL)
 	{
-		name = sh_join2(path[i], '/', argv[0]);
-		if (access(name, X_OK) == 0)
+		strings[1] = sh_join2(path[i], '/', argv[0]);
+		if (access(strings[1], X_OK) == 0)
 		{
-			ret = sh_exec(sh, name, argv);
-			free(name);
+			ret = sh_exec(sh, strings[1], argv);
+			free(strings[1]);
 			sh_free_list(path);
 			return (ret);
 		}
-		free(name);
+		free(strings[1]);
 		i += 1;
 	}
 	sh_free_list(path);
