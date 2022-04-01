@@ -74,7 +74,6 @@ int
 	if (ft_strchr(argv[0], '/') != NULL || strings[0] == NULL)
 		return (sh_exec(sh, argv[0], argv));
 	/* TODO: check if splitting by : is correct */
-	/* TODO: what if PATH is unset */
 	path = ft_split(strings[0], ':');
 	i = 0;
 	while (path[i] != NULL)

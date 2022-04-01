@@ -17,13 +17,14 @@ static void
 }
 
 int
-	sh_echo(t_minishell *sh, char **argv, const int io[3])
+	sh_echo(t_minishell *sh, int argc, char **argv, const int io[3])
 {
 	const char	*suffix;
 	const char	*delim;
 	size_t		i;
 
 	(void) sh;
+	(void) argc;
 	suffix = "\n";
 	delim = "";
 	i = 1;

@@ -81,15 +81,17 @@ int
 	t_input		in;
 	char		*tmp;
 	int			fd;
-	t_builtin	builtins[1];
+	t_builtin	builtins[2];
 
 	(void) argc;
 	builtins[0].key = "echo";
 	builtins[0].fn = sh_echo;
+	builtins[1].key = "exit";
+	builtins[1].fn = sh_exit;
 	tmp = getcwd(NULL, 0);
 	sh.self = sh_join_path(tmp, argv[0]);
 	sh.builtins = builtins;
-	sh.builtins_size = 1;
+	sh.builtins_size = 2;
 	sh.args = argv + argc;
 	sh.interactive = 1;
 	free(tmp);

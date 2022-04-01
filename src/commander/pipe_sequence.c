@@ -105,9 +105,13 @@ static pid_t
 	_cm_simple_builtin_cmd(t_minishell *sh, t_simple_cmd_ctx *ctx, t_builtin_proc proc)
 {
 	int	rc;
+	int	argc;
 
+	argc = 0;
+	while (ctx->args[argc] != NULL)
+		argc += 1;
 	_cm_setup_builtin_redirects(sh, ctx->cmd_node->childs[1], ctx->io);
-	rc = proc(sh, ctx->args, ctx->io);
+	rc = proc(sh, argc, ctx->args, ctx->io);
 	_cm_close_nostd(ctx->io[SH_STDIN_INDEX]);
 	_cm_close_nostd(ctx->io[SH_STDOUT_INDEX]);
 	_cm_close_nostd(ctx->io[SH_STDERR_INDEX]);

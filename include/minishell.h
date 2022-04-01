@@ -83,7 +83,7 @@ typedef struct s_minishell	t_minishell;
 typedef struct s_envvar		t_envvar;
 typedef struct s_builtin	t_builtin;
 /* return code should be: -return_code - 1 */
-typedef int					(*t_builtin_proc)(t_minishell *sh, char **argv, const int io[3]);
+typedef int					(*t_builtin_proc)(t_minishell *sh, int argc, char **argv, const int io[3]);
 
 struct s_envvar
 {
@@ -142,6 +142,7 @@ int			sh_sigaction(int sig, const struct sigaction *act, struct sigaction *oact)
 
 int			sh_exists(const char *filen);
 
-int			sh_echo(t_minishell *sh, char **argv, const int io[3]);
+int			sh_echo(t_minishell *sh, int argc, char **argv, const int io[3]);
+int			sh_exit(t_minishell *sh, int argc, char **argv, const int io[3]);
 
 #endif
