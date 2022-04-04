@@ -123,37 +123,6 @@ static int
 	return (0);
 }
 
-/* TODO properly implement heredocs
-static int
-	_cm_handle_redi_node(t_minishell *sh, t_snode *redi_node)
-{
-	int		from_fd;
-	char	**filen;
-
-	from_fd = _cm_redi_get_from(sh, redi_node);
-	if (redi_node->type == sx_io_here)
-		return (_cm_handle_here_redi(sh, redi_node));
-	if (redi_node->childs_size == 0)
-		return (fprintf(stderr, "CraSH: No file specified\n"), 1);
-	filen = cm_expand(sh, &redi_node->childs[0]->token, 0);
-	if (!filen || !*filen || *(filen + 1))
-		return (fprintf(stderr, "CraSH: Ambigious redirect\n"), 1);
-	if (redi_node->type == sx_lessand)
-		return (_cm_handle_lessand_redi(sh, redi_node, from_fd, *filen));
-	if (redi_node->type == sx_greatand)
-		return (_cm_handle_greatand_redi(sh, redi_node, from_fd, *filen));
-	if (redi_node->type == sx_clobber || redi_node->type == sx_lessgreat)
-		return (_cm_open_file(*filen, from_fd, _cm_get_redi_flags(redi_node->type), 0644) < 0);
-	if (redi_node->type == sx_less)
-		return (_cm_open_file(*filen, from_fd, _cm_get_redi_flags(redi_node->type), 0) < 0);
-	if (_cm_check_clobber(sh, *filen))
-		return (fprintf(stderr, "CraSH: Cannot overwrite existing file"), 1);
-	if (redi_node->type == sx_great || redi_node->type == sx_dgreat)
-		return (_cm_open_file(*filen, from_fd, _cm_get_redi_flags(redi_node->type), 0644) < 0);
-	return (-1);
-}*/
-
-
 static int
 	_cm_handle_redi_node_noerr(t_minishell *sh, t_snode *redi_node, char *filen)
 {

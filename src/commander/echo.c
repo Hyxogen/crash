@@ -6,14 +6,15 @@
 #include <errno.h>
 #include <string.h>
 
-static void
+static int
 	_sh_putstr_fd(const char *str, const int io[3])
 {
 	if (ft_putstr_fd((char*) str, io[SH_STDOUT_INDEX]) < 0)
 	{
 		dprintf(io[SH_STDERR_INDEX], "echo(%d): %s\n", errno, strerror(errno)); /* TODO replace with own printf */
-		exit(-1); /* TODO: this shouldn't exit the entire shell */
+		return (-1);
 	}
+	return (0);
 }
 
 int
@@ -35,11 +36,12 @@ int
 	}
 	while (argv[i] != NULL)
 	{
-		_sh_putstr_fd((char *) delim, io);
-		_sh_putstr_fd(argv[i], io);
+		if (_sh_putstr_fd((char *) delim, io) || _sh_putstr_fd(argv[i], io))
+			return (-1);
 		delim = " ";
 		i += 1;
 	}
-	_sh_putstr_fd((char *) suffix, io);
+	if (_sh_putstr_fd((char *) suffix, io))
+		return (-1);
 	return (0);
 }
