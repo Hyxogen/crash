@@ -28,7 +28,9 @@ static t_commandeer_proc
 	procs[sx_list] = commandeer_inner;
 	procs[sx_term] = commandeer_inner;
 	procs[sx_command_list] = commandeer_inner;
+	procs[sx_compound_list] = commandeer_inner;
 	procs[sx_pipe_sequence] = commandeer_pipe_sequence;
+	procs[sx_if_clause] = cm_if_clause;
 	return (procs);
 }
 
@@ -55,4 +57,10 @@ int
 	commandeer(t_minishell *sh, t_snode *node, const int io[3])
 {
 	return (get_command_table()[node->type](sh, node, io));
+}
+
+pid_t
+	cm_convert_retcode(int rc)
+{
+	return (-(rc + 1));
 }

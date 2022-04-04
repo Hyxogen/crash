@@ -250,8 +250,8 @@ void
 	}
 }
 
-t_snode
-	*pr_parse(t_parser *pr)
+static t_snode
+	*_pr_parse(t_parser *pr)
 {
 	t_snode	*node;
 	t_snode	*child;
@@ -310,7 +310,7 @@ int
 			pr_next_token(&pr);
 		if (pr.current.id == tk_invalid || pr.current.id == tk_null)
 			break ;
-		node = pr_parse(&pr);
+		node = _pr_parse(&pr);
 		if (node != NULL)
 		{
 			print_node(node, 0);

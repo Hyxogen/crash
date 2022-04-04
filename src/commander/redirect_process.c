@@ -17,6 +17,7 @@
 #include <limits.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 static int
 	_cm_open_file(const char *filen, int fd, int flags, int mode)
@@ -95,8 +96,25 @@ static int
 static int
 	_cm_handle_here_redi(t_minishell *sh, t_snode *redi_node)
 {
-	(void) sh;
-	(void) redi_node;
+	char	**str;
+	int		here_pipe[2];
+	pid_t	pid;
+
+	str = cm_expand(sh, &redi_node->childs[0]->here_content, 1);
+	sh_assert(str != NULL);
+	sh_pipe(here_pipe);
+	sh_dup2(here_pipe[0], STDIN_FILENO);
+	pid = sh_fork();
+	if (pid == 0)
+	{
+		sh_close(here_pipe[0]);
+		sh_write(here_pipe[1], *str, ft_strlen(*str));
+		free(str);
+		sh_close(here_pipe[1]);
+		exit(EXIT_SUCCESS);
+	}
+	sh_close(here_pipe[1]);
+	free(str);
 	return (0);
 }
 

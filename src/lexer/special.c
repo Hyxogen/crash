@@ -52,7 +52,7 @@ int
 		|| lex->src->nex == '-'
 		|| lex->src->nex == '$'
 		|| lex->src->nex == '!'
-		|| lex->src->nex == '0')
+		|| ft_isdigit(lex->src->nex))
 	{
 		lex_update(lex, 1);
 		tmp = lex->tok;

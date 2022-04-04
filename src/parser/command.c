@@ -31,7 +31,7 @@ int
 		{
 			red = snode(sx_io_redirect_list);
 			pr_redirect_list(pr, red);
-			node_add_child(parent, red);
+			node_add_child(parent->childs[parent->childs_size - 1], red);
 			return (1);
 		}
 	}

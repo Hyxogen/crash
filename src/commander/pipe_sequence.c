@@ -54,7 +54,7 @@ char **_array_add(char **array, char *value)
 	return (array);
 }
 
-char **_word_list_to_array(t_minishell *sh, t_snode *word_list)
+char **cm_word_list_to_array(t_minishell *sh, t_snode *word_list)
 {
 	char	**ret;
 	char	**tmp;
@@ -115,7 +115,7 @@ static pid_t
 	_cm_close_nostd(ctx->io[SH_STDIN_INDEX]);
 	_cm_close_nostd(ctx->io[SH_STDOUT_INDEX]);
 	_cm_close_nostd(ctx->io[SH_STDERR_INDEX]);
-	return (-(rc + 1));
+	return (cm_convert_retcode(rc));
 }
 
 static pid_t
@@ -176,7 +176,7 @@ pid_t
 	t_simple_cmd_ctx	ctx;
 	pid_t				ret;
 
-	ctx.args = _word_list_to_array(sh, cmd_node->childs[0]);
+	ctx.args = cm_word_list_to_array(sh, cmd_node->childs[0]);
 	_do_assignments(sh, cmd_node->childs[2], !!ctx.args[0]);
 	if (!ctx.args[0])
 		return (-1); /* TODO Should this be handled differenlty? */
@@ -215,10 +215,10 @@ static t_cm_cmd_proc
 {
 	static t_cm_cmd_proc procs[] = {
 		cm_simple_cmd_command,
+		cm_if_clause,
 		cm_unimplemented_cmd_command,
 		cm_unimplemented_cmd_command,
-		cm_unimplemented_cmd_command,
-		cm_unimplemented_cmd_command,
+		cm_for_clause,
 		cm_unimplemented_cmd_command,
 		cm_unimplemented_cmd_command
 	};
@@ -237,6 +237,11 @@ pid_t
 	return (-1);
 }
 
+
+/*
+
+*/
+
 static int
 	_commandeer_pipe_sequence_rec(t_minishell *sh, const t_pipe_ctx *ctx, int prev_out_fd, size_t index)
 {
@@ -250,7 +255,7 @@ static int
 	ft_memcpy(cmd_io, ctx->io, sizeof(int) * 3);
 	cmd_node = ctx->pipe_node->childs[ctx->pipe_node->childs_size - index];
 	cmd_io[SH_STDIN_INDEX] = prev_out_fd;
-	proc = _get_commandeer_cmd_procs()[sx_simple_cmd - cmd_node->type];
+	proc = _get_commandeer_cmd_procs()[cmd_node->type - sx_simple_cmd];
 	if (index != 1)
 	{
 		sh_pipe(pipe_io);
@@ -270,7 +275,7 @@ static int
 		waitpid(pid, &ex_code, 0);
 		return (_get_exit_code(ex_code));
 	}
-	return (-pid + 1);
+	return (-(pid + 1));
 }
 
 int

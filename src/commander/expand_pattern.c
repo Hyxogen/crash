@@ -1,12 +1,13 @@
 #include "commander.h"
 
 char
-	*param_pattern(t_minishell *sh, t_token *token, const char *str, size_t i)
+	**param_pattern(t_minishell *sh, t_token *tok, char **str, size_t i)
 {
 	(void) sh;
-	(void) token;
+	(void) tok;
 	(void) str;
 	(void) i;
 	// TODO: implement
 	sh_assert(0);
+	return (NULL);
 }

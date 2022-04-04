@@ -139,8 +139,14 @@ int			sh_dup(int fildes);
 int			sh_close(int fildes);
 int			sh_open(const char *path, int oflag, mode_t mode);
 int			sh_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
+ssize_t		sh_write(int fildes, const void *buf, size_t nbyte);
 
 int			sh_exists(const char *filen);
+void		sh_strlst_clear(char **strs);
+char		*sh_strlst_join(char **strs, char delim);
+char		**sh_strlst_new(char *str);
+char		**sh_strlst_empty(void);
+char		**sh_strlst_dup(char **strs);
 
 int			sh_echo(t_minishell *sh, int argc, char **argv, const int io[3]);
 int			sh_exit(t_minishell *sh, int argc, char **argv, const int io[3]);

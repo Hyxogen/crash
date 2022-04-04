@@ -44,7 +44,7 @@ int
 	sh.self = sh_join_path(tmp, argv[0]);
 	sh.builtins = builtins;
 	sh.builtins_size = 4;
-	sh.args = argv + argc;
+	sh.args = argv;
 	sh.interactive = 1;
 	free(tmp);
 	sh_env_init(&sh, envp);

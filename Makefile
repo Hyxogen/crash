@@ -22,9 +22,10 @@ PARSER_FILES	:= \
 COMMANDER_FILES	:= \
 	commander.c execvp.c pipe_sequence.c env.c redirect_process.c expand.c \
 	signal.c expand_param.c expand_command.c expand_pattern.c echo.c \
-	redirect_builtin.c exit.c run.c colon.c dot.c
+	redirect_builtin.c exit.c run.c colon.c dot.c condition.c \
+	expand_special.c loop.c
 UTIL_FILES		:= \
-	die.c memory.c op.c util.c wrap.c
+	die.c memory.c op.c util.c wrap.c strlst.c
 
 FILE_NAMES		:= \
 	$(BASE_FILES) \
@@ -89,8 +90,8 @@ ifeq ($(config), debug)
 		LFLAGS	+= -fsanitize=address,undefined
 	endif
 else ifeq ($(config), release)
-	CFLAGS		+= -Werror -g3 -O2
-	LFLAGS		+= -Werror
+	CFLAGS		+= -g3 -O2
+	LFLAGS		+=
 else ifeq ($(config), distr)
 	CFLAGS		+= -Werror -g0 -Ofast
 	LFLAGS		+= -Werror 

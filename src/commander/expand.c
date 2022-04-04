@@ -18,7 +18,7 @@
 #include <stdio.h>
 
 static void
-	expand_add(char ***list, int *new, int tmp)
+	expadd(char ***list, int *new, int tmp)
 {
 	size_t	i;
 	size_t	len;
@@ -44,23 +44,29 @@ static void
 	}
 }
 
-static char
-	*expand_part(t_minishell *sh, t_tpart *part)
+static int
+	expand_part(t_minishell *sh, t_tpart *part, char ***list, size_t *i)
 {
-	if (part->id == lx_normal)
-	{
-		if (part->data == NULL)
-			return (ft_strdup(""));
-		return (ft_strdup(part->data));
-	}
 	if (part->id == lx_parameter)
-		return (cm_expand_param(sh, part->data));
+	{
+		*list = cm_expand_param(sh, part->data);
+		*i += *list != NULL;
+		return (*list != NULL);
+	}
+	*list = sh_safe_malloc(sizeof(**list) * 2);
+	(*list)[0] = NULL;
+	(*list)[1] = NULL;
+	if (part->id == lx_normal && part->data == NULL)
+		(*list)[0] = (ft_strdup(""));
+	if (part->id == lx_normal && part->data != NULL)
+		(*list)[0] = (ft_strdup(part->data));
 	if (part->id == lx_command)
-		return (cm_expand_command(sh, part->data));
+		(*list)[0] = (cm_expand_command(sh, part->data));
 	if (part->id == lx_backtick)
-		return (cm_expand_backtick(sh, part->data));
+		(*list)[0] = (cm_expand_backtick(sh, part->data));
 	// TODO: arithmetic expansion
-	sh_assert(0);
+	*i += (*list)[0] != NULL;
+	return ((*list)[0] != NULL);
 }
 
 static void
@@ -81,69 +87,76 @@ static void
 			else
 			{
 				if (*new == 2)
-					expand_add(list, new, 0);
+					expadd(list, new, 0);
 				*new = 2;
 			}
 		}
 		else
-			expand_add(list, new, str[i]);
+			expadd(list, new, str[i]);
 		i += 1;
 	}
 }
 
+// TODO: proper word splitting for arrays
 static int
-	expand_int(t_minishell *sh, t_token *token, char ***list, int nosplit)
+	expand_int(t_minishell *sh, t_token *token, t_token_ctx *ctx, int nosplit)
 {
-	size_t	i;
-	size_t	j;
+	size_t	i[3];
 	int		new;
 	char	*ifs;
 
 	new = 2;
-	i = 0;
+	i[0] = 0;
 	ifs = sh_getenv(sh, "IFS", " \t\n");
-	while (i < token->count)
+	while (i[0] < token->count)
 	{
-		j = 0;
-		if (token->parts[i].quote)
-			expand_add(&list[1], &new, 0);
-		if (token->parts[i].quote || token->parts[i].id == lx_normal
-			|| nosplit)
-			while (list[0][i][j] != '\0')
-				expand_add(&list[1], &new, list[0][i][j++]);
-		else
-			expand_split(&list[1], &new, list[0][i], ifs);
-		i += 1;
+		i[1] = 0;
+		while (ctx->list[i[0]][i[1]] != NULL)
+		{
+			i[2] = 0;
+			if (i[1] > 0)
+				new = 2;
+			if (token->parts[i[0]].quote)
+				expadd(&ctx->fields, &new, 0);
+			if (token->parts[i[0]].quote || token->parts[i[0]].id == lx_normal
+				|| nosplit)
+				while (ctx->list[i[0]][i[1]][i[2]] != '\0')
+					expadd(&ctx->fields, &new, ctx->list[i[0]][i[1]][i[2]++]);
+			else
+				expand_split(&ctx->fields, &new, ctx->list[i[0]][i[1]], ifs);
+			i[1] += 1;
+		}
+		i[0] += 1;
 	}
 	return (0);
 }
 
-// TODO: assignments should not be split
 char
 	**cm_expand(t_minishell *sh, t_token *token, int nosplit)
 {
-	char	**list[2];
-	size_t	i;
-	size_t	j;
+	t_token_ctx	ctx;
+	size_t		i[3];
 
-	list[0] = sh_safe_malloc(sizeof(*list[0]) * token->count);
-	list[1] = NULL;
-	i = 0;
-	while (i < token->count)
+	ctx.list = sh_safe_malloc(sizeof(*ctx.list) * token->count);
+	ctx.fields = NULL;
+	i[0] = 0;
+	while (i[0] < token->count)
+		if (!expand_part(sh, &token->parts[i[0]], &ctx.list[i[0]], &i[0]))
+			break ;
+	if (i[0] == token->count)
 	{
-		list[0][i] = expand_part(sh, &token->parts[i]);
-		if (list[0][i++] == NULL)
-			break;
+		ctx.fields = sh_safe_malloc(sizeof(*ctx.fields));
+		ctx.fields[0] = NULL;
+		expand_int(sh, token, &ctx, nosplit);
 	}
-	if (i == token->count)
+	i[1] = 0;
+	while (i[1] < i[0])
 	{
-		list[1] = sh_safe_malloc(sizeof(*list[1]));
-		list[1][0] = NULL;
-		expand_int(sh, token, list, nosplit);
+		i[2] = 0;
+		while (ctx.list[i[1]][i[2]] != NULL)
+			free(ctx.list[i[1]][i[2]++]);
+		free(ctx.list[i[1]++]);
 	}
-	j = 0;
-	while (j < i)
-		free(list[0][j++]);
-	free(list[0]);
-	return (list[1]);
+	free(ctx.list);
+	return (ctx.fields);
 }

@@ -5,7 +5,6 @@
 #include <stdlib.h>
 
 // TODO: verify
-// TODO: trim newlines at end
 static char
 	*expand_command_fd(pid_t pid, int fd)
 {

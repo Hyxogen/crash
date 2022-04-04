@@ -111,3 +111,13 @@ int
 	sh_check(ret >= 0, "sigaction");
 	return (ret);
 }
+
+ssize_t
+	sh_write(int fildes, const void *buf, size_t nbyte)
+{
+	int	ret;
+
+	ret = write(fildes, buf, nbyte);
+	sh_check(ret >= 0, "write");
+	return (ret);
+}
