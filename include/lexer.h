@@ -127,6 +127,8 @@ struct s_lexer
 	const char	*end;
 	int			here_flags;
 	int			error;
+	int			new_part;
+	int			empty_quote;
 };
 
 void		lex_append(t_lexer *lex, char **string, size_t *length, int esc);
@@ -170,6 +172,6 @@ void		token_init(t_token *tok);
 void		token_destroy(t_token *tok);
 void		token_move(t_token *dst, t_token *src);
 
-t_tpart		*token_add_part(t_token *tok, t_lexer_id id, int quote);
+t_tpart		*token_add_part(t_lexer *lex, t_lexer_id id, int quote);
 
 #endif

@@ -51,6 +51,7 @@ int
 {
 	int	status;
 
+	lex->new_part = 1;
 	lex_skip(lex);
 	lex->tok = tok;
 	token_init(tok);
@@ -70,7 +71,6 @@ int
 	status = check_op(lex);
 	if (tok->id != tk_null)
 		return (status);
-	token_add_part(lex->tok, lx_normal, lex->quote);
 	tok->id = tk_word;
 	return (lex_main(lex));
 }

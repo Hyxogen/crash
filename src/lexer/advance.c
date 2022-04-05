@@ -91,6 +91,8 @@ void
 {
 	t_tpart	*part;
 
+	if (lex->new_part && !sep)
+		token_add_part(lex, lx_normal, lex->quote);
 	lex_append(lex, &lex->tok->str, &lex->tok->len, 1);
 	if (lex->tok->count > 0)
 	{

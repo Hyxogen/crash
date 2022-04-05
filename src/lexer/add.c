@@ -15,10 +15,12 @@
 #include "memory.h"
 
 t_tpart
-	*token_add_part(t_token *tok, t_lexer_id id, int quote)
+	*token_add_part(t_lexer *lex, t_lexer_id id, int quote)
 {
 	t_tpart	part;
+	t_token	*tok;
 
+	tok = lex->tok;
 	part.id = id;
 	part.data = NULL;
 	part.len = 0;
@@ -27,5 +29,7 @@ t_tpart
 			(tok->count + 1) * sizeof(part));
 	tok->parts[tok->count] = part;
 	tok->count += 1;
+	lex->new_part = 0;
+	lex->empty_quote = 0;
 	return (&tok->parts[tok->count - 1]);
 }

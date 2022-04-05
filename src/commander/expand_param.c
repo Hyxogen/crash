@@ -18,14 +18,12 @@ static char
 static void
 	param_error(t_minishell *sh, t_token *token, const char *key, size_t i)
 {
-	size_t		index;
 	char		**exp;
 	char		*str;
 	(void)		key;
 
 	exp = param_expand(sh, token, i);
 	str = sh_strlst_join(exp, ' ');
-	index = 0;
 	fprintf(stderr, "CraSH: %s: %s\n", key, str);
 	sh_strlst_clear(exp);
 	free(str);
