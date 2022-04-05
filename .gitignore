@@ -12,3 +12,4 @@ stdall
 *.txt
 *.diff
 *.d
+/.cache

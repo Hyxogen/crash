@@ -45,13 +45,11 @@ static int
 static int
 	_cm_handle_greatand_redi(t_snode *redi_node, int io_index, char *word, int io[3])
 {
-	t_snode	*file_node;
 	long	target_fd;
 
 	(void) redi_node;
 	if (io_index < 0)
 		io_index = SH_STDOUT_INDEX;
-	file_node = redi_node->childs[0];
 	if (!ft_strcmp("-", word))
 		return (io[io_index] = -1, 0);
 	target_fd = ft_atol(word);
@@ -67,13 +65,11 @@ static int
 static int
 	_cm_handle_lessand_redi(t_snode *redi_node, int io_index, char *word, int io[3])
 {
-	t_snode	*file_node;
 	long	target_fd;
 
 	(void) redi_node;
 	if (io_index < 0)
 		io_index = SH_STDOUT_INDEX;
-	file_node = redi_node->childs[0];
 	if (!ft_strcmp("-", word))
 		return (io[io_index] = -1, 0);
 	target_fd = ft_atol(word);

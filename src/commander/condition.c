@@ -4,98 +4,6 @@
 
 
 #include <stdio.h>
-/*
-$ if true; then echo Hallo; elif false; then echo Ok?; elif false; then echo Huh?; else echo KO; fi
-sx_list
-  sx_term
-    sx_pipe_sequence
-      sx_if_clause
-        sx_compound_list
-          sx_term ;
-            sx_pipe_sequence
-              sx_simple_cmd
-                sx_wordlist
-                  sx_word:
-                    tk_word: true
-                      lx_normal: true
-                sx_io_redirect_list
-                sx_ass_list
-        sx_compound_list
-          sx_term ;
-            sx_pipe_sequence
-              sx_simple_cmd
-                sx_wordlist
-                  sx_word:
-                    tk_word: echo
-                      lx_normal: echo
-                  sx_word:
-                    tk_word: Hallo
-                      lx_normal: Hallo
-                sx_io_redirect_list
-                sx_ass_list
-        sx_if_clause
-          sx_compound_list
-            sx_term ;
-              sx_pipe_sequence
-                sx_simple_cmd
-                  sx_wordlist
-                    sx_word:
-                      tk_word: false
-                        lx_normal: false
-                  sx_io_redirect_list
-                  sx_ass_list
-          sx_compound_list
-            sx_term ;
-              sx_pipe_sequence
-                sx_simple_cmd
-                  sx_wordlist
-                    sx_word:
-                      tk_word: echo
-                        lx_normal: echo
-                    sx_word:
-                      tk_word: Ok?
-                        lx_normal: Ok?
-                  sx_io_redirect_list
-                  sx_ass_list
-          sx_if_clause
-            sx_compound_list
-              sx_term ;
-                sx_pipe_sequence
-                  sx_simple_cmd
-                    sx_wordlist
-                      sx_word:
-                        tk_word: false
-                          lx_normal: false
-                    sx_io_redirect_list
-                    sx_ass_list
-            sx_compound_list
-              sx_term ;
-                sx_pipe_sequence
-                  sx_simple_cmd
-                    sx_wordlist
-                      sx_word:
-                        tk_word: echo
-                          lx_normal: echo
-                      sx_word:
-                        tk_word: Huh?
-                          lx_normal: Huh?
-                    sx_io_redirect_list
-                    sx_ass_list
-            sx_compound_list
-              sx_term ;
-                sx_pipe_sequence
-                  sx_simple_cmd
-                    sx_wordlist
-                      sx_word:
-                        tk_word: echo
-                          lx_normal: echo
-                      sx_word:
-                        tk_word: KO
-                          lx_normal: KO
-                    sx_io_redirect_list
-                    sx_ass_list
-        sx_io_redirect_list
-*/
 
 /* TODO setup redirects */
 pid_t
@@ -111,5 +19,46 @@ pid_t
 		return (cm_if_clause(sh, ifnode->childs[2], io));
 	else if (ifnode->childs_size >= 3)
 		return (cm_convert_retcode(commandeer(sh, ifnode->childs[2], io)));
+	return (cm_convert_retcode(0));
+}
+
+/* TODO handle lists */
+/* TODO handle pattern matching */
+static int
+	_cm_strlst_cmp(char **lhs, char **rhs)
+{
+	char	*lhs_str;
+	char	*rhs_str;
+
+	lhs_str = *lhs;
+	rhs_str = *rhs;
+	
+	if (lhs_str == rhs_str)
+		return (0);
+	return (ft_strcmp(lhs_str, rhs_str));
+}
+
+pid_t
+	cm_case_clause(t_minishell *sh, t_snode *node, const int io[3])
+{
+	size_t	clauses;
+	size_t	index;
+	char	**lhs;
+	char	**rhs;
+	int		case_io[3];
+
+	sh_assert(node->type == sx_case_clause);
+	clauses = node->childs_size - 1;
+	lhs = cm_expand(sh, &node->token, 1);
+	index = 0;
+	ft_memcpy(case_io, io, sizeof(int) * 3);
+	_cm_setup_builtin_redirects(sh, node->childs[node->childs_size - 1], case_io);
+	while (index < clauses)
+	{
+		rhs = cm_expand(sh, &node->childs[index]->token, 1);
+		if (!_cm_strlst_cmp(lhs, rhs))
+			return (cm_convert_retcode(commandeer(sh, node->childs[index], io)));
+		index++;
+	}
 	return (cm_convert_retcode(0));
 }
