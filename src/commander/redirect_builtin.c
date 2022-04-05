@@ -154,6 +154,7 @@ static int
 
 	if (redi_node->childs_size == 0)
 		return (fprintf(stderr, "CraSH: No file specified\n"), 1);
+	sh_assert(redi_node->childs[0]->token.id != tk_invalid);
 	filen = cm_expand(sh, &redi_node->childs[0]->token, 0);
 	if (!filen || !*filen || *(filen + 1))
 		return (fprintf(stderr, "CraSH: Ambigious redirect\n"), 1);
@@ -168,6 +169,7 @@ int
 	size_t	index;
 	int		rc;
 
+	sh_assert(redi_list->type == sx_io_redirect_list);
 	(void) sh;
 	index = 0;
 	size = redi_list->childs_size;

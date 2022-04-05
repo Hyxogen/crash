@@ -42,6 +42,13 @@ sx_list
         sx_io_redirect_list
 */
 
+/*
+TODO: Check this:
+> for name in 1 2 3 4; do
+> ./fdcheck
+> done < src/main.c
+*/
+
 /* TODO implement no wordlist */
 /* TODO setup redirects */
 pid_t
@@ -50,17 +57,20 @@ pid_t
 	char	*name;
 	char	**list;
 	int		rc;
+  int   for_io[3];
 	t_snode	*do_node;
 
 	name = fornode->token.str;
 	list = cm_word_list_to_array(sh, fornode->childs[0]);
 	do_node = fornode->childs[1];
+  ft_memcpy(for_io, io, sizeof(int) * 3);
+  _cm_setup_builtin_redirects(sh, fornode->childs[fornode->childs_size - 1], for_io);
 	while (*list)
 	{
 		sh_setenv(sh, name, *list, 0);
-		rc = commandeer(sh, do_node, io);
+		rc = commandeer(sh, do_node, for_io);
 		list += 1;
 	}
-	sh_strlst_clear(list);
+	// sh_strlst_clear(list);
 	return (cm_convert_retcode(rc));
 }

@@ -35,7 +35,7 @@ FILE_NAMES		:= \
 	$(patsubst %,commander/%,$(COMMANDER_FILES)) \
 	$(patsubst %,util/%,$(UTIL_FILES))
 
-CC				:= cc
+CC				:= clang
 LINK_CMD		:= $(CC)
 CFLAGS			:= -Wall -Wextra -pedantic
 LFLAGS			:= -Wall -Wextra
@@ -83,7 +83,7 @@ ifndef config
 endif
 
 ifeq ($(config), debug)
-	CFLAGS		+= -DSH_DEBUG=1 -g3 -Og
+	CFLAGS		+= -DSH_DEBUG=1 -g3 -O0
 	LFLAGS		+= -DSH_DEBUG=1
 	ifndef nsan
 		CFLAGS	+= -fsanitize=address,undefined
