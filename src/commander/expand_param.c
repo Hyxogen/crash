@@ -144,8 +144,6 @@ static char
 		tmp = param_subst_null(sh, token, key, i);
 	else if (str[0] == NULL)
 		tmp = param_subst_empty_list(sh, token, key, i);
-	else if (str[0][0] == '\0')
-		tmp = param_subst_null(sh, token, key, i);
 	else
 		tmp = param_subst_normal(sh, token, key, i);
 	sh_strlst_clear(str);
