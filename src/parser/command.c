@@ -27,7 +27,8 @@ int
 			|| pr_for_clause(pr, parent)
 			|| pr_case_clause(pr, parent))
 		{
-			pr_redirect_list(pr, parent->childs[parent->childs_size - 1]);
+			if (!pr_redirect_list(pr, parent->childs[parent->childs_size - 1]))
+				node_add_child(parent->childs[parent->childs_size - 1], snode(sx_io_redirect_list));
 			return (1);
 		}
 	}
