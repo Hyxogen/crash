@@ -57,14 +57,12 @@ static int
 static int
 	_cm_handle_lessand_redi(t_minishell *sh, t_snode *redi_node, int from_fd, char *word)
 {
-	t_snode	*file_node;
 	long	target_fd;
 
 	(void) redi_node;
 	(void) sh;
 	if (from_fd < 0)
 		from_fd = STDIN_FILENO;
-	file_node = redi_node->childs[0];
 	if (!ft_strcmp("-", word))
 		return (sh_close(from_fd), 0);
 	target_fd = ft_atol(word);
@@ -76,14 +74,12 @@ static int
 static int
 	_cm_handle_greatand_redi(t_minishell *sh, t_snode *redi_node, int from_fd, char *word)
 {
-	t_snode	*file_node;
 	long	target_fd;
 
 	(void) redi_node;
 	(void) sh;
 	if (from_fd < 0)
 		from_fd = STDOUT_FILENO;
-	file_node = redi_node->childs[0];
 	if (!ft_strcmp("-", word))
 		return (sh_close(from_fd), 0);
 	target_fd = ft_atol(word);

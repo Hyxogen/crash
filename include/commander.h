@@ -62,6 +62,7 @@ pid_t	cm_convert_retcode(int rc);
 pid_t	cm_simple_cmd_command(t_minishell *sh, t_snode *cmd_node, const int io[3]);
 pid_t	cm_if_clause(t_minishell *sh, t_snode *ifnode, const int io[3]);
 pid_t	cm_for_clause(t_minishell *sh, t_snode *ifnode, const int io[3]);
+pid_t	cm_case_clause(t_minishell *sh, t_snode *ifnode, const int io[3]);
 
 int		commandeer_pipe_sequence(t_minishell *sh, t_snode *list_node, const int io[3]);
 int		commandeer_inner(t_minishell *sh, t_snode *node, const int io[3]);

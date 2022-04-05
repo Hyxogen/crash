@@ -217,7 +217,7 @@ static t_cm_cmd_proc
 		cm_simple_cmd_command,
 		cm_if_clause,
 		cm_unimplemented_cmd_command,
-		cm_unimplemented_cmd_command,
+		cm_case_clause,
 		cm_for_clause,
 		cm_unimplemented_cmd_command,
 		cm_unimplemented_cmd_command
