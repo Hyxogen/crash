@@ -13,6 +13,9 @@
 #include "parser.h"
 #include <stdlib.h>
 
+
+#include <stdio.h>
+
 int
 	pr_convert_io_number(t_parser *pr, t_token *token)
 {
@@ -38,6 +41,7 @@ int
 
 	if (pr->current.id == tk_invalid)
 		return (0);
+	token_init(&token); /* NOTE: Can prob be removed */
 	token.id = tk_invalid;
 	if (pr->current.id == tk_ionumber)
 	{

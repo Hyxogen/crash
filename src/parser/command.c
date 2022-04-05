@@ -16,8 +16,6 @@
 int
 	pr_compound_cmd(t_parser *pr, t_snode *parent)
 {
-	t_snode	*red;
-
 	if (pr->current.id != tk_invalid)
 	{
 		pr_convert_reserved(pr, &pr->current);
@@ -29,9 +27,7 @@ int
 			|| pr_for_clause(pr, parent)
 			|| pr_case_clause(pr, parent))
 		{
-			red = snode(sx_io_redirect_list);
-			pr_redirect_list(pr, red);
-			node_add_child(parent->childs[parent->childs_size - 1], red);
+			pr_redirect_list(pr, parent->childs[parent->childs_size - 1]);
 			return (1);
 		}
 	}
