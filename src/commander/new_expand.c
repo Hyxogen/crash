@@ -1,47 +1,150 @@
 #include "commander.h"
 #include "minishell.h"
 #include "memory.h"
+#include <stdlib.h>
 
 void
-	expansion_destroy(t_expansion *xps, size_t count)
+	expansion_destroy(t_expand *exp)
 {
 	size_t	i;
 	size_t	j;
 
 	i = 0;
-	while (i < count)
+	while (i < exp->count)
 	{
 		j = 0;
-		while (xps[i].fields[j] != NULL)
+		while (exp->parts[i].str[j] != NULL)
 		{
-			free(xps[i].fields[j]);
+			free(exp->parts[i].str[j]);
 			j += 1;
 		}
-		free(xps[i].fields);
+		free(exp->parts[i].str);
 		i += 1;
 	}
-	free(xps);
+	free(exp->parts);
 }
 
-int
-	expand_part(t_minishell *sh, t_expand *out, t_tpart *part)
+void
+	expansion_init(t_expand *exp)
 {
-	if (part->id == lx_normal)
-		return (expand_normal(sh, out, part->data));
-	if (part->id == lx_command)
-		return (expand_command(sh, out, part->data));
-	if (part->id == lx_backtick)
-		return (expand_backtick(sh, out, part->data));
-	if (part->id == lx_parameter)
-		return (expand_param(sh, out, part->data));
-	if (part->id == lx_arithmetic)
-		return (expand_arith(sh, out, part->data));
-	sh_assert(0);
-	return (-1);
+	exp->parts = NULL;
+	exp->count = 0;
+}
+
+void
+	expansion_add_part(t_expand *exp, char **str, int quote)
+{
+	exp->parts = sh_safe_realloc(exp->parts,
+		sizeof(*exp->parts) * exp->count,
+		sizeof(*exp->parts) * (exp->count + 1));
+	exp->parts[exp->count].str = str;
+	exp->parts[exp->count].quote = quote;
+	exp->parts[exp->count].normal = 0;
+	exp->parts[exp->count].array = 0;
+	exp->count += 1;
 }
 
 int
-	expand_collate(t_minishell *sh, t_expand *out, t_expand *xps, size_t count)
+	expand_part(t_minishell *sh, t_expand *exp, t_tpart *part)
+{
+	size_t	i;
+	int		tmp;
+
+	i = exp->count;
+	tmp = 0;
+	if (part->id == lx_normal)
+		expansion_add_part(exp, sh_strlst_new(ft_strdup(part->data)), 0);
+	else if (part->id == lx_command)
+		tmp = expand_command(sh, exp, part->data);
+	else if (part->id == lx_backtick)
+		tmp = expand_backtick(sh, exp, part->data);
+	else if (part->id == lx_parameter)
+		tmp = expand_param(sh, exp, part->data);
+	else
+		tmp = expand_arith(sh, exp, part->data);
+	if (tmp < 0)
+		return (-1);
+	while (i < exp->count)
+	{
+		exp->parts[i].normal = (part->id == lx_normal);
+		exp->parts[i].quote = (exp->parts[i].quote || part->quote);
+		i += 1;
+	}
+	return (0);
+}
+
+void
+	expand_add(char ***fields, int *new, int tmp)
+{
+	size_t	i;
+	size_t	len;
+
+	i = 0;
+	while ((*fields)[i] != NULL)
+		i += 1;
+	if (*new)
+	{
+		*fields = sh_safe_realloc(*fields,
+			sizeof(**fields) * (i + 1),
+			sizeof(**fields) * (i + 2));
+		(*fields)[i] = sh_safe_malloc(1);
+		(*fields)[i][0] = '\0';
+		i += 1;
+		(*fields)[i] = NULL;
+		*new = 0;
+	}
+	if (tmp != '\0')
+	{
+		len = ft_strlen((*fields)[i - 1]);
+		(*fields)[i - 1] = sh_safe_realloc((*fields)[i - 1], len + 1, len + 2);
+		(*fields)[i - 1][len] = tmp;
+		(*fields)[i - 1][len + 1] = '\0';
+	}
+}
+
+void
+	expand_add_str(char ***fields, int *new, char *str)
+{
+	size_t	i;
+
+	i = 0;
+	while (str[i] != '\0')
+	{
+		expand_add(fields, new, str[i]);
+		i += 1;
+	}
+}
+
+void
+	expand_split(char ***fields, int *new, char *str, char *ifs)
+{
+	size_t	i;
+
+	i = 0;
+	while (str[i] != '\0')
+	{
+		if (ft_strchr(ifs, str[i]) != NULL)
+		{
+			if (ft_strchr("\n\t\r\v\f ", str[i]) != NULL)
+			{
+				if (*new != 2)
+					*new = 1;
+			}
+			else
+			{
+				if (*new == 2)
+					expand_add(fields, new, '\0');
+				*new = 2;
+			}
+		}
+		else
+			expand_add(fields, new, str[i]);
+		i += 1;
+	}
+}
+
+void
+	expand_collate(t_minishell *sh, t_expand *exp, char ***fields)
 {
 	char	*ifs;
 	int		new;
@@ -51,49 +154,117 @@ int
 	ifs = sh_getenv(sh, "IFS", " \t\n");
 	new = 2;
 	i = 0;
-	while (i < token->count)
+	while (i < exp->count)
 	{
 		j = 0;
-		while (xps[i].fields[j] != NULL)
+		while (exp->parts[i].str[j] != NULL)
 		{
 			if (j > 0)
 				new = 2;
+			if (exp->parts[i].quote)
+				expand_add(fields, &new, '\0');
+			if (exp->parts[i].quote || exp->parts[i].normal)
+				expand_add_str(fields, &new, exp->parts[i].str[j]);
+			else
+				expand_split(fields, &new, exp->parts[i].str[j], ifs);
 			j += 1;
 		}
 		i += 1;
 	}
 }
 
-t_expand
-	*cm_expand_list(t_minishell *sh, t_token *token)
+void
+	expand_str_add(char **str, int **quote, int ch, int quot)
 {
-	t_expand	*xps;
-	size_t		i;
+	size_t	i;
 
-	xps = sh_safe_malloc(sizeof(*xps) * token->count);
-	while (i < token->count)
+	i = 0;
+	while ((*str)[i] != '\0')
+		i += 1;
+	*str = sh_safe_realloc(*str, i + 1, i + 2);
+	(*str)[i] = ch;
+	(*str)[i + 1] = '\0';
+	if (quote != NULL)
 	{
-		if (expand_part(sh, &xps[i], &token->parts[i]) < 0)
-			break ;
+		*quote = sh_safe_realloc(*quote,
+			sizeof(**quote) * i,
+			sizeof(**quote) * (i + 1));
+		(*quote)[i] = quot;
+	}
+}
+
+void
+	expand_str_add_part(char **str, int **quote, t_epart *part, int delim)
+{
+	size_t	i;
+	size_t	j;
+
+	i = 0;
+	while (part->str[i] != NULL)
+	{
+		if (i != 0)
+			expand_str_add(str, quote, delim, part->quote);
+		j = 0;
+		while (part->str[i][j] != '\0')
+		{
+			expand_str_add(str, quote, part->str[i][j], part->quote);
+			j += 1;
+		}
 		i += 1;
 	}
-	if (i == token->count)
-		return (xps);
-	expansion_destroy(xps, i);
-	free(xps);
-	return (NULL);
 }
 
 int
-	cm_expand(t_minishell *sh, t_expand *out, t_token *token)
+	cm_expand_list(t_minishell *sh, t_expand *exp, t_token *token)
 {
-	t_expand	*xps;
-	int			result;
+	size_t	i;
 
-	xps = cm_expand_list(sh, token);
-	if (xps == NULL)
-		return (-1);
-	result = expand_collate(sh, out, xps, token->count);
-	expansion_destroy(xps, token->count);
+	expansion_init(exp);
+	i = 0;
+	while (i < token->count)
+	{
+		if (expand_part(sh, exp, &token->parts[i]) < 0)
+		{
+			expansion_destroy(exp);
+			return (-1);
+		}
+		i += 1;
+	}
+	return (0);
+}
+
+char
+	*cm_expand_str(t_minishell *sh, t_token *token, int **quote, int ch)
+{
+	t_expand	exp;
+	char		*result;
+	size_t		i;
+
+	if (cm_expand_list(sh, &exp, token) < 0)
+		return (NULL);
+	result = sh_safe_malloc(1);
+	result[0] = '\0';
+	i = 0;
+	while (i < exp.count)
+	{
+		expand_str_add_part(&result, quote, &exp.parts[i], ch);
+		i += 1;
+	}
+	expansion_destroy(&exp);
 	return (result);
+}
+
+// TODO: check null when called
+char
+	**cm_expand(t_minishell *sh, t_token *token)
+{
+	t_expand	exp;
+	char		**fields;
+
+	if (cm_expand_list(sh, &exp, token) < 0)
+		return (NULL);
+	fields = sh_strlst_empty();
+	expand_collate(sh, &exp, &fields);
+	expansion_destroy(&exp);
+	return (fields);
 }

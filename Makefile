@@ -20,10 +20,11 @@ PARSER_FILES	:= \
 	function.c general.c io.c list.c loop.c node_int.c node.c other.c \
 	pipe.c redirect.c separator.c subshell.c die.c error.c global.c
 COMMANDER_FILES	:= \
-	commander.c execvp.c pipe_sequence.c env.c redirect_process.c expand.c \
-	signal.c expand_param.c expand_command.c expand_pattern.c echo.c \
-	redirect_builtin.c exit.c run.c colon.c dot.c condition.c \
-	expand_special.c loop.c
+	commander.c execvp.c pipe_sequence.c env.c redirect_process.c signal.c \
+	echo.c redirect_builtin.c exit.c run.c colon.c dot.c condition.c loop.c \
+	pattern.c command.c \
+	new_expand.c new_expand_param.c new_expand_command.c new_expand_arith.c
+# expand.c expand_param.c expand_command.c expand_pattern.c expand_special.c
 UTIL_FILES		:= \
 	die.c memory.c op.c util.c wrap.c strlst.c
 
@@ -47,8 +48,10 @@ DEP_DIR			:= build
 
 LIBFT_DIR		:= $(LIB_DIR)/libft
 LIBFT_LIB		:= $(LIBFT_DIR)/libft.a
+FT_PRINTF_DIR	:= $(LIB_DIR)/ft_printf
+FT_PRINTF_LIB	:= $(FT_PRINTF_DIR)/libftprintf.a
 
-INC_DIR			:= include $(LIBFT_DIR)
+INC_DIR			:= include $(LIBFT_DIR) $(FT_PRINTF_DIR)
 
 SOURCES			:= $(patsubst %.c,$(SRC_DIR)/%.c,$(FILE_NAMES))
 OBJECTS			:= $(patsubst %.c,$(OBJ_DIR)/%.o,$(FILE_NAMES))
@@ -101,8 +104,8 @@ endif
 
 all: $(NAME) crash
 
-$(NAME): $(OBJECTS) $(LIBFT_LIB)
-	$(LINK_CMD) -o $@ $(OBJECTS) $(LIBFT_LIB) $(LFLAGS) -lreadline
+$(NAME): $(OBJECTS) $(LIBFT_LIB) $(FT_PRINTF_LIB)
+	$(LINK_CMD) -o $@ $(OBJECTS) $(LIBFT_LIB) $(FT_PRINTF_LIB) $(LFLAGS) -lreadline
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(@D)
@@ -110,6 +113,9 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 
 $(LIBFT_LIB):
 	${MAKE} -C $(LIBFT_DIR) bonus
+
+$(FT_PRINTF_LIB):
+	${MAKE} -C $(FT_PRINTF_DIR) bonus
 
 crash: $(NAME)
 	ln -s $(NAME) $@

@@ -19,6 +19,7 @@
 
 /* Constant Rage Again SHell */
 /* Can't Rest Again SHell */
+/* Crying Rivers Again SHell*/
 /* https://pubs.opengroup.org/onlinepubs/009656399/toc.pdf */
 
 /**
@@ -49,6 +50,7 @@
  * Process was killed by magic
  * Snake? SNAAAAAAAAKE!!!
  * Illegal instruction
+ * $USER is not in the sudoers file.  This incident will be reported.
  * 
  * Success:
  * Command entered, did yes
@@ -67,6 +69,7 @@
  * Good message
  * Hello, World!
  * A winner is you
+ * $USER is in the sudoers file.  This incident will not be reported.
  */
 
 # define SH_ENV_EXPORT 1

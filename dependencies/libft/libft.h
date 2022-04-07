@@ -32,6 +32,14 @@ int		ft_isdigit(int ch);
 int		ft_isalnum(int ch);
 int		ft_isascii(int ch);
 int		ft_isprint(int ch);
+int		ft_isgraph(int ch);
+int		ft_isblank(int ch);
+int		ft_iscntrl(int ch);
+int		ft_islower(int ch);
+int		ft_isupper(int ch);
+int		ft_ispunct(int ch);
+int		ft_isspace(int ch);
+int		ft_isxdigit(int ch);
 int		ft_toupper(int ch);
 int		ft_tolower(int ch);
 

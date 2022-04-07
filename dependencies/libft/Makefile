@@ -8,7 +8,9 @@ SRC=\
 	ft_strlcpy.c 	ft_strlen.c 	ft_strmapi.c 	ft_strncmp.c	\
 	ft_strnstr.c 	ft_strrchr.c 	ft_strtrim.c 	ft_substr.c		\
 	ft_tolower.c 	ft_toupper.c	shft_strndup.c	shft_atol.c		\
-	shft_strcmp.c
+	shft_strcmp.c	shft_isblank.c	shft_iscntrl.c	shft_isgraph.c	\
+	shft_islower.c	shft_ispunct.c	shft_isupper.c	shft_isxdigit.c \
+	shft_isspace.c
 SRC_BONUS=\
 	ft_lstadd_back_bonus.c 	ft_lstadd_front_bonus.c	\
 	ft_lstclear_bonus.c 	ft_lstdelone_bonus.c	\

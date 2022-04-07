@@ -81,7 +81,12 @@ int
 	sh_close(int fildes)
 {
 	int	ret;
+	// void	*buffer[10];
+	int tmp;
 
+	// dprintf(STDERR_FILENO, "closing %d\n", fildes);
+	// tmp = backtrace(buffer, 10);
+	// backtrace_symbols_fd(buffer, tmp, STDERR_FILENO);
 	ret = close(fildes);
 	sh_check(ret >= 0, "close");
 	return (ret);

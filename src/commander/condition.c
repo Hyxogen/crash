@@ -1,5 +1,7 @@
 #include "commander.h"
 
+#include "memory.h"
+#include <libft.h>
 #include <string.h>
 
 
@@ -29,13 +31,18 @@ static int
 {
 	char	*lhs_str;
 	char	*rhs_str;
+	char	*escape_info;
+	int		match;
 
 	lhs_str = *lhs;
 	rhs_str = *rhs;
 	
 	if (lhs_str == rhs_str)
 		return (0);
-	return (ft_strcmp(lhs_str, rhs_str));
+	escape_info = sh_safe_malloc(ft_strlen(rhs_str)); /* TODO setup actual escape info */
+	match = match_pattern(lhs_str, rhs_str, escape_info);
+	printf("lhs:\"%s\" rhs:\"%s\" match:%d\n", lhs_str, rhs_str, match);
+	return (!match);
 }
 
 pid_t
@@ -49,13 +56,13 @@ pid_t
 
 	sh_assert(node->type == sx_case_clause);
 	clauses = node->childs_size - 1;
-	lhs = cm_expand(sh, &node->token, 1);
+	lhs = cm_expand(sh, &node->token); // TODO use cm_expand_str instead
 	index = 0;
 	ft_memcpy(case_io, io, sizeof(int) * 3);
 	_cm_setup_builtin_redirects(sh, node->childs[node->childs_size - 1], case_io);
 	while (index < clauses)
 	{
-		rhs = cm_expand(sh, &node->childs[index]->token, 1);
+		rhs = cm_expand(sh, &node->childs[index]->token); // TODO use cm_expand_str instead
 		if (!_cm_strlst_cmp(lhs, rhs))
 			return (cm_convert_retcode(commandeer(sh, node->childs[index], io)));
 		index++;

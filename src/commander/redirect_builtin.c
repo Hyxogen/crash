@@ -151,7 +151,7 @@ static int
 	if (redi_node->childs_size == 0)
 		return (fprintf(stderr, "CraSH: No file specified\n"), 1);
 	sh_assert(redi_node->childs[0]->token.id != tk_invalid);
-	filen = cm_expand(sh, &redi_node->childs[0]->token, 0);
+	filen = cm_expand(sh, &redi_node->childs[0]->token);
 	if (!filen || !*filen || *(filen + 1))
 		return (fprintf(stderr, "CraSH: Ambigious redirect\n"), 1);
 	return (_cm_handle_redi_node_noerr(sh, redi_node, *filen, io));

@@ -96,7 +96,7 @@ static int
 	int		here_pipe[2];
 	pid_t	pid;
 
-	str = cm_expand(sh, &redi_node->childs[0]->here_content, 1);
+	str = cm_expand(sh, &redi_node->childs[0]->here_content); // TODO use cm_expand_str instead
 	sh_assert(str != NULL);
 	sh_pipe(here_pipe);
 	sh_dup2(here_pipe[0], STDIN_FILENO);
@@ -174,7 +174,7 @@ static int
 
 	if (redi_node->childs_size == 0)
 		return (fprintf(stderr, "CraSH: No file specified\n"), 1);
-	filen = cm_expand(sh, &redi_node->childs[0]->token, 0);
+	filen = cm_expand(sh, &redi_node->childs[0]->token);
 	if (!filen || !*filen || *(filen + 1))
 		return (fprintf(stderr, "CraSH: Ambigious redirect\n"), 1);
 	return (_cm_handle_redi_node_noerr(sh, redi_node, *filen));
