@@ -36,6 +36,8 @@ typedef struct s_cmd_base		t_cmd_base;
 typedef struct s_simple_cmd_ctx	t_simple_cmd_ctx;
 typedef struct s_pipe_ctx		t_pipe_ctx;
 typedef struct s_token_ctx		t_token_ctx;
+typedef struct s_expand			t_expand;
+typedef struct s_pattern_node	t_pattern_node;
 
 struct s_simple_cmd_ctx {
 	t_minishell	*sh;
@@ -49,9 +51,21 @@ struct s_pipe_ctx {
 	int		io[3];
 };
 
+struct s_expand {
+	char	**fields;
+	int		quote;
+};
+
 struct s_token_ctx {
 	char	***list;
 	char	**fields;
+};
+
+struct s_pattern_node {
+	char			chars[256];
+	int				invert;
+	int				infinite;
+	t_pattern_node	*next;
 };
 
 int		commander_setup(t_minishell *sh);

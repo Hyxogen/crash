@@ -43,7 +43,11 @@ int
 		if (lex->src->cur == -1)
 			return (-1);
 		if (lex_quoted(lex) || !lex_special(lex))
+		{
+			if (!lex->quote && lex->src->bslash)
+				lex->new_part = 1;
 			lex_update(lex, 0);
+		}
 	}
 	return (1);
 }
