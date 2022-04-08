@@ -37,12 +37,39 @@ static int
 	return (1);
 }
 
+static void
+	_pattern_debug_print_pattern(t_pattern_node *head)
+{
+	size_t	index;
+	size_t	size;
+
+	size = sizeof(head->chars) / sizeof(head->chars[0]);
+	while (head)
+	{
+		printf("[");
+		index = 0;
+		while (index < size)
+		{
+			if (head->chars[index])
+				printf("%c", (char) index);
+			index++;
+		}
+		head = head->next;
+		printf("]");
+	}
+	printf("\n");
+}
+
 int
 	pattern_match(const char *str, char *pattern, int *info)
 {
 	t_pattern_node	*head;
+	int				match;
 
 	head = _pattern_generate(pattern, info);
 	sh_assert(head != NULL);
-	return (_pattern_match(str, head));
+	_pattern_debug_print_pattern(head);
+	match = _pattern_match(str, head);
+	_pattern_destroy(head);
+	return (match);
 }

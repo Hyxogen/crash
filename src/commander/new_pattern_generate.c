@@ -2,6 +2,7 @@
 
 #include "memory.h"
 #include <libft.h>
+#include <stdlib.h>
 
 #define SH_PATTERN_ESCAPED	0x1
 
@@ -35,7 +36,7 @@ static void
 	_pattern_generate_body(char **pattern, int **info, t_pattern_node *current)
 {
 	if (*(*info) & SH_PATTERN_ESCAPED)
-		current->chars[(size_t) *pattern] = 0x1;
+		current->chars[(size_t) *(*pattern)] = 0x1;
 	else if (*(*pattern) == '[')
 	{
 		*info += _pattern_process_brackets(pattern, current, 0, 0);
@@ -71,9 +72,15 @@ t_pattern_node
 	return (head);
 }
 
-/* TODO implement */
 void
 	_pattern_destroy(t_pattern_node *node)
 {
-	(void) node;
+	t_pattern_node	*next;
+
+	while (node)
+	{
+		next = node->next;
+		free(node);
+		node = next;
+	}
 }

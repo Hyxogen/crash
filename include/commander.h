@@ -127,4 +127,5 @@ int				_pattern_process_char_class(char **pattern, t_pattern_node *node);
 int				_pattern_process_brackets(char **pattern, t_pattern_node *node, int moved, int local_moved);
 t_pattern_node	*_pattern_generate(char *pattern, int *info);
 int				pattern_match(const char *str, char *pattern, int *info);
+void			_pattern_destroy(t_pattern_node *node);
 #endif

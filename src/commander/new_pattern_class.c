@@ -2,30 +2,7 @@
 
 #include "memory.h"
 #include <libft.h>
-/*
-static void
-	_pattern_debug_print_pattern(t_pattern_node *head)
-{
-	size_t	index;
-	size_t	size;
 
-	size = sizeof(head->chars) / sizeof(head->chars[0]);
-	while (head)
-	{
-		printf("[");
-		index = 0;
-		while (index < size)
-		{
-			if (head->chars[index])
-				printf("%c", (char) index);
-			index++;
-		}
-		head = head->next;
-		printf("]");
-	}
-	printf("\n");
-}
-*/
 /**
  * Processes something called a collating symbols, which is (as far as I
  * understand) something to be handled as one character even though it

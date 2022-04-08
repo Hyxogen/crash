@@ -21,10 +21,12 @@ PARSER_FILES	:= \
 	pipe.c redirect.c separator.c subshell.c die.c error.c global.c
 COMMANDER_FILES	:= \
 	commander.c execvp.c pipe_sequence.c env.c redirect_process.c signal.c \
-	echo.c redirect_builtin.c exit.c run.c colon.c dot.c condition.c loop.c \
+	redirect_builtin.c run.c condition.c loop.c \
 	command.c expansion.c expand.c expand_param.c expand_command.c \
 	expand_arith.c new_pattern.c new_pattern_brackets.c new_pattern_class.c \
-	new_pattern_generate.c set.c
+	new_pattern_generate.c
+BUILTINS_FILES	:= \
+	set.c echo.c dot.c colon.c exit.c
 UTIL_FILES		:= \
 	die.c memory.c op.c util.c wrap.c strlst.c
 
@@ -34,6 +36,7 @@ FILE_NAMES		:= \
 	$(patsubst %,input/%,$(INPUT_FILES)) \
 	$(patsubst %,parser/%,$(PARSER_FILES)) \
 	$(patsubst %,commander/%,$(COMMANDER_FILES)) \
+	$(patsubst %,builtins/%,$(BUILTINS_FILES)) \
 	$(patsubst %,util/%,$(UTIL_FILES))
 
 CC				:= clang
@@ -85,12 +88,19 @@ ifndef config
 	config = debug
 endif
 
+ifndef san
+	san := address
+endif 
+
 ifeq ($(config), debug)
 	CFLAGS		+= -DSH_DEBUG=1 -g3 -O0
 	LFLAGS		+= -DSH_DEBUG=1
-	ifndef nsan
+	ifeq ($(san), address)
 		CFLAGS	+= -fsanitize=address,undefined
 		LFLAGS	+= -fsanitize=address,undefined
+	else ifeq ($(san), memory)
+		CFLAGS	+= -fsanitize=memory,undefined
+		LFLAGS	+= -fsanitize=memory,undefined
 	endif
 else ifeq ($(config), release)
 	CFLAGS		+= -g3 -O2

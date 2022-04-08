@@ -12,7 +12,8 @@ static int
 {
 	int	moved;
 
-	moved = 0;
+	moved = 1;
+	*pattern += 1;
 	if (*(*pattern) == '^')
 	{
 		node->invert = 1;
@@ -69,7 +70,7 @@ static int
 	}
 	if (*(*pattern) && *(*pattern + 1) == '-' && *(*pattern + 2))
 	{
-		if (*(*pattern + 3) && *(*pattern + 3) != ']')
+		if (*(*pattern + 2) != ']')
 		{
 			if (*(*pattern) > *(*pattern + 2)) /* TODO error or something */
 				return (0);
@@ -107,7 +108,7 @@ int
 		if (local_moved)
 		{
 			moved += local_moved;
-			continue;
+			continue ;
 		}
 		node->chars[(size_t) *(*pattern)] = 0x1;
 		*pattern += 1;
