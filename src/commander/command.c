@@ -3,9 +3,34 @@
 #include <unistd.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 #include <stdio.h>
+
+static void
+	_do_assignments(t_minishell *sh, t_snode *ass_list, int is_tmp)
+{
+	size_t	i;
+	size_t	j;
+	char	*tmp;
+
+	i = 0;
+	while (i < ass_list->childs_size)
+	{
+		j = 0;
+		while (ass_list->childs[i]->token.str[j] != '=')
+			j += 1;
+		tmp = cm_expand_str(sh, &ass_list->childs[i]->token, NULL, ' ');
+		// TODO: handle errors (tmp == NULL)
+		tmp[j] = '\0';
+		// TODO: maybe also errors for readonly stuff?
+		// TODO: temporary if there is a command name after
+		sh_setenv(sh, tmp, tmp + j + 1, is_tmp);
+		free(tmp);
+		i += 1;
+	}
+}
 
 static void
 	_sh_execvp_error_handler(const char *name, int error)

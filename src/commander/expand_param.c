@@ -135,6 +135,10 @@ int
 	expand_pattern(t_minishell *sh, t_expand *exp,
 		t_param_ctx *ctx, t_expand *tmp)
 {
+	(void) sh;
+	(void) exp;
+	(void) ctx;
+	(void) tmp;
 	// TODO: implement
 	return (-1);
 }

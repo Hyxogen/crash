@@ -83,6 +83,7 @@ RESET					:="\033[0m"
 COMPILE_COLOR			:= $(GREEN)
 LINK_COLOR				:= $(CYAN)
 OBJECT_COLOR			:= $(RED)
+CLEAN_COLOR				:= $(PURPLE)
 
 ifndef config
 	config = debug
@@ -93,7 +94,7 @@ ifndef san
 endif 
 
 ifeq ($(config), debug)
-	CFLAGS		+= -DSH_DEBUG=1 -g3 -O0
+	CFLAGS		+= -DSH_DEBUG=1 -g3 -Og
 	LFLAGS		+= -DSH_DEBUG=1
 	ifeq ($(san), address)
 		CFLAGS	+= -fsanitize=address,undefined
@@ -114,28 +115,40 @@ endif
 
 all: $(NAME) crash
 
+SILENT			:=
+
+ifndef verbose
+	SILENT		:= @
+endif
+
 $(NAME): $(OBJECTS) $(LIBFT_LIB) $(FT_PRINTF_LIB)
-	$(LINK_CMD) -o $@ $(OBJECTS) $(LIBFT_LIB) $(FT_PRINTF_LIB) $(LFLAGS) -lreadline
+	@printf $(LINK_COLOR)Linking$(RESET)\ $(OBJECT_COLOR)$(notdir $@)$(RESET)\\n
+	$(SILENT)$(LINK_CMD) -o $@ $(OBJECTS) $(LIBFT_LIB) $(FT_PRINTF_LIB) $(LFLAGS) -lreadline
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c -o $@ $< -MMD $(patsubst %,-I%,$(INC_DIR))
+	$(SILENT)mkdir -p $(@D)
+	@printf $(COMPILE_COLOR)Compiling$(RESET)\ $(notdir $<)\\n
+	$(SILENT)$(CC) $(CFLAGS) -c -o $@ $< -MMD $(patsubst %,-I%,$(INC_DIR))
 
 $(LIBFT_LIB):
-	${MAKE} -C $(LIBFT_DIR) bonus
+	$(SILENT)${MAKE} -C $(LIBFT_DIR) bonus
 
 $(FT_PRINTF_LIB):
-	${MAKE} -C $(FT_PRINTF_DIR) bonus
+	$(SILENT)${MAKE} -C $(FT_PRINTF_DIR) bonus
 
 crash: $(NAME)
-	ln -s $(NAME) $@
+	$(SILENT)ln -s $(NAME) $@
 
 clean:
-	rm -rf build
-	${MAKE} -C $(LIBFT_DIR) fclean
+	@printf $(CLEAN_COLOR)Cleaning\ object\ files\ and\ dependencies$(RESET)\\n
+	$(SILENT)rm -rf build
+	$(SILENT)${MAKE} -C $(LIBFT_DIR) fclean
+	$(SILENT)${MAKE} -C $(FT_PRINTF_DIR) fclean
 
 fclean: clean
-	rm -f $(NAME)
+	@printf $(CLEAN_COLOR)Cleaning\ output\ files$(RESET)\\n
+	$(SILENT)rm -f $(NAME)
+	$(SILENT)rm -f crash
 
 re: fclean
 	make all

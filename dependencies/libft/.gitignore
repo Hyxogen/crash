@@ -4,3 +4,4 @@
 /Libft-Tests
 *.o
 *.a
+/libft.lock

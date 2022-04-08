@@ -37,8 +37,6 @@ static int
 	lhs_str = *lhs;
 	escape_info = NULL;
 	
-	if (lhs_str == rhs_str)
-		return (0);
 	rhs_str = cm_expand_str(sh, tok, &escape_info, ' ');
 	match = pattern_match(lhs_str, rhs_str, escape_info);
 	return (!match);
@@ -50,7 +48,6 @@ pid_t
 	size_t	clauses;
 	size_t	index;
 	char	**lhs;
-	char	**rhs;
 	int		case_io[3];
 
 	(void) closefd;
