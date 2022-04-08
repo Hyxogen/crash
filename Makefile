@@ -94,8 +94,8 @@ ifndef san
 endif 
 
 ifeq ($(config), debug)
-	CFLAGS		+= -DSH_DEBUG=1 -g3 -Og
-	LFLAGS		+= -DSH_DEBUG=1
+	CFLAGS		+= -DSH_DEBUG=1 -fno-inline -g3 -Og
+	LFLAGS		+= -DSH_DEBUG=1 -fno-inline
 	ifeq ($(san), address)
 		CFLAGS	+= -fsanitize=address,undefined
 		LFLAGS	+= -fsanitize=address,undefined

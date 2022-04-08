@@ -16,6 +16,9 @@
 #include <fcntl.h>
 #include <stdio.h>
 
+
+#include <execinfo.h>
+
 int
 	sh_dup2(int fildes, int fildes2)
 {
@@ -81,8 +84,9 @@ int
 	sh_close(int fildes)
 {
 	int	ret;
-
-	ret = close(fildes);
+	
+	// TODO: FILE DESCRIPTORS! FILE DESCRIPTORS EVERYWHERE! THEY ARE COMING TO GET US! THEY NEED TO BE CLOSED! BUT NOT TWICE PLEASE!
+	ret = close(fildes); // THERE IN THE TREES MAN, IN THE TREEEES!!!!
 	sh_check(ret >= 0, "close");
 	return (ret);
 }

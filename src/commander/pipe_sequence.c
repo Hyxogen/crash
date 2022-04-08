@@ -128,8 +128,10 @@ static int
 		cmd_io[SH_STDOUT_INDEX] = pipe_io[1];
 		pid = proc(sh, cmd_node, cmd_io, pipe_io[0]); /* TODO make sure pipe_io[0] fd is closed in child */
 		if (pid > 0)
+		{
 			_cm_close_nostd(prev_out_fd);
-		_cm_close_nostd(pipe_io[1]);
+			_cm_close_nostd(pipe_io[1]);
+		}
 		ex_code = _commandeer_pipe_sequence_rec(sh, ctx, pipe_io[0], index - 1);
 		if (pid > 0)
 			sh_waitpid(pid, NULL, 0);
