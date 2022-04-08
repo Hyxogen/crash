@@ -30,7 +30,7 @@ static t_commandeer_proc
 	procs[sx_command_list] = commandeer_inner;
 	procs[sx_compound_list] = commandeer_inner;
 	procs[sx_pipe_sequence] = commandeer_pipe_sequence;
-	procs[sx_if_clause] = cm_if_clause;
+	// procs[sx_if_clause] = cm_if_clause;
 	return (procs);
 }
 

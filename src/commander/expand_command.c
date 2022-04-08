@@ -1,12 +1,13 @@
 #include "commander.h"
+#include "minishell.h"
 #include "memory.h"
 #include "parser.h"
 #include <unistd.h>
 #include <stdlib.h>
 
 // TODO: verify
-static char
-	*expand_command_fd(pid_t pid, int fd)
+int
+	expand_command_fd(t_expand *exp, pid_t pid, int fd)
 {
 	char	*str;
 	size_t	size;
@@ -27,15 +28,16 @@ static char
 	str[size] = '\0';
 	sh_close(fd);
 	sh_waitpid(pid, NULL, 0);
-	return (str);
+	expansion_add_part(exp, sh_strlst_new(str), 0);
+	return (0);
 }
 
-static char
-	*expand_backtick_int(t_minishell *sh, t_lexer *lex)
+int
+	expand_backtick_int(t_minishell *sh, t_expand *exp, t_lexer *lex)
 {
 	t_parser	pr;
 	t_snode		*node;
-	char		*result;
+	int			result;
 
 	pr_init(&pr);
 	pr.lexer = lex;
@@ -44,15 +46,15 @@ static char
 	pr_complete_cmdlst(&pr, node);
 	// TODO: more than 1 child?
 	sh_assert(node->childs_size == 1);
-	result = cm_expand_command(sh, node->childs[0]);
+	result = expand_command(sh, exp, node->childs[0]);
 	node_destroy(node);
 	pr_destroy(&pr);
 	return (result);
 }
 
 // TODO: verify
-char
-	*cm_expand_command(t_minishell *sh, t_snode *node)
+int
+	expand_command(t_minishell *sh, t_expand *exp, t_snode *node)
 {
 	pid_t	pid;
 	int		pipe_in[2];
@@ -75,22 +77,22 @@ char
 	sh_close(pipe_in[0]);
 	sh_close(pipe_in[1]);
 	sh_close(pipe_out[1]);
-	return expand_command_fd(pid, pipe_out[0]);
+	return (expand_command_fd(exp, pid, pipe_out[0]));
 }
 
-char
-	*cm_expand_backtick(t_minishell *sh, char *str)
+int
+	expand_backtick(t_minishell *sh, t_expand *exp, char *str)
 {
 	t_input		in;
 	t_source	src;
 	t_lexer		lex;
-	char		*result;
+	int			result;
 
 	input_new(&in, in_string, str);
 	src_init(&src, &in);
 	lex_init(&lex);
 	lex.src = &src;
-	result = expand_backtick_int(sh, &lex);
-	// TODO: check error
+	result = expand_backtick_int(sh, exp, &lex);
+	// TODO: check error and free resources?
 	return (result);
 }

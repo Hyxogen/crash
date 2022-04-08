@@ -22,9 +22,9 @@ PARSER_FILES	:= \
 COMMANDER_FILES	:= \
 	commander.c execvp.c pipe_sequence.c env.c redirect_process.c signal.c \
 	echo.c redirect_builtin.c exit.c run.c colon.c dot.c condition.c loop.c \
-	pattern.c command.c \
-	new_expand.c new_expand_param.c new_expand_command.c new_expand_arith.c
-# expand.c expand_param.c expand_command.c expand_pattern.c expand_special.c
+	command.c expansion.c expand.c expand_param.c expand_command.c \
+	expand_arith.c new_pattern.c new_pattern_brackets.c new_pattern_class.c \
+	new_pattern_generate.c set.c
 UTIL_FILES		:= \
 	die.c memory.c op.c util.c wrap.c strlst.c
 
@@ -127,7 +127,8 @@ clean:
 fclean: clean
 	rm -f $(NAME)
 
-re: fclean all
+re: fclean
+	make all
 
 test:
 	make CC=clang

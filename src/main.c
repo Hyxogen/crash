@@ -29,7 +29,7 @@ int
 	t_input		in;
 	char		*tmp;
 	int			fd;
-	t_builtin	builtins[4];
+	t_builtin	builtins[5];
 
 	(void) argc;
 	builtins[0].key = "echo";
@@ -40,10 +40,12 @@ int
 	builtins[2].fn = sh_dot;
 	builtins[3].key = ":";
 	builtins[3].fn = sh_colon;
+	builtins[4].key = "set";
+	builtins[4].fn = sh_set;
 	tmp = getcwd(NULL, 0);
 	sh.self = sh_join_path(tmp, argv[0]);
 	sh.builtins = builtins;
-	sh.builtins_size = 4;
+	sh.builtins_size = 5;
 	sh.args = argv;
 	sh.interactive = 1;
 	free(tmp);

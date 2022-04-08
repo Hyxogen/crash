@@ -155,5 +155,6 @@ int			sh_echo(t_minishell *sh, int argc, char **argv, const int io[3]);
 int			sh_exit(t_minishell *sh, int argc, char **argv, const int io[3]);
 int			sh_dot(t_minishell *sh, int argc, char **argv, const int io[3]);
 int			sh_colon(t_minishell *sh, int argc, char **argv, const int io[3]);
+int			sh_set(t_minishell *sh, int argc, char **argv, const int io[3]);
 
 #endif

@@ -52,7 +52,7 @@ TODO: Check this:
 /* TODO implement no wordlist */
 /* TODO setup redirects */
 pid_t
-	cm_for_clause(t_minishell *sh, t_snode *fornode, const int io[3])
+	cm_for_clause(t_minishell *sh, t_snode *fornode, const int io[3], int closefd)
 {
 	char	*name;
 	char	**list;
@@ -60,6 +60,7 @@ pid_t
   int   for_io[3];
 	t_snode	*do_node;
 
+  (void) closefd;
 	name = fornode->token.str;
 	list = cm_word_list_to_array(sh, fornode->childs[0]);
 	do_node = fornode->childs[1];

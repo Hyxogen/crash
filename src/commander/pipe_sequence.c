@@ -121,12 +121,13 @@ static t_cm_cmd_proc
 }
 
 pid_t
-	cm_unimplemented_cmd_command(t_minishell *sh, t_snode *node, const int io[3])
+	cm_unimplemented_cmd_command(t_minishell *sh, t_snode *node, const int io[3], int closefd)
 {
 	(void) sh;
 	(void) node;
 	(void) io;
 
+	(void) closefd;
 	fprintf(stderr, "Executing this command type is not implemented yet\n");
 	return (-1);
 }

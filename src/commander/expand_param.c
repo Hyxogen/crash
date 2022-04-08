@@ -1,108 +1,12 @@
 #include "commander.h"
+#include "minishell.h"
+#include "memory.h"
+#include "ft_printf.h"
 #include <stdlib.h>
-
-
-#include <stdio.h>
-
-static char
-	**param_expand(t_minishell *sh, t_token *token, size_t i)
-{
-	char	**result;
-
-	token->parts[0].data = (char*) token->parts[0].data + i;
-	result = cm_expand(sh, token, 1);
-	token->parts[0].data = (char*) token->parts[0].data - i;
-	return (result);
-}
-
-static void
-	param_error(t_minishell *sh, t_token *token, const char *key, size_t i)
-{
-	char		**exp;
-	char		*str;
-	(void)		key;
-
-	exp = param_expand(sh, token, i);
-	str = sh_strlst_join(exp, ' ');
-	fprintf(stderr, "CraSH: %s: %s\n", key, str); // TODO: not use fprintf
-	sh_strlst_clear(exp);
-	free(str);
-	if (!sh->interactive)
-		exit(EXIT_FAILURE);
-	sh_assert(0);
-}
-
-static char
-	**param_assign(t_minishell *sh, t_token *token, const char *key, size_t i)
-{
-	char	**str;
-	char	*tmp;
-
-	if (key[0] == '*'
-		|| key[0] == '@'
-		|| key[0] == '#'
-		|| key[0] == '?'
-		|| key[0] == '-'
-		|| key[0] == '$'
-		|| key[0] == '!'
-		|| ft_isdigit(key[0]))
-	{
-		// TODO: cannot assign
-		return (NULL);
-	}
-	str = param_expand(sh, token, i);
-	tmp = sh_strlst_join(str, ' ');
-	sh_strlst_clear(str);
-	sh_setenv(sh, key, tmp, 0);
-	return (sh_strlst_new(tmp));
-}
-
-static int
-	param_empty(char **var, int empty_is_null)
-{
-	if (var == NULL || var[0] == NULL)
-		return (1);
-	if (var[0][0] == '\0' && empty_is_null)
-		return (1);
-	return (0);
-}
-
-static char
-	**param_promote(char **str)
-{
-	if (str == NULL)
-		return (sh_strlst_new(ft_strdup("")));
-	return (str);
-}
-
-static char
-	**param_subst(t_minishell *sh, t_token *token, char *key, size_t i)
-{
-	char	**str;
-	int		empty;
-
-	str = cm_expand_special(sh, key);
-	if (token->str[i] == '\0')
-		return (param_promote(str));
-	if (token->str[i] == '%' || token->str[i] == '#')
-		return (param_pattern(sh, token, str, i));
-	empty = param_empty(str, token->str[i] == ':');
-	i += token->str[i] == ':';
-	if ((token->str[i] == '-' && !empty)
-		|| (token->str[i] == '+' && empty))
-		return (param_promote(str));
-	sh_strlst_clear(str);
-	if (token->str[i] == '+' || token->str[i] == '-')
-		return (param_expand(sh, token, i + 1));
-	if (token->str[i] == '?')
-		return (param_error(sh, token, key, i + 1), NULL);
-	if (token->str[i] == '=')
-		return (param_assign(sh, token, key, i + 1));
-	return (NULL);
-}
+#include <unistd.h>
 
 size_t
-	param_length(const char *param)
+	expand_key_length(const char *param)
 {
 	size_t	i;
 
@@ -124,29 +28,183 @@ size_t
 	return (i);
 }
 
-char
-	**cm_expand_param(t_minishell *sh, t_token *token)
+int
+	expand_empty(t_expand *exp, int empty_is_null)
 {
-	char	**var;
-	char	*key;
-	size_t	i;
-	char	**str;
+	if (exp->count == 0 || exp->parts[0].str[0] == NULL)
+		return (1);
+	if (exp->parts[0].str[0][0] == '\0'
+		&& exp->parts[0].str[1] == NULL
+		&& empty_is_null)
+		return (1);
+	return (0);
+}
 
+size_t
+	expand_length(t_expand *exp)
+{
+	size_t	i;
+
+	if (exp->count == 0)
+		return (0);
+	i = 0;
+	if (exp->parts[0].array)
+		while (exp->parts[0].str[i] != NULL)
+			i += 1;
+	else
+		while (exp->parts[0].str[0][i] != '\0')
+			i += 1;
+	return (i);
+}
+
+int
+	expand_special(t_minishell *sh, t_expand *exp, char *key)
+{
+	char	*result;
+
+	// TODO: special parameters
+	if (key[0] == '@')
+	{
+		expansion_add_part(exp, sh_strlst_dup(sh->args + 1), 0);
+		exp->parts[exp->count - 1].array = 1;
+		return (0);
+	}
+	result = sh_getenv(sh, key, NULL);
+	if (result == NULL)
+		return (-1);
+	expansion_add_part(exp, sh_strlst_new(ft_strdup(result)), 0);
+	return (0);
+}
+
+int
+	expand_error(t_minishell *sh, t_param_ctx *ctx, size_t i)
+{
+	char	*str;
+
+	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + i;
+	str = cm_expand_str(sh, ctx->token, NULL, ' ');
+	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data - i;
+	// TODO: print basic error if token empty
+	ft_fprintf(STDERR_FILENO, "CraSH: %s: %s", ctx->key, str);
+	free(str);
+	if (!sh->interactive)
+		exit(EXIT_FAILURE);
+	return (-1);
+}
+
+int
+	expand_assign(t_minishell *sh, t_expand *exp, t_param_ctx *ctx, size_t i)
+{
+	char	*str;
+
+	if (ctx->key[0] == '*'
+		|| ctx->key[0] == '@'
+		|| ctx->key[0] == '#'
+		|| ctx->key[0] == '?'
+		|| ctx->key[0] == '-'
+		|| ctx->key[0] == '$'
+		|| ctx->key[0] == '!'
+		|| ft_isdigit(ctx->key[0]))
+	{
+		// TODO: cannot assign
+		return (-1);
+	}
+	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + i;
+	str = cm_expand_str(sh, ctx->token, NULL, ' ');
+	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data - i;
+	sh_setenv(sh, ctx->key, str, 0);
+	expansion_add_part(exp, sh_strlst_new(str), 0);
+	return (0);
+}
+
+int
+	expand_right(t_minishell *sh, t_expand *exp, t_param_ctx *ctx, size_t i)
+{
+	t_expand	tmp;
+	int			result;
+
+	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + i;
+	result = cm_expand_list(sh, &tmp, ctx->token);
+	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data - i;
+	expansion_copy_parts(exp, &tmp);
+	expansion_destroy(&tmp);
+	return (result);
+}
+
+int
+	expand_pattern(t_minishell *sh, t_expand *exp,
+		t_param_ctx *ctx, t_expand *tmp)
+{
+	// TODO: implement
+	return (-1);
+}
+
+int
+	expand_promote(t_expand *exp, t_expand *tmp)
+{
+	if (tmp->count == 0)
+		expansion_add_part(exp, sh_strlst_new(ft_strdup("")), 0);
+	else
+		expansion_copy_parts(exp, tmp);
+	expansion_destroy(tmp);
+	return (0);
+}
+
+int
+	expand_subst(t_minishell *sh, t_expand *exp, t_param_ctx *ctx)
+{
+	t_expand	tmp;
+	int			empty;
+
+	expansion_init(&tmp);
+	expand_special(sh, &tmp, ctx->key);
+	if (ctx->token->str[ctx->i] == '\0')
+		return (expand_promote(exp, &tmp));
+	if (ctx->token->str[ctx->i] == '%' || ctx->token->str[ctx->i] == '#')
+		return (expand_pattern(sh, exp, ctx, &tmp));
+	empty = expand_empty(&tmp, ctx->token->str[ctx->i] == ':');
+	ctx->i += ctx->token->str[ctx->i] == ':';
+	if (ctx->token->str[ctx->i] == '+' && empty
+		&& tmp.count == 1 && tmp.parts[0].array)
+		return (expansion_add_part(exp, sh_strlst_empty(), 0), 0);
+	if ((ctx->token->str[ctx->i] == '-' && !empty)
+		|| (ctx->token->str[ctx->i] == '+' && empty))
+		return (expand_promote(exp, &tmp));
+	expansion_destroy(&tmp);
+	if (ctx->token->str[ctx->i] == '+' || ctx->token->str[ctx->i] == '-')
+		return (expand_right(sh, exp, ctx, ctx->i + 1));
+	if (ctx->token->str[ctx->i] == '?')
+		return (expand_error(sh, ctx, ctx->i + 1));
+	if (ctx->token->str[ctx->i] == '=')
+		return (expand_assign(sh, exp, ctx, ctx->i + 1));
+	return (-1);
+}
+
+int
+	expand_param(t_minishell *sh, t_expand *exp, t_token *token)
+{
+	t_expand	tmp;
+	t_param_ctx	ctx;
+	int			result;
+
+	ctx.token = token;
 	if (token->str[0] == '#' && (token->str[1] != '#'
 		|| token->str[2] == '\0'))
 	{
-		i = param_length(token->str + 1) + 1;
-		if (token->str[i] != '\0')
-			return (NULL);
-		var = cm_expand_special(sh, token->str + 1);
-		if (var == NULL || var[0] == NULL || var[1] != NULL)
-			return (sh_strlst_new(ft_strdup("0")));
-		return (sh_strlst_new(ft_itoa(ft_strlen(var[0]))));
+		ctx.i = expand_key_length(token->str + 1) + 1;
+		if (token->str[ctx.i] != '\0')
+			return (-1);
+		expansion_init(&tmp);
+		expand_special(sh, &tmp, token->str + 1);
+		expansion_add_part(exp,
+			sh_strlst_new(ft_itoa(expand_length(&tmp))), 0);
+		expansion_destroy(&tmp);
+		return (0);
 	}
-	i = param_length(token->str);
-	key = ft_strdup(token->str);
-	key[i] = '\0';
-	str = param_subst(sh, token, key, i);
-	free(key);
-	return (str);
+	ctx.i = expand_key_length(token->str);
+	ctx.key = ft_strdup(token->str);
+	ctx.key[ctx.i] = '\0';
+	result = expand_subst(sh, exp, &ctx);
+	free(ctx.key);
+	return (result);
 }

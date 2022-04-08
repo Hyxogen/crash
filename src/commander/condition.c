@@ -9,7 +9,7 @@
 
 /* TODO setup redirects */
 pid_t
-	cm_if_clause(t_minishell *sh, t_snode *ifnode, const int io[3])
+	cm_if_clause(t_minishell *sh, t_snode *ifnode, const int io[3], int closefd)
 {
 	int	rc;
 
@@ -18,7 +18,7 @@ pid_t
 	if (!rc)
 		return (cm_convert_retcode(commandeer(sh, ifnode->childs[1], io)));
 	if (ifnode->childs_size >= 3 && ifnode->childs[2]->type == sx_if_clause)
-		return (cm_if_clause(sh, ifnode->childs[2], io));
+		return (cm_if_clause(sh, ifnode->childs[2], io, closefd));
 	else if (ifnode->childs_size >= 3)
 		return (cm_convert_retcode(commandeer(sh, ifnode->childs[2], io)));
 	return (cm_convert_retcode(0));
@@ -31,7 +31,7 @@ static int
 {
 	char	*lhs_str;
 	char	*rhs_str;
-	char	*escape_info;
+	int		*escape_info;
 	int		match;
 
 	lhs_str = *lhs;
@@ -39,14 +39,14 @@ static int
 	
 	if (lhs_str == rhs_str)
 		return (0);
-	escape_info = sh_safe_malloc(ft_strlen(rhs_str)); /* TODO setup actual escape info */
-	match = match_pattern(lhs_str, rhs_str, escape_info);
+	escape_info = sh_safe_malloc(sizeof(*escape_info) * ft_strlen(rhs_str)); /* TODO setup actual escape info */
+	match = pattern_match(lhs_str, rhs_str, escape_info);
 	printf("lhs:\"%s\" rhs:\"%s\" match:%d\n", lhs_str, rhs_str, match);
 	return (!match);
 }
 
 pid_t
-	cm_case_clause(t_minishell *sh, t_snode *node, const int io[3])
+	cm_case_clause(t_minishell *sh, t_snode *node, const int io[3], int closefd)
 {
 	size_t	clauses;
 	size_t	index;
@@ -54,6 +54,7 @@ pid_t
 	char	**rhs;
 	int		case_io[3];
 
+	(void) closefd;
 	sh_assert(node->type == sx_case_clause);
 	clauses = node->childs_size - 1;
 	lhs = cm_expand(sh, &node->token); // TODO use cm_expand_str instead
