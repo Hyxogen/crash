@@ -38,6 +38,7 @@ void
 	lex->error = 0;
 	lex->end = NULL;
 	lex->here_flags = 0;
+	lex->new_part = 1;
 }
 
 void
