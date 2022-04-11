@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+// TODO: $(kdaushdf) doesn't work
+
 int
 	expand_command_fd(t_expand *exp, pid_t pid, int fd)
 {

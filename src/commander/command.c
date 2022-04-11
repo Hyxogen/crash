@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 
-static void
+static int
 	_do_assignments(t_snode *ass_list, int is_tmp)
 {
 	size_t	i;
@@ -22,14 +22,17 @@ static void
 		while (ass_list->childs[i]->token.str[j] != '=')
 			j += 1;
 		tmp = cm_expand_str(&ass_list->childs[i]->token, NULL, ' ');
-		if (tmp != NULL)
+		if (tmp == NULL)
 		{
-			tmp[j] = '\0';
-			sh_setenv(tmp, tmp + j + 1, is_tmp);
-			free(tmp);
+			sh_env_clean();
+			return (-1);
 		}
+		tmp[j] = '\0';
+		sh_setenv(tmp, tmp + j + 1, is_tmp);
+		free(tmp);
 		i += 1;
 	}
+	return (0);	
 }
 
 static void
@@ -90,7 +93,8 @@ static pid_t
 		sh_dup2(ctx->io[SH_STDIN_INDEX], STDIN_FILENO);
 		sh_dup2(ctx->io[SH_STDOUT_INDEX], STDOUT_FILENO);
 		sh_dup2(ctx->io[SH_STDERR_INDEX], STDERR_FILENO);
-		_cm_setup_process_redirects(ctx->cmd_node->childs[1]);
+		if (_cm_setup_process_redirects(ctx->cmd_node->childs[1]))
+			exit(1);
 		if (ctx->io[SH_STDIN_INDEX] != STDIN_FILENO)
 			sh_close(ctx->io[SH_STDIN_INDEX]);
 		if (ctx->io[SH_STDOUT_INDEX] != STDOUT_FILENO)
@@ -111,12 +115,11 @@ pid_t
 	pid_t				ret;
 
 	ctx.args = cm_word_list_to_array(cmd_node->childs[0]);
-	_do_assignments(cmd_node->childs[2], !!ctx.args[0]);
+	if (ctx.args == 0 || _do_assignments(cmd_node->childs[2], !!ctx.args[0]))
+		return (cm_convert_retcode(1));
 	if (!ctx.args[0])
-		return (-1); /* TODO Should this be handled differenlty? */
-	ctx.io[SH_STDIN_INDEX] = io[SH_STDIN_INDEX];
-	ctx.io[SH_STDOUT_INDEX] = io[SH_STDOUT_INDEX];
-	ctx.io[SH_STDERR_INDEX] = io[SH_STDERR_INDEX];
+		return (cm_convert_retcode(0));
+	ft_memcpy(ctx.io, io, sizeof(ctx.io));
 	ctx.cmd_node = cmd_node;
 	ctx.closefd = closefd;
 	i = 0;

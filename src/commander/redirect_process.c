@@ -85,7 +85,6 @@ static int
 	return (sh_dup2(target_fd, from_fd) < 0);
 }
 
-/* TODO implement */
 static int
 	_cm_handle_here_redi(t_snode *redi_node)
 {
@@ -93,8 +92,9 @@ static int
 	int		here_pipe[2];
 	pid_t	pid;
 
-	// TODO: check error
 	str = cm_expand_str(&redi_node->childs[0]->here_content, NULL, ' ');
+	if (str == NULL)
+		return (-1);
 	sh_pipe(here_pipe);
 	sh_dup2(here_pipe[0], STDIN_FILENO);
 	pid = sh_fork();
@@ -171,7 +171,9 @@ static int
 	if (redi_node->childs_size == 0)
 		return (sh_err1("no file specified"), 1);
 	filen = cm_expand(&redi_node->childs[0]->token);
-	if (!filen || !*filen || *(filen + 1))
+	if (!filen)
+		return (-1);
+	if (!*filen || *(filen + 1))
 		return (sh_err1("ambiguous redirect"), 1);
 	return (_cm_handle_redi_node_noerr(redi_node, *filen));
 }
@@ -189,12 +191,9 @@ int
 	while (index < size)
 	{
 		node = redi_list->childs[index];
-		rc  = _cm_handle_redi_node(node);
+		rc = _cm_handle_redi_node(node);
 		if (rc)
-		{
-			sh_err1("failed to set up redirect");
 			return (rc);
-		}
 		index++;
 	}
 	return (0);

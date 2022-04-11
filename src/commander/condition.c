@@ -34,6 +34,8 @@ static int
 	escape_info = NULL;
 	
 	rhs_str = cm_expand_str(tok, &escape_info, ' ');
+	if (rhs_str == NULL)
+		return (-1);
 	match = pattern_match(lhs, rhs_str, escape_info);
 	return (!match);
 }
@@ -45,18 +47,24 @@ pid_t
 	size_t	index;
 	char	*lhs;
 	int		case_io[3];
+	int		cmp;
 
 	(void) closefd;
 	sh_assert(node->type == sx_case_clause);
 	clauses = node->childs_size - 1;
 	lhs = cm_expand_str(&node->token, NULL, ' ');
+	if (!lhs)
+		return (cm_convert_retcode(1));
 	index = 0;
 	ft_memcpy(case_io, io, sizeof(int) * 3);
 	_cm_setup_builtin_redirects(node->childs[node->childs_size - 1], case_io);
 	while (index < clauses)
 	{
-		if (!_cm_strlst_cmp(lhs, &node->childs[index]->token))
+		cmp = _cm_strlst_cmp(lhs, &node->childs[index]->token);
+		if (!cmp)
 			return (cm_convert_retcode(commandeer(node->childs[index], io)));
+		else if (cmp < 0)
+			return (cm_convert_retcode(1));
 		index++;
 	}
 	return (cm_convert_retcode(0));

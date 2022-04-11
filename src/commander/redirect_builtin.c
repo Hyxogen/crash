@@ -150,7 +150,9 @@ static int
 		return (sh_err1("no file specified"), -1);
 	sh_assert(redi_node->childs[0]->token.id != tk_invalid);
 	filen = cm_expand(&redi_node->childs[0]->token);
-	if (!filen || !*filen || *(filen + 1))
+	if (!filen)
+		return (-1);
+	if (!*filen || *(filen + 1))
 		return (sh_err1("ambigious redirect"), -1);
 	return (_cm_handle_redi_node_noerr(redi_node, *filen, io));
 }

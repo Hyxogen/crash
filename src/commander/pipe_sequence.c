@@ -69,11 +69,13 @@ char **cm_word_list_to_array(t_snode *word_list)
 	{
 		tmp = cm_expand(&word_list->childs[i]->token);
 		j = 0;
-		while (tmp[j] != NULL)
+		if (tmp == NULL)
 		{
-			ret = _array_add(ret, tmp[j]);
-			j += 1;
+			sh_strlst_clear(ret);
+			return (NULL);
 		}
+		while (tmp[j] != NULL)
+			ret = _array_add(ret, tmp[j++]);
 		free(tmp);
 		i += 1;
 	}
