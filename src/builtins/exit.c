@@ -1,4 +1,5 @@
 #include "commander.h"
+#include "ft_printf.h"
 
 #include <libft.h>
 #include <stdio.h>
@@ -44,12 +45,14 @@ int
 		exit(0);
 	if (argc >= 3)
 	{
-		dprintf(io[SH_STDERR_INDEX], "exit: too many arguments\n");
+		// TODO: use shell name from argv[0]
+		ft_fprintf(io[SH_STDERR_INDEX], "exit: too many arguments\n");
 		exit(0);
 	}
 	if (sh_atol(argv[1], &ex_code) < 0)
 	{
-		dprintf(io[SH_STDERR_INDEX], "exit: numeric argument required\n");
+		// TODO: use shell name from argv[0]
+		ft_fprintf(io[SH_STDERR_INDEX], "exit: numeric argument required\n");
 		exit(0);
 	}
 	exit(ex_code);

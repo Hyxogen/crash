@@ -1,6 +1,8 @@
 #include "minishell.h"
 #include "commander.h"
 #include "parser.h"
+#include "ft_printf.h"
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -55,7 +57,7 @@ int
 			commandeer(sh, node, std_io);
 		node_destroy(node);
 		if (pr.lexer->error)
-			printf("Syntax error\n");
+			ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: Syntax error\n", sh->name);
 	}
 	pr_destroy(&pr);
 	// TODO: errors?

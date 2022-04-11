@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "ft_printf.h"
 
 #include <signal.h>
 #include <stdlib.h>
@@ -30,7 +31,9 @@ void
 {
 	if (!test)
 	{
-		printf("Assertion failed!\n");
+		// TODO: use shell name from argv[0]
+		// TODO: use stderr from t_minishell
+		ft_fprintf(STDERR_FILENO, "Assertion failed!\n");
 		exit(EXIT_FAILURE);
 	}
 }
@@ -40,6 +43,8 @@ void
 {
 	if (!test)
 	{
+		// TODO: use shell name from argv[0]
+		// TODO: use stderr from t_minishell
 		perror(s);
 		exit(EXIT_FAILURE);
 	}

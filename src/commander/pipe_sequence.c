@@ -11,9 +11,10 @@
 /* ************************************************************************** */
 
 #include "commander.h"
-
+#include "ft_printf.h"
 #include "minishell.h"
 #include "memory.h"
+
 #include <unistd.h>
 #include <signal.h>
 #include <errno.h>
@@ -104,47 +105,110 @@ pid_t
 	(void) io;
 
 	(void) closefd;
-	fprintf(stderr, "Executing this command type is not implemented yet\n");
+	ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: Executing this command type is not implemented yet\n", sh->name);
 	return (-1);
 }
 
-static int
-	_commandeer_pipe_sequence_rec(t_minishell *sh, const t_pipe_ctx *ctx, int prev_out_fd, size_t index)
+static void
+	print_open(void)
 {
-	pid_t			pid;
-	int				cmd_io[3];
-	int				pipe_io[2];
-	t_snode			*cmd_node;
-	t_cm_cmd_proc	proc;
-	int				ex_code;
-
-	ft_memcpy(cmd_io, ctx->io, sizeof(int) * 3);
-	cmd_node = ctx->pipe_node->childs[ctx->pipe_node->childs_size - index];
-	cmd_io[SH_STDIN_INDEX] = prev_out_fd;
-	proc = _get_commandeer_cmd_procs()[cmd_node->type - sx_simple_cmd];
-	if (index != 1)
-	{
-		sh_pipe(pipe_io);
-		cmd_io[SH_STDOUT_INDEX] = pipe_io[1];
-		pid = proc(sh, cmd_node, cmd_io, pipe_io[0]); /* TODO make sure pipe_io[0] fd is closed in child */
-		if (pid > 0)
-		{
-			_cm_close_nostd(prev_out_fd);
-			_cm_close_nostd(pipe_io[1]);
+	int	i;
+	int count;
+	
+	count = 0;
+	for (i = 0; i < OPEN_MAX; i++) {
+		if (fcntl(i, F_GETFD) < 0) {
+			if (errno != EBADF)
+				fprintf(stderr, "Error\n");
+		} else {
+			printf("%d OPEN; ", i);
+			count++;
 		}
-		ex_code = _commandeer_pipe_sequence_rec(sh, ctx, pipe_io[0], index - 1);
-		if (pid > 0)
-			sh_waitpid(pid, NULL, 0);
-		return (ex_code);
 	}
-	pid = proc(sh, cmd_node, cmd_io, -1);
-	if (pid > 0)
+	printf("\n%d/%d open\n", count, OPEN_MAX);
+}
+
+static pid_t
+	_cm_cmd(t_minishell *sh, t_snode *node, int in, int out)
+{
+	int				io[3];
+	t_cm_cmd_proc	proc;
+
+	io[SH_STDIN_INDEX] = in;
+	io[SH_STDOUT_INDEX] = out;
+	io[SH_STDERR_INDEX] = STDERR_FILENO;
+	proc = _get_commandeer_cmd_procs()[node->type - sx_simple_cmd];
+	return (proc(sh, node, io, -1));
+}
+
+static int
+	_cm_pipe_sequence_wait(pid_t last_process)
+{
+	pid_t	pid;
+	int		return_code;
+	int		status_code;
+
+	if (last_process <= 0)
+		return_code = cm_convert_retcode(last_process);
+	while (1)
 	{
-		_cm_close_nostd(cmd_io[SH_STDIN_INDEX]);
-		waitpid(pid, &ex_code, 0);
-		return (_get_exit_code(ex_code));
+		pid = waitpid(0, &status_code, WUNTRACED);
+		if (pid < 0)
+		{
+			sh_assert(errno == ECHILD);
+			return (return_code);
+		}
+		if (pid == last_process)
+			return_code = _get_exit_code(status_code);
 	}
-	return (-(pid + 1));
+	sh_assert(0);
+	return (-1);
+}
+
+/* Will not close begin_in and end_out */
+/* TODO make sure that child process also don't close begin_in and end_out */
+/* Check fd leak
+> echo Hallo | if true; then cat; fi
+> ./fdcheck
+Will slowly build up more and more fds
+
+> ./fdcheck 1>&2 | ./fdcheck 1>&2 | ./fdcheck
+0 OPEN; 1 OPEN; 2 OPEN; 3 OPEN; 12 OPEN; 25 OPEN; 26 OPEN; 
+7/10240 open
+0 OPEN; 1 OPEN; 2 OPEN; 4 OPEN; 12 OPEN; 25 OPEN; 26 OPEN; 
+7/10240 open
+0 OPEN; 1 OPEN; 2 OPEN; 12 OPEN; 25 OPEN; 26 OPEN; 
+*/
+static int
+	_cm_pipe_sequence_iter(t_minishell *sh, t_snode *node, const int begin_in, const int end_out)
+{
+	pid_t			last_process;
+	size_t			count;
+	size_t			index;
+	int				prev_out;
+	int				pipe_io[2];
+
+	index = 0;
+	count = node->childs_size;
+	prev_out = begin_in;
+	while (index < count)
+	{
+		if (index + 1 >= count)
+			last_process = _cm_cmd(sh, node->childs[index], prev_out, end_out);
+		else
+		{
+			sh_pipe(pipe_io);
+			_cm_cmd(sh, node->childs[index], prev_out, pipe_io[1]);
+			if (prev_out != begin_in)
+				sh_close(prev_out);
+			prev_out = pipe_io[0];
+			sh_close(pipe_io[1]);
+		}
+		index++;
+	}
+	if (prev_out != begin_in)
+		sh_close(prev_out);
+	return (_cm_pipe_sequence_wait(last_process));
 }
 
 int
@@ -158,7 +222,7 @@ int
 	ctx.pipe_node = seq_node;
 	ft_memcpy(ctx.io, io, sizeof(int) * 3);
 	cm_disable_reaper(sh);
-	rc = _commandeer_pipe_sequence_rec(sh, &ctx, io[STDIN_FILENO], seq_node->childs_size);
+	rc = _cm_pipe_sequence_iter(sh, seq_node, io[SH_STDIN_INDEX], io[SH_STDOUT_INDEX]);
 	cm_enable_reaper(sh);
 	return (rc);
 }

@@ -24,21 +24,17 @@ pid_t
 	return (cm_convert_retcode(0));
 }
 
-/* TODO handle lists */
-/* TODO handle pattern matching */
 static int
-	_cm_strlst_cmp(t_minishell *sh, char **lhs, t_token *tok)
+	_cm_strlst_cmp(t_minishell *sh, char *lhs, t_token *tok)
 {
-	char	*lhs_str;
 	char	*rhs_str;
 	int		*escape_info;
 	int		match;
 
-	lhs_str = *lhs;
 	escape_info = NULL;
 	
 	rhs_str = cm_expand_str(sh, tok, &escape_info, ' ');
-	match = pattern_match(lhs_str, rhs_str, escape_info);
+	match = pattern_match(lhs, rhs_str, escape_info);
 	return (!match);
 }
 
@@ -47,19 +43,18 @@ pid_t
 {
 	size_t	clauses;
 	size_t	index;
-	char	**lhs;
+	char	*lhs;
 	int		case_io[3];
 
 	(void) closefd;
 	sh_assert(node->type == sx_case_clause);
 	clauses = node->childs_size - 1;
-	lhs = cm_expand(sh, &node->token); // TODO use cm_expand_str instead
+	lhs = cm_expand_str(sh, &node->token, NULL, ' ');
 	index = 0;
 	ft_memcpy(case_io, io, sizeof(int) * 3);
 	_cm_setup_builtin_redirects(sh, node->childs[node->childs_size - 1], case_io);
 	while (index < clauses)
 	{
-		// rhs = cm_expand(sh, &node->childs[index]->token); // TODO use cm_expand_str instead
 		if (!_cm_strlst_cmp(sh, lhs, &node->childs[index]->token))
 			return (cm_convert_retcode(commandeer(sh, node->childs[index], io)));
 		index++;

@@ -19,8 +19,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <stdio.h>
-
-/* TODO fix ": $(echo hallo)" */
+#include <libgen.h>
 
 int
 	main(int argc, char **argv, char **envp)
@@ -48,6 +47,8 @@ int
 	sh.builtins_size = 5;
 	sh.args = argv;
 	sh.interactive = 1;
+	tmp = ft_strdup(argv[0]);
+	sh.name = basename(tmp); // TODO: can't use basename
 	free(tmp);
 	sh_env_init(&sh, envp);
 	cm_enable_reaper(&sh);

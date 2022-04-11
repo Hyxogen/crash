@@ -1,4 +1,5 @@
 #include "commander.h"
+#include "ft_printf.h"
 
 #include <unistd.h>
 #include <errno.h>
@@ -22,12 +23,12 @@ static void
 		while (ass_list->childs[i]->token.str[j] != '=')
 			j += 1;
 		tmp = cm_expand_str(sh, &ass_list->childs[i]->token, NULL, ' ');
-		// TODO: handle errors (tmp == NULL)
-		tmp[j] = '\0';
-		// TODO: maybe also errors for readonly stuff?
-		// TODO: temporary if there is a command name after
-		sh_setenv(sh, tmp, tmp + j + 1, is_tmp);
-		free(tmp);
+		if (tmp != NULL)
+		{
+			tmp[j] = '\0';
+			sh_setenv(sh, tmp, tmp + j + 1, is_tmp);
+			free(tmp);
+		}
 		i += 1;
 	}
 }
@@ -37,17 +38,23 @@ static void
 {
 	if (error == ENOENT)
 	{
-		fprintf(stderr, "CraSH: Could not find executable: \"%s\"\n", name);
+		// TODO: use shell name from argv[0]
+		// TODO: use stderr from t_minishell?
+		ft_fprintf(STDERR_FILENO, "CraSH: Could not find executable: \"%s\"\n", name);
 		exit(127);
 	}
 	else if (error == EACCES)
 	{
-		fprintf(stderr, "CraSH: \"%s\" permission denied\n", name);
+		// TODO: use shell name from argv[0]
+		// TODO: use stderr from t_minishell?
+		ft_fprintf(STDERR_FILENO, "CraSH: \"%s\" permission denied\n", name);
 		exit(127);
 	}
 	else
 	{
-		fprintf(stderr,
+		// TODO: use shell name from argv[0]
+		// TODO: use stderr from t_minishell?
+		ft_fprintf(STDERR_FILENO,
 			"CraSH: An unknown error ocurred in attempting to execute: \"%s\". Crashing.\n%s\n", name, strerror(error));
 		sh_abort();
 	}   
@@ -64,9 +71,6 @@ static pid_t
 		argc += 1;
 	_cm_setup_builtin_redirects(sh, ctx->cmd_node->childs[1], ctx->io);
 	rc = proc(sh, argc, ctx->args, ctx->io);
-	_cm_close_nostd(ctx->io[SH_STDIN_INDEX]);
-	_cm_close_nostd(ctx->io[SH_STDOUT_INDEX]);
-	_cm_close_nostd(ctx->io[SH_STDERR_INDEX]);
 	return (cm_convert_retcode(rc));
 }
 

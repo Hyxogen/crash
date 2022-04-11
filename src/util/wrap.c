@@ -85,8 +85,7 @@ int
 {
 	int	ret;
 	
-	// TODO: FILE DESCRIPTORS! FILE DESCRIPTORS EVERYWHERE! THEY ARE COMING TO GET US! THEY NEED TO BE CLOSED! BUT NOT TWICE PLEASE!
-	ret = close(fildes); // THERE IN THE TREES MAN, IN THE TREEEES!!!!
+	ret = close(fildes);
 	sh_check(ret >= 0, "close");
 	return (ret);
 }
@@ -101,6 +100,8 @@ int
 		ret = open(path, oflag, mode);
 	else
 		ret = open(path, oflag);
+	// TODO: use shell name from argv[0]
+	// TODO: use sh_check?
 	if (ret <= 0)
 		perror("CraSH");
 	return (ret);

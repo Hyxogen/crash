@@ -11,8 +11,10 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "commander.h"
 #include "libft.h"
 #include "memory.h"
+#include "ft_printf.h"
 #include <stdlib.h>
 
 t_envvar
@@ -72,7 +74,8 @@ t_envvar
 	var = sh_getenv_int(sh, key, 1);
 	if (var->attr & SH_ENV_READONLY)
 	{
-		// TODO: error
+		ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: %s: readonly variable\n", sh->name, key);
+		return (NULL);
 	}
 	if (tmp)
 		var->tmp_value = ft_strdup(value);

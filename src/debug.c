@@ -269,6 +269,7 @@ static t_snode
 	return (child);
 }
 
+// TODO: remove or normalize
 int
 	main(int argc, char **argv, char **envp)
 {
@@ -317,6 +318,8 @@ int
 			commandeer(&sh, node, std_io);
 		}
 		node_destroy(node);
+		// TODO: use shell name from argv[0]
+		// TODO: use stderr from t_minishell
 		if (pr.lexer->error)
 			printf("Syntax error\n");
 		sh_assert(!pr.lexer->error);

@@ -1,4 +1,5 @@
 #include "commander.h"
+#include "ft_printf.h"
 
 #include <libft.h>
 #include <stdio.h>
@@ -11,7 +12,8 @@ static int
 {
 	if (ft_putstr_fd((char*) str, io[SH_STDOUT_INDEX]) < 0)
 	{
-		dprintf(io[SH_STDERR_INDEX], "echo(%d): %s\n", errno, strerror(errno)); /* TODO replace with own printf */
+		// TODO: use shell name from argv[0]
+		ft_fprintf(io[SH_STDERR_INDEX], "echo(%d): %s\n", errno, strerror(errno));
 		return (-1);
 	}
 	return (0);

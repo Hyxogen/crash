@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "commander.h"
+#include "ft_printf.h"
 
 #include <libft.h>
 #include <stdio.h>
@@ -46,7 +47,7 @@ static int
 		from_fd = ft_atol(redi_node->token.str);
 		if (from_fd < 0 || from_fd >= INT_MAX)
 		{
-			fprintf(stderr, "CraSH: Invalid file descriptor\n");
+			ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: Invalid file descriptor\n", sh->name);
 			return (0);
 		}
 	}
@@ -67,7 +68,7 @@ static int
 		return (sh_close(from_fd), 0);
 	target_fd = ft_atol(word);
 	if (target_fd < 0 || target_fd >= INT_MAX)
-		return (fprintf(stderr, "CraSH: Invalid file descriptor\n"), -1);
+		return (ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: Invalid file descriptor\n", sh->name), -1);
 	return (sh_dup2(from_fd, target_fd) < 0);
 }
 
@@ -84,7 +85,7 @@ static int
 		return (sh_close(from_fd), 0);
 	target_fd = ft_atol(word);
 	if (target_fd < 0 || target_fd >= INT_MAX)
-		return (fprintf(stderr, "CraSH: Invalid file descriptor\n"), -1);
+		return (ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: Invalid file descriptor\n", sh->name), -1);
 	return (sh_dup2(target_fd, from_fd) < 0);
 }
 
@@ -92,19 +93,19 @@ static int
 static int
 	_cm_handle_here_redi(t_minishell *sh, t_snode *redi_node)
 {
-	char	**str;
+	char	*str;
 	int		here_pipe[2];
 	pid_t	pid;
 
-	str = cm_expand(sh, &redi_node->childs[0]->here_content); // TODO use cm_expand_str instead
-	sh_assert(str != NULL);
+	// TODO: check error
+	str = cm_expand_str(sh, &redi_node->childs[0]->here_content, NULL, ' ');
 	sh_pipe(here_pipe);
 	sh_dup2(here_pipe[0], STDIN_FILENO);
 	pid = sh_fork();
 	if (pid == 0)
 	{
 		sh_close(here_pipe[0]);
-		sh_write(here_pipe[1], *str, ft_strlen(*str));
+		sh_write(here_pipe[1], str, ft_strlen(str));
 		free(str);
 		sh_close(here_pipe[1]);
 		exit(EXIT_SUCCESS);
@@ -160,7 +161,7 @@ static int
 			0644 * (redi_node->type == sx_clobber || redi_node->type == sx_lessgreat)) < 0);
 	}
 	if (sh_exists(filen) && _cm_check_clobber(sh, filen))
-		return (fprintf(stderr, "CraSH: Cannot overwrite existing file"), -1);
+		return (ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: Cannot overwrite existing file\n", sh->name), -1);
 	if (from_fd == -1)
 		from_fd = SH_STDOUT_INDEX;
 	return (_cm_open_file(filen, from_fd,
@@ -173,10 +174,10 @@ static int
 	char	**filen;
 
 	if (redi_node->childs_size == 0)
-		return (fprintf(stderr, "CraSH: No file specified\n"), 1);
+		return (ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: No file specified\n", sh->name), 1);
 	filen = cm_expand(sh, &redi_node->childs[0]->token);
 	if (!filen || !*filen || *(filen + 1))
-		return (fprintf(stderr, "CraSH: Ambigious redirect\n"), 1);
+		return (ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: Ambigious redirect\n", sh->name), 1);
 	return (_cm_handle_redi_node_noerr(sh, redi_node, *filen));
 }
 
@@ -197,7 +198,7 @@ int
 		rc  = _cm_handle_redi_node(sh, node);
 		if (rc)
 		{
-			fprintf(stdout, "CraSH: Failed to setup redirect\n");
+			ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: Failed to setup redirect\n", sh->name);
 			return (rc);
 		}
 		index++;

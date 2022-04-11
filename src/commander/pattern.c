@@ -8,6 +8,7 @@
 
 #define SH_PATTERN_ESCAPED	0x1
 
+// TODO: remove or update to ft_printf
 static void
 	_debug_print_pattern(t_pattern_node *head)
 {

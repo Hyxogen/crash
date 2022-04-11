@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-// TODO: verify
 int
 	expand_command_fd(t_expand *exp, pid_t pid, int fd)
 {
@@ -44,7 +43,6 @@ int
 	pr_next_token(&pr);
 	node = snode(sx_none);
 	pr_complete_cmdlst(&pr, node);
-	// TODO: more than 1 child?
 	sh_assert(node->childs_size == 1);
 	result = expand_command(sh, exp, node->childs[0]);
 	node_destroy(node);
@@ -52,7 +50,6 @@ int
 	return (result);
 }
 
-// TODO: verify
 int
 	expand_command(t_minishell *sh, t_expand *exp, t_snode *node)
 {
@@ -93,6 +90,6 @@ int
 	lex_init(&lex);
 	lex.src = &src;
 	result = expand_backtick_int(sh, exp, &lex);
-	// TODO: check error and free resources?
+	input_destroy(&in);
 	return (result);
 }

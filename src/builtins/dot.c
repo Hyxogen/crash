@@ -1,4 +1,5 @@
 #include "commander.h"
+#include "ft_printf.h"
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -22,12 +23,14 @@ int
 
 	if (argc <= 1)
 	{
-		dprintf(io[SH_STDERR_INDEX], "filename argument required\n");
+		// TODO: use shell name from argv[0]
+		ft_fprintf(io[SH_STDERR_INDEX], "filename argument required\n");
 		return (-1);
 	}
 	if (_is_binary(argv[1]))
 	{
-		dprintf(io[SH_STDERR_INDEX], "%s is a binary executable\n", argv[1]);
+		// TODO: use shell name from argv[0]
+		ft_fprintf(io[SH_STDERR_INDEX], "%s is a binary executable\n", argv[1]);
 		return (-1);
 	}
 	fd = sh_open(argv[1], O_RDONLY, 0);

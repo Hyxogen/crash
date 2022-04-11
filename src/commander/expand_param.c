@@ -81,12 +81,16 @@ int
 {
 	char	*str;
 
-	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + i;
-	str = cm_expand_str(sh, ctx->token, NULL, ' ');
-	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data - i;
-	// TODO: print basic error if token empty
-	ft_fprintf(STDERR_FILENO, "CraSH: %s: %s", ctx->key, str);
-	free(str);
+	if (((char *) ctx->token->parts[0].data)[i] == '\0')
+		ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: %s: parameter not set\n", sh->name, ctx->key);
+	else
+	{
+		ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + i;
+		str = cm_expand_str(sh, ctx->token, NULL, ' ');
+		ctx->token->parts[0].data = (char*) ctx->token->parts[0].data - i;
+		ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: %s: %s\n", sh->name, ctx->key, str);
+		free(str);
+	}
 	if (!sh->interactive)
 		exit(EXIT_FAILURE);
 	return (-1);
@@ -106,7 +110,7 @@ int
 		|| ctx->key[0] == '!'
 		|| ft_isdigit(ctx->key[0]))
 	{
-		// TODO: cannot assign
+		ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: $%s: cannot assign in this way\n", sh->name, ctx->key);
 		return (-1);
 	}
 	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + i;

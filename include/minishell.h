@@ -102,7 +102,6 @@ struct s_builtin
 	t_builtin_proc	fn;
 };
 
-/* TODO: locals */
 struct s_minishell
 {
 	t_envvar			*vars;
@@ -112,7 +111,9 @@ struct s_minishell
 	char				*self;
 	char				**args;
 	int					interactive;
+	int					io[3];
 	struct sigaction	child_reaper;
+	const char			*name;
 };
 
 char		*sh_join2(char *lhs, char delim, char *rhs);
@@ -157,4 +158,5 @@ int			sh_dot(t_minishell *sh, int argc, char **argv, const int io[3]);
 int			sh_colon(t_minishell *sh, int argc, char **argv, const int io[3]);
 int			sh_set(t_minishell *sh, int argc, char **argv, const int io[3]);
 
+void		sh_backtrace(int count);
 #endif

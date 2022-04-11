@@ -11,7 +11,10 @@
 /* ************************************************************************** */
 
 #include "parser.h"
+#include "ft_printf.h"
+
 #include <stdio.h>
+#include <unistd.h>
 
 int
 	pr_error_token(t_parser *pr, t_snode *parent,
@@ -26,7 +29,9 @@ int
 	{
 		node_destroy(node);
 		pr->lexer->error = SH_PR_UNEXTOKEN;
-		printf("Unexpected token %s:%d expected:%d got:%d, I'm in mode %d\n",
+		// TODO: use shell name from argv[0]
+		// TODO: use stderr from t_minishell
+		ft_fprintf(STDERR_FILENO, "Unexpected token %s:%d expected:%d got:%d, I'm in mode %d\n",
 			__FILE__, __LINE__, tk_id, pr->current.id, pr->lexer->id);
 		return (0);
 	}
@@ -54,6 +59,8 @@ int
 		return (1);
 	}
 	pr->lexer->error = SH_PR_UNEXTOKEN;
-	printf("Unexpected token %s:%d\n", __FILE__, __LINE__);
+	// TODO: use shell name from argv[0]
+	// TODO: use stderr from t_minishell
+	ft_fprintf(STDERR_FILENO, "Unexpected token %s:%d\n", __FILE__, __LINE__);
 	return (0);
 }

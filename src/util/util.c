@@ -15,6 +15,9 @@
 #include "libft.h"
 #include <sys/stat.h>
 #include <errno.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <execinfo.h>
 
 char
 	*sh_join2(char *lhs, char delim, char *rhs)
@@ -67,4 +70,15 @@ int
 		return (1);
 	sh_assert(errno == ENOENT);
 	return (0);	
+}
+
+// TODO: debug function, remove!!!
+void
+	sh_backtrace(int count)
+{
+	void	**buffer = malloc(sizeof(*buffer) * (count + 1));
+
+	count = backtrace(buffer, count + 1);
+	backtrace_symbols_fd(buffer + 1, count - 1, STDERR_FILENO);
+	free(buffer);
 }
