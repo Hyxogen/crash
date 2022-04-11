@@ -1,8 +1,21 @@
 #!/bin/sh
 
+# TODO:
+# while loops
+# functions
+# break
+# export
+# pattern expansions
+# arithmetic expansions
+
+export eyes
+export tongue
+export full
+export thoughts
+
 cowfile="default.cow"
-export eyes="oo"
-export tongue="  "
+eyes="oo"
+tongue="  "
 wrapcolumn=40
 progname="$(basename $0)"
 cowpath="${COWPATH:-cows}"
@@ -65,13 +78,13 @@ repeat() {
 construct_balloon() {
 	count=$(echo "$2" | wc -l)
 	if [ "${1#*think}" != "$0" ]; then
-		export thoughts="o"
+		thoughts="o"
 		border="( ) ( ) ( )"
 	elif [ $count -lt 2 ]; then
-		export thoughts="\\"
+		thoughts="\\"
 		border="< >"
 	else
-		export thoughts="\\"
+		thoughts="\\"
 		border="/ \\ \\ / | |"
 	fi
 	echo "$2" | (
@@ -151,14 +164,14 @@ else
 fi
 
 if [ "${cowfile#*/}" != "$cowfile" ]; then
-	export full=$cowfile
+	full=$cowfile
 else
 	for d in $(IFS=: echo $cowpath); do
 		if [ -f "$d/$cowfile" ]; then
-			export full="$d/$cowfile"
+			full="$d/$cowfile"
 			break
 		elif [ -f "$d/$cowfile.cow" ]; then
-			export full="$d/$cowfile.cow"
+			full="$d/$cowfile.cow"
 			break
 		fi
 	done

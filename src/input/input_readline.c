@@ -13,6 +13,7 @@
 #include "input.h"
 
 #include "libft.h"
+#include <stdio.h>
 #include <readline/readline.h>
 
 /* use correct prompt */

@@ -50,7 +50,7 @@ static void
 	}
 	else
 	{
-		sh_err2(name, "unknown error");
+		sh_err3(name, "unknown error", strerror(errno));
 		sh_abort();
 	}   
 }

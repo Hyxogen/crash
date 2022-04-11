@@ -68,6 +68,11 @@ int
 		exp->parts[exp->count - 1].array = 1;
 		return (0);
 	}
+	else if (key[0] == '0')
+	{
+		expansion_add_part(exp, sh_strlst_new(ft_strdup(sh()->args[0])), 0);
+		return (0);
+	}
 	result = sh_getenv(key, NULL);
 	if (result == NULL)
 		return (-1);

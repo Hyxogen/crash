@@ -62,6 +62,7 @@ pid_t
 	t_snode	*do_node;
 
 	(void) closefd;
+	rc = 0;
 	name = fornode->token.str;
 	list = cm_word_list_to_array(fornode->childs[0]);
 	list_cpy = list;
