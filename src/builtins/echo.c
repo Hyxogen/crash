@@ -1,5 +1,4 @@
 #include "commander.h"
-#include "ft_printf.h"
 
 #include <libft.h>
 #include <stdio.h>
@@ -8,19 +7,18 @@
 #include <string.h>
 
 static int
-	_sh_putstr_fd(const char *str, const int io[3])
+	_sh_putstr_fd(const char *str)
 {
-	if (ft_putstr_fd((char*) str, io[SH_STDOUT_INDEX]) < 0)
+	if (ft_putstr_fd((char*) str, sh()->io[SH_STDOUT_INDEX]) < 0)
 	{
-		// TODO: use shell name from argv[0]
-		ft_fprintf(io[SH_STDERR_INDEX], "echo(%d): %s\n", errno, strerror(errno));
+		sh_err2("echo", strerror(errno));
 		return (-1);
 	}
 	return (0);
 }
 
 int
-	sh_echo( int argc, char **argv, const int io[3])
+	sh_echo(int argc, char **argv)
 {
 	const char	*suffix;
 	const char	*delim;
@@ -37,12 +35,12 @@ int
 	}
 	while (argv[i] != NULL)
 	{
-		if (_sh_putstr_fd((char *) delim, io) || _sh_putstr_fd(argv[i], io))
+		if (_sh_putstr_fd((char *) delim) || _sh_putstr_fd(argv[i]))
 			return (-1);
 		delim = " ";
 		i += 1;
 	}
-	if (_sh_putstr_fd((char *) suffix, io))
+	if (_sh_putstr_fd((char *) suffix))
 		return (-1);
 	return (0);
 }

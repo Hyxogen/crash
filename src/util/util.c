@@ -84,7 +84,8 @@ void
 }
 
 /* this is not a global */
-t_minishell *sh(void)
+t_minishell
+	*sh(void)
 {
 	static t_minishell	shell;
 

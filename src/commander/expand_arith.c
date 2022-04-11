@@ -3,7 +3,7 @@
 #include "memory.h"
 
 int
-	expand_arith( t_expand *exp, t_token *token)
+	expand_arith(t_expand *exp, t_token *token)
 {
 	(void) exp;
 	(void) token;

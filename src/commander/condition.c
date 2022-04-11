@@ -9,7 +9,7 @@
 
 /* TODO setup redirects */
 pid_t
-	cm_if_clause( t_snode *ifnode, const int io[3], int closefd)
+	cm_if_clause(t_snode *ifnode, const int io[3], int closefd)
 {
 	int	rc;
 
@@ -25,7 +25,7 @@ pid_t
 }
 
 static int
-	_cm_strlst_cmp( char *lhs, t_token *tok)
+	_cm_strlst_cmp(char *lhs, t_token *tok)
 {
 	char	*rhs_str;
 	int		*escape_info;
@@ -39,7 +39,7 @@ static int
 }
 
 pid_t
-	cm_case_clause( t_snode *node, const int io[3], int closefd)
+	cm_case_clause(t_snode *node, const int io[3], int closefd)
 {
 	size_t	clauses;
 	size_t	index;

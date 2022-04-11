@@ -11,13 +11,13 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "ft_printf.h"
 
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
 
 void
 	sh_abort(void)
@@ -25,15 +25,12 @@ void
 	kill(0, SIGTERM);
 }
 
-/* TODO: Ask Nicolas for fprintf permission */
 void
 	sh_assert_impl(int test)
 {
 	if (!test)
 	{
-		// TODO: use shell name from argv[0]
-		// TODO: use stderr from t_minishell
-		ft_fprintf(STDERR_FILENO, "Assertion failed!\n");
+		sh_err1("assertion failed");
 		exit(EXIT_FAILURE);
 	}
 }
@@ -43,9 +40,7 @@ void
 {
 	if (!test)
 	{
-		// TODO: use shell name from argv[0]
-		// TODO: use stderr from t_minishell
-		perror(s);
+		sh_err2(s, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 }

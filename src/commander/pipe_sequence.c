@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "commander.h"
-#include "ft_printf.h"
 #include "minishell.h"
 #include "memory.h"
 
@@ -55,7 +54,7 @@ char **_array_add(char **array, char *value)
 	return (array);
 }
 
-char **cm_word_list_to_array( t_snode *word_list)
+char **cm_word_list_to_array(t_snode *word_list)
 {
 	char	**ret;
 	char	**tmp;
@@ -98,18 +97,18 @@ static t_cm_cmd_proc
 }
 
 pid_t
-	cm_unimplemented_cmd_command( t_snode *node, const int io[3], int closefd)
+	cm_unimplemented_cmd_command(t_snode *node, const int io[3], int closefd)
 {
 	(void) node;
 	(void) io;
 
 	(void) closefd;
-	ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: Executing this command type is not implemented yet\n", sh()->name);
+	sh_err1("executing this command type is not implemented yet");
 	return (-1);
 }
 
 static pid_t
-	_cm_cmd(t_snode *node, int in, int out)
+	_cm_cmd(t_snode *node, int in, int out, int pipe_write)
 {
 	int				io[3];
 	t_cm_cmd_proc	proc;
@@ -118,7 +117,7 @@ static pid_t
 	io[SH_STDOUT_INDEX] = out;
 	io[SH_STDERR_INDEX] = STDERR_FILENO;
 	proc = _get_commandeer_cmd_procs()[node->type - sx_simple_cmd];
-	return (proc(node, io, -1));
+	return (proc(node, io, pipe_write));
 }
 
 static int
@@ -146,11 +145,7 @@ static int
 }
 
 /* TODO make sure that child process also don't close begin_in and end_out */
-/* Check fd leak
-> echo Hallo | if true; then cat; fi
-> ./fdcheck
-Will slowly build up more and more fds
-
+/* 
 > ./fdcheck 1>&2 | ./fdcheck 1>&2 | ./fdcheck
 0 OPEN; 1 OPEN; 2 OPEN; 3 OPEN; 12 OPEN; 25 OPEN; 26 OPEN; 
 7/10240 open
@@ -160,7 +155,7 @@ Will slowly build up more and more fds
 */
 /* Will not close begin_in and end_out */
 static int
-	_cm_pipe_sequence_iter( t_snode *node, int begin_in, int end_out)
+	_cm_pipe_sequence_iter(t_snode *node, int begin_in, int end_out)
 {
 	pid_t			last_process;
 	size_t			count_index[2];
@@ -172,11 +167,11 @@ static int
 	while (count_index[1] < count_index[0])
 	{
 		if (count_index[1] + 1 >= count_index[0])
-			last_process = _cm_cmd(node->childs[count_index[1]], prev_pipe_io[0], end_out);
+			last_process = _cm_cmd(node->childs[count_index[1]], prev_pipe_io[0], end_out, -1);
 		else
 		{
 			sh_pipe(&prev_pipe_io[1]);
-			_cm_cmd(node->childs[count_index[1]], prev_pipe_io[0], prev_pipe_io[2]);
+			_cm_cmd(node->childs[count_index[1]], prev_pipe_io[0], prev_pipe_io[2], prev_pipe_io[1]);
 			if (prev_pipe_io[0] != begin_in)
 				sh_close(prev_pipe_io[0]);
 			prev_pipe_io[0] = prev_pipe_io[1];
@@ -190,15 +185,12 @@ static int
 }
 
 int
-	commandeer_pipe_sequence( t_snode *seq_node, const int io[3])
+	commandeer_pipe_sequence(t_snode *seq_node, const int io[3])
 {
-	t_pipe_ctx	ctx;
 	int			rc;
 
 	if (seq_node->childs_size == 0)
 		return (0);
-	ctx.pipe_node = seq_node;
-	ft_memcpy(ctx.io, io, sizeof(int) * 3);
 	cm_disable_reaper();
 	rc = _cm_pipe_sequence_iter(seq_node, io[SH_STDIN_INDEX], io[SH_STDOUT_INDEX]);
 	cm_enable_reaper();

@@ -1,7 +1,6 @@
 #include "commander.h"
 #include "minishell.h"
 #include "memory.h"
-#include "ft_printf.h"
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -82,13 +81,13 @@ int
 	char	*str;
 
 	if (((char *) ctx->token->parts[0].data)[i] == '\0')
-		ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: %s: parameter not set\n", sh()->name, ctx->key);
+		sh_err2(ctx->key, "parameter not set");
 	else
 	{
 		ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + i;
 		str = cm_expand_str(ctx->token, NULL, ' ');
 		ctx->token->parts[0].data = (char*) ctx->token->parts[0].data - i;
-		ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: %s: %s\n", sh()->name, ctx->key, str);
+		sh_err2(ctx->key, str);
 		free(str);
 	}
 	if (!sh()->interactive)
@@ -110,7 +109,7 @@ int
 		|| ctx->key[0] == '!'
 		|| ft_isdigit(ctx->key[0]))
 	{
-		ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: $%s: cannot assign in this way\n", sh()->name, ctx->key);
+		sh_err2(ctx->key, "cannot assign in this way");
 		return (-1);
 	}
 	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + i;

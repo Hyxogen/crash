@@ -1,7 +1,6 @@
 #include "minishell.h"
 #include "commander.h"
 #include "parser.h"
-#include "ft_printf.h"
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -28,7 +27,7 @@ t_snode
 }
 
 int
-	sh_cm_run( t_input *in)
+	sh_cm_run(t_input *in)
 {
 	t_source	src;
 	t_lexer		lex;
@@ -46,6 +45,7 @@ int
 	std_io[SH_STDERR_INDEX] = STDERR_FILENO;
 	while (!pr.lexer->error)
 	{
+		in->more = 0;
 		pr.lexer->error = 0;
 		if (pr.current.id != tk_invalid)
 			token_destroy(&pr.current);
@@ -57,7 +57,7 @@ int
 			commandeer(node, std_io);
 		node_destroy(node);
 		if (pr.lexer->error)
-			ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: Syntax error\n", sh()->name);
+			sh_err1("syntax error");
 	}
 	pr_destroy(&pr);
 	// TODO: errors?

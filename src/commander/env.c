@@ -14,11 +14,10 @@
 #include "commander.h"
 #include "libft.h"
 #include "memory.h"
-#include "ft_printf.h"
 #include <stdlib.h>
 
 t_envvar
-	*sh_setenv_int( const char *key)
+	*sh_setenv_int(const char *key)
 {
 	t_envvar	*var;
 
@@ -35,7 +34,7 @@ t_envvar
 }
 
 t_envvar
-	*sh_getenv_int( const char *key, int create)
+	*sh_getenv_int(const char *key, int create)
 {
 	size_t	i;
 
@@ -52,7 +51,7 @@ t_envvar
 }
 
 char
-	*sh_getenv( const char *key, const char *def)
+	*sh_getenv(const char *key, const char *def)
 {
 	t_envvar	*var;
 
@@ -67,14 +66,14 @@ char
 }
 
 t_envvar
-	*sh_setenv( const char *key, const char *value, int tmp)
+	*sh_setenv(const char *key, const char *value, int tmp)
 {
 	t_envvar	*var;
 
 	var = sh_getenv_int(key, 1);
 	if (var->attr & SH_ENV_READONLY)
 	{
-		ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: %s: readonly variable\n", sh()->name, key);
+		sh_err2(key, "readonly variable");
 		return (NULL);
 	}
 	if (tmp)
@@ -85,7 +84,7 @@ t_envvar
 }
 
 char
-	**sh_env()
+	**sh_env(void)
 {
 	char	**out;
 	size_t	i;
@@ -107,7 +106,7 @@ char
 }
 
 void
-	sh_env_clean()
+	sh_env_clean(void)
 {
 	size_t	i;
 
@@ -121,7 +120,7 @@ void
 }
 
 void
-	sh_env_init( char **env)
+	sh_env_init(char **env)
 {
 	char		*key;
 	char		*value;

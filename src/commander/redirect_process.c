@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "commander.h"
-#include "ft_printf.h"
 
 #include <libft.h>
 #include <stdio.h>
@@ -36,7 +35,7 @@ static int
 }
 
 static int
-	_cm_redi_get_from( t_snode *redi_node)
+	_cm_redi_get_from(t_snode *redi_node)
 {
 	int	from_fd;
 
@@ -46,7 +45,7 @@ static int
 		from_fd = ft_atol(redi_node->token.str);
 		if (from_fd < 0 || from_fd >= INT_MAX)
 		{
-			ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: Invalid file descriptor\n", sh()->name);
+			sh_err1("invalid file descriptor");
 			return (0);
 		}
 	}
@@ -55,7 +54,7 @@ static int
 
 /* TODO check if correct */
 static int
-	_cm_handle_lessand_redi( t_snode *redi_node, int from_fd, char *word)
+	_cm_handle_lessand_redi(t_snode *redi_node, int from_fd, char *word)
 {
 	long	target_fd;
 
@@ -66,12 +65,12 @@ static int
 		return (sh_close(from_fd), 0);
 	target_fd = ft_atol(word);
 	if (target_fd < 0 || target_fd >= INT_MAX)
-		return (ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: Invalid file descriptor\n", sh()->name), -1);
+		return (sh_err1("invalid file descriptor"), -1);
 	return (sh_dup2(from_fd, target_fd) < 0);
 }
 
 static int
-	_cm_handle_greatand_redi( t_snode *redi_node, int from_fd, char *word)
+	_cm_handle_greatand_redi(t_snode *redi_node, int from_fd, char *word)
 {
 	long	target_fd;
 
@@ -82,13 +81,13 @@ static int
 		return (sh_close(from_fd), 0);
 	target_fd = ft_atol(word);
 	if (target_fd < 0 || target_fd >= INT_MAX)
-		return (ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: Invalid file descriptor\n", sh()->name), -1);
+		return (sh_err1("invalid file descriptor"), -1);
 	return (sh_dup2(target_fd, from_fd) < 0);
 }
 
 /* TODO implement */
 static int
-	_cm_handle_here_redi( t_snode *redi_node)
+	_cm_handle_here_redi(t_snode *redi_node)
 {
 	char	*str;
 	int		here_pipe[2];
@@ -128,14 +127,14 @@ static int
 
 /* TODO: implement clobber check */
 static int
-	_cm_check_clobber( const char *filen)
+	_cm_check_clobber(const char *filen)
 {
 	(void) filen;
 	return (0);
 }
 
 static int
-	_cm_handle_redi_node_noerr( t_snode *redi_node, char *filen)
+	_cm_handle_redi_node_noerr(t_snode *redi_node, char *filen)
 {
 	int		from_fd;
 
@@ -157,7 +156,7 @@ static int
 			0644 * (redi_node->type == sx_clobber || redi_node->type == sx_lessgreat)) < 0);
 	}
 	if (sh_exists(filen) && _cm_check_clobber(filen))
-		return (ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: Cannot overwrite existing file\n", sh()->name), -1);
+		return (sh_err1("cannot overwrite existing file"), -1);
 	if (from_fd == -1)
 		from_fd = SH_STDOUT_INDEX;
 	return (_cm_open_file(filen, from_fd,
@@ -165,20 +164,20 @@ static int
 }
 
 static int
-	_cm_handle_redi_node( t_snode *redi_node)
+	_cm_handle_redi_node(t_snode *redi_node)
 {
 	char	**filen;
 
 	if (redi_node->childs_size == 0)
-		return (ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: No file specified\n", sh()->name), 1);
+		return (sh_err1("no file specified"), 1);
 	filen = cm_expand(&redi_node->childs[0]->token);
 	if (!filen || !*filen || *(filen + 1))
-		return (ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: Ambigious redirect\n", sh()->name), 1);
+		return (sh_err1("ambiguous redirect"), 1);
 	return (_cm_handle_redi_node_noerr(redi_node, *filen));
 }
 
 int
-	_cm_setup_process_redirects( t_snode *redi_list)
+	_cm_setup_process_redirects(t_snode *redi_list)
 {
 	t_snode	*node;
 	size_t	size;
@@ -193,7 +192,7 @@ int
 		rc  = _cm_handle_redi_node(node);
 		if (rc)
 		{
-			ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: Failed to setup redirect\n", sh()->name);
+			sh_err1("failed to set up redirect");
 			return (rc);
 		}
 		index++;

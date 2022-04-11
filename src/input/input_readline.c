@@ -15,6 +15,7 @@
 #include "libft.h"
 #include <readline/readline.h>
 
+/* use correct prompt */
 ssize_t
 	_input_readline_line_proc(t_input *in, char **lp)
 {

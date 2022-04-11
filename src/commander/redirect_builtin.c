@@ -1,5 +1,4 @@
 #include "commander.h"
-#include "ft_printf.h"
 #include "minishell.h"
 
 #include <libft.h>
@@ -28,9 +27,7 @@ static int
 		from_fd = ft_atol(redi_node->token.str);
 		if (from_fd < 0 || from_fd >= INT_MAX)
 		{
-			// TODO: use shell name from argv[0]
-			// TODO: use stderr from t_minishell
-			ft_fprintf(STDERR_FILENO, "CraSH: Invalid file descriptor\n");
+			sh_err1("invalid file descriptor");
 			return (-2);
 		}
 	}
@@ -56,10 +53,8 @@ static int
 	if (!ft_strcmp("-", word))
 		return (io[io_index] = -1, 0);
 	target_fd = ft_atol(word);
-	// TODO: use shell name from argv[0]
-	// TODO: use stderr from t_minishell
 	if (target_fd < 0 || target_fd >= INT_MAX)
-		return (ft_fprintf(STDERR_FILENO, "CraSH: Invalid file descriptor\n"), -1);
+		return (sh_err1("invalid file descriptor")), -1;
 	if (target_fd >= SH_STDERR_INDEX)
 		return (0);
 	io[io_index] = target_fd;
@@ -78,10 +73,8 @@ static int
 	if (!ft_strcmp("-", word))
 		return (io[io_index] = -1, 0);
 	target_fd = ft_atol(word);
-	// TODO: use shell name from argv[0]
-	// TODO: use stderr from t_minishell
 	if (target_fd < 0 || target_fd >= INT_MAX)
-		return (ft_fprintf(STDERR_FILENO, "CraSH: Invalid file descriptor\n"), -1);
+		return (sh_err1("invalid file descriptor")), -1;
 	if (target_fd >= SH_STDERR_INDEX)
 		return (0);
 	io[io_index] = target_fd;
@@ -90,7 +83,7 @@ static int
 
 /* TODO implement */
 static int
-	_cm_handle_here_redi( t_snode *redi_node, int io[3])
+	_cm_handle_here_redi(t_snode *redi_node, int io[3])
 {
 	(void) redi_node;
 	(void) io;
@@ -119,7 +112,7 @@ static int
 }
 
 static int
-	_cm_handle_redi_node_noerr( t_snode *redi_node, char *filen, int io[3])
+	_cm_handle_redi_node_noerr(t_snode *redi_node, char *filen, int io[3])
 {
 	int		io_index;
 
@@ -141,7 +134,7 @@ static int
 			0644 * (redi_node->type == sx_clobber || redi_node->type == sx_lessgreat)), 0) < 0);
 	}
 	if (sh_exists(filen) && _cm_check_clobber())
-		return (ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: Cannot overwrite existing file\n", sh()->name), -1);
+		return (sh_err1("cannot overwrite existing file"), -1);
 	if (io_index == -1)
 		io_index = SH_STDOUT_INDEX;
 	return ((io[io_index] = _cm_open_file(filen,
@@ -149,21 +142,21 @@ static int
 }
 
 static int
-	_cm_handle_redi_node( t_snode *redi_node, int io[3])
+	_cm_handle_redi_node(t_snode *redi_node, int io[3])
 {
 	char	**filen;
 
 	if (redi_node->childs_size == 0)
-		return (ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: No file specified\n", sh()->name), 1);
+		return (sh_err1("no file specified"), -1);
 	sh_assert(redi_node->childs[0]->token.id != tk_invalid);
 	filen = cm_expand(&redi_node->childs[0]->token);
 	if (!filen || !*filen || *(filen + 1))
-		return (ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: Ambigious redirect\n", sh()->name), 1);
+		return (sh_err1("ambigious redirect"), -1);
 	return (_cm_handle_redi_node_noerr(redi_node, *filen, io));
 }
 
 int
-	_cm_setup_builtin_redirects( t_snode *redi_list, int io[3])
+	_cm_setup_builtin_redirects(t_snode *redi_list, int io[3])
 {
 	t_snode	*node;
 	size_t	size;
@@ -178,10 +171,7 @@ int
 		node = redi_list->childs[index];
 		rc  = _cm_handle_redi_node(node, io);
 		if (rc)
-		{
-			ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: Failed to setup redirect\n", sh()->name);
 			return (rc);
-		}
 		index++;
 	}
 	return (0);

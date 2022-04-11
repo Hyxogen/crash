@@ -86,7 +86,7 @@ typedef struct s_minishell	t_minishell;
 typedef struct s_envvar		t_envvar;
 typedef struct s_builtin	t_builtin;
 /* return code should be: -return_code - 1 */
-typedef int					(*t_builtin_proc)( int argc, char **argv, const int io[3]);
+typedef int					(*t_builtin_proc)(int argc, char **argv);
 
 struct s_envvar
 {
@@ -120,13 +120,13 @@ char		*sh_join2(char *lhs, char delim, char *rhs);
 void		sh_split2(char *str, char delim, char **lhs, char **rhs);
 char		*sh_join_path(char *lhs, char *rhs);
 
-t_envvar	*sh_setenv_int( const char *key);
-t_envvar	*sh_getenv_int( const char *key, int create);
-char		*sh_getenv( const char *key, const char *def);
-t_envvar	*sh_setenv( const char *key, const char *value, int tmp);
-char		**sh_env();
-void		sh_env_clean();
-void		sh_env_init( char **env);
+t_envvar	*sh_setenv_int(const char *key);
+t_envvar	*sh_getenv_int(const char *key, int create);
+char		*sh_getenv(const char *key, const char *def);
+t_envvar	*sh_setenv(const char *key, const char *value, int tmp);
+char		**sh_env(void);
+void		sh_env_clean(void);
+void		sh_env_init(char **env);
 
 void		pr_debug(void);
 void		sh_assert_impl(int test);
@@ -152,14 +152,17 @@ char		**sh_strlst_new(char *str);
 char		**sh_strlst_empty(void);
 char		**sh_strlst_dup(char **strs);
 
-int			sh_echo( int argc, char **argv, const int io[3]);
-int			sh_exit( int argc, char **argv, const int io[3]);
-int			sh_dot( int argc, char **argv, const int io[3]);
-int			sh_colon( int argc, char **argv, const int io[3]);
-int			sh_set( int argc, char **argv, const int io[3]);
+int			sh_echo(int argc, char **argv);
+int			sh_exit(int argc, char **argv);
+int			sh_dot(int argc, char **argv);
+int			sh_colon(int argc, char **argv);
+int			sh_set(int argc, char **argv);
 
 void		sh_backtrace(int count);
 
 t_minishell	*sh(void);
+void		sh_err1(const char *s1);
+void		sh_err2(const char *s1, const char *s2);
+void		sh_err3(const char *s1, const char *s2, const char *s3);
 
 #endif

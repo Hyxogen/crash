@@ -32,7 +32,7 @@ int
 }
 
 int
-	expand_backtick_int( t_expand *exp, t_lexer *lex)
+	expand_backtick_int(t_expand *exp, t_lexer *lex)
 {
 	t_parser	pr;
 	t_snode		*node;
@@ -51,7 +51,7 @@ int
 }
 
 int
-	expand_command( t_expand *exp, t_snode *node)
+	expand_command(t_expand *exp, t_snode *node)
 {
 	pid_t	pid;
 	int		pipe_in[2];
@@ -78,7 +78,7 @@ int
 }
 
 int
-	expand_backtick( t_expand *exp, char *str)
+	expand_backtick(t_expand *exp, char *str)
 {
 	t_input		in;
 	t_source	src;

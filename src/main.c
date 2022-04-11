@@ -46,6 +46,9 @@ int
 	sh()->builtins_size = 5;
 	sh()->args = argv;
 	sh()->interactive = 1;
+	sh()->io[SH_STDIN_INDEX] = STDIN_FILENO;
+	sh()->io[SH_STDOUT_INDEX] = STDOUT_FILENO;
+	sh()->io[SH_STDERR_INDEX] = STDERR_FILENO;
 	tmp = ft_strdup(argv[0]);
 	sh()->name = basename(tmp); // TODO: can't use basename
 	free(tmp);

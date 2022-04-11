@@ -32,7 +32,7 @@ static void
 }
 
 static int
-	sh_exec( char *name, char **argv)
+	sh_exec(char *name, char **argv)
 {
 	int		ret;
 	size_t	i;
@@ -62,7 +62,7 @@ static int
 }
 
 int
-	sh_execvp( char **argv)
+	sh_execvp(char **argv)
 {
 	size_t	i;
 	char	**path;

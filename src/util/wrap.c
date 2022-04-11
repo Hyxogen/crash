@@ -100,10 +100,7 @@ int
 		ret = open(path, oflag, mode);
 	else
 		ret = open(path, oflag);
-	// TODO: use shell name from argv[0]
-	// TODO: use sh_check?
-	if (ret <= 0)
-		perror("CraSH");
+	sh_check(ret >= 0, "open");
 	return (ret);
 }
 

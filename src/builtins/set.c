@@ -1,10 +1,9 @@
 #include "commander.h"
 
 int
-	sh_set( int argc, char **argv, const int io[3])
+	sh_set(int argc, char **argv)
 {
 	(void) argc;
-	(void) io;
 	sh()->args = argv;
 	return (0);
 }

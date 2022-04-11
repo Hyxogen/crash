@@ -1,5 +1,4 @@
 #include "commander.h"
-#include "ft_printf.h"
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -13,7 +12,7 @@ static int
 }
 
 int
-	sh_dot( int argc, char **argv, const int io[3])
+	sh_dot(int argc, char **argv)
 {
 	t_input	in;
 	char	**old_args;
@@ -23,14 +22,12 @@ int
 
 	if (argc <= 1)
 	{
-		// TODO: use shell name from argv[0]
-		ft_fprintf(io[SH_STDERR_INDEX], "filename argument required\n");
+		sh_err2(".", "filename argument required");
 		return (-1);
 	}
 	if (_is_binary(argv[1]))
 	{
-		// TODO: use shell name from argv[0]
-		ft_fprintf(io[SH_STDERR_INDEX], "%s is a binary executable\n", argv[1]);
+		sh_err3(".", argv[1], "cannot execute binary file");
 		return (-1);
 	}
 	fd = sh_open(argv[1], O_RDONLY, 0);

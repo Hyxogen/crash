@@ -28,7 +28,7 @@ COMMANDER_FILES	:= \
 BUILTINS_FILES	:= \
 	set.c echo.c dot.c colon.c exit.c
 UTIL_FILES		:= \
-	die.c memory.c op.c util.c wrap.c strlst.c
+	die.c memory.c op.c util.c wrap.c strlst.c err.c
 
 FILE_NAMES		:= \
 	$(BASE_FILES) \

@@ -317,10 +317,8 @@ int
 			commandeer(node, std_io);
 		}
 		node_destroy(node);
-		// TODO: use shell name from argv[0]
-		// TODO: use stderr from t_minishell
 		if (pr.lexer->error)
-			printf("Syntax error\n");
+			sh_err1("Syntax error");
 		sh_assert(!pr.lexer->error);
 	}
 	input_destroy(&in);

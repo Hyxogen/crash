@@ -1,5 +1,4 @@
 #include "commander.h"
-#include "ft_printf.h"
 
 #include <unistd.h>
 #include <errno.h>
@@ -38,24 +37,17 @@ static void
 {
 	if (error == ENOENT)
 	{
-		// TODO: use shell name from argv[0]
-		// TODO: use stderr from t_minishell?
-		ft_fprintf(STDERR_FILENO, "CraSH: Could not find executable: \"%s\"\n", name);
+		sh_err2(name, "command not found");
 		exit(127);
 	}
 	else if (error == EACCES)
 	{
-		// TODO: use shell name from argv[0]
-		// TODO: use stderr from t_minishell?
-		ft_fprintf(STDERR_FILENO, "CraSH: \"%s\" permission denied\n", name);
+		sh_err2(name, "permission denied");
 		exit(127);
 	}
 	else
 	{
-		// TODO: use shell name from argv[0]
-		// TODO: use stderr from t_minishell?
-		ft_fprintf(STDERR_FILENO,
-			"CraSH: An unknown error ocurred in attempting to execute: \"%s\". Crashing.\n%s\n", name, strerror(error));
+		sh_err2(name, "unknown error");
 		sh_abort();
 	}   
 }
@@ -65,12 +57,23 @@ static pid_t
 {
 	int	rc;
 	int	argc;
+	int	io_cpy[3];
 
 	argc = 0;
+	ft_memcpy(io_cpy, sh()->io, sizeof(io_cpy));
+	ft_memcpy(sh()->io, ctx->io, sizeof(io_cpy));
 	while (ctx->args[argc] != NULL)
 		argc += 1;
-	_cm_setup_builtin_redirects(ctx->cmd_node->childs[1], ctx->io);
-	rc = proc(argc, ctx->args, ctx->io);
+	if (_cm_setup_builtin_redirects(ctx->cmd_node->childs[1], sh()->io))
+		return (cm_convert_retcode(-1));
+	rc = proc(argc, ctx->args);
+	if (sh()->io[SH_STDIN_INDEX] != ctx->io[SH_STDIN_INDEX])
+		_cm_close_nostd(sh()->io[SH_STDIN_INDEX]);
+	if (sh()->io[SH_STDOUT_INDEX] != ctx->io[SH_STDOUT_INDEX])
+		_cm_close_nostd(sh()->io[1]);
+	if (sh()->io[SH_STDERR_INDEX] != ctx->io[SH_STDERR_INDEX])
+		_cm_close_nostd(sh()->io[SH_STDERR_INDEX]);
+	ft_memcpy(sh()->io, io_cpy, sizeof(io_cpy));
 	return (cm_convert_retcode(rc));
 }
 
@@ -101,7 +104,7 @@ static pid_t
 }
 
 pid_t
-	cm_simple_cmd_command( t_snode *cmd_node, const int io[3], int closefd)
+	cm_simple_cmd_command(t_snode *cmd_node, const int io[3], int closefd)
 {
 	size_t				i;
 	t_simple_cmd_ctx	ctx;
