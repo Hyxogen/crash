@@ -116,9 +116,9 @@ pid_t
 
 	ctx.args = cm_word_list_to_array(cmd_node->childs[0]);
 	if (ctx.args == 0 || _do_assignments(cmd_node->childs[2], !!ctx.args[0]))
-		return (cm_convert_retcode(1));
+		return (sh_strlst_clear(ctx.args), cm_convert_retcode(1));
 	if (!ctx.args[0])
-		return (cm_convert_retcode(0));
+		return (sh_strlst_clear(ctx.args), cm_convert_retcode(0));
 	ft_memcpy(ctx.io, io, sizeof(ctx.io));
 	ctx.cmd_node = cmd_node;
 	ctx.closefd = closefd;
@@ -129,11 +129,13 @@ pid_t
 		{
 			ret = _cm_simple_builtin_cmd(&ctx, sh()->builtins[i].fn);
 			sh_env_clean();
+			sh_strlst_clear(ctx.args);
 			return (ret);
 		}
 		i += 1;
 	}
 	ret = _cm_simple_extern_cmd(&ctx);
 	sh_env_clean();
+	sh_strlst_clear(ctx.args);
 	return (ret);
 }

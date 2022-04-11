@@ -42,6 +42,7 @@ int
 	builtins[4].fn = sh_set;
 	tmp = getcwd(NULL, 0);
 	sh()->self = sh_join_path(tmp, argv[0]);
+	free(tmp);
 	sh()->builtins = builtins;
 	sh()->builtins_size = 5;
 	sh()->args = argv;

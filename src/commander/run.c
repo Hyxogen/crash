@@ -60,6 +60,8 @@ int
 			sh_err1("syntax error");
 	}
 	pr_destroy(&pr);
+	input_destroy(in);
+	sh_env_destroy();
 	// TODO: errors?
 	return (0);
 }

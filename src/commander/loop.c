@@ -56,6 +56,7 @@ pid_t
 {
 	char	*name;
 	char	**list;
+	char	**list_cpy;
 	int		rc;
 	int		for_io[3];
 	t_snode	*do_node;
@@ -63,6 +64,7 @@ pid_t
 	(void) closefd;
 	name = fornode->token.str;
 	list = cm_word_list_to_array(fornode->childs[0]);
+	list_cpy = list;
 	do_node = fornode->childs[1];
 	ft_memcpy(for_io, io, sizeof(int) * 3);
 	_cm_setup_builtin_redirects(fornode->childs[fornode->childs_size - 1], for_io);
@@ -72,6 +74,6 @@ pid_t
 		rc = commandeer(do_node, for_io);
 		list += 1;
 	}
-	// sh_strlst_clear(list);
+	sh_strlst_clear(list_cpy);
 	return (cm_convert_retcode(rc));
 }

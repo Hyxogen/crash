@@ -138,11 +138,11 @@ int
 	expand_pattern(t_expand *exp,
 		t_param_ctx *ctx, t_expand *tmp)
 {
-	(void) sh;
 	(void) exp;
 	(void) ctx;
 	(void) tmp;
 	// TODO: implement
+	expansion_destroy(tmp);
 	return (-1);
 }
 
@@ -173,7 +173,7 @@ int
 	ctx->i += ctx->token->str[ctx->i] == ':';
 	if (ctx->token->str[ctx->i] == '+' && empty
 		&& tmp.count == 1 && tmp.parts[0].array)
-		return (expansion_add_part(exp, sh_strlst_empty(), 0), 0);
+		return (expansion_destroy(&tmp), expansion_add_part(exp, sh_strlst_empty(), 0), 0);
 	if ((ctx->token->str[ctx->i] == '-' && !empty)
 		|| (ctx->token->str[ctx->i] == '+' && empty))
 		return (expand_promote(exp, &tmp));

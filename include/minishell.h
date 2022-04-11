@@ -127,6 +127,7 @@ t_envvar	*sh_setenv(const char *key, const char *value, int tmp);
 char		**sh_env(void);
 void		sh_env_clean(void);
 void		sh_env_init(char **env);
+void		sh_env_destroy(void);
 
 void		pr_debug(void);
 void		sh_assert_impl(int test);

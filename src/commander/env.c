@@ -77,9 +77,17 @@ t_envvar
 		return (NULL);
 	}
 	if (tmp)
+	{
+		if (var->tmp_value)
+			free(var->tmp_value);
 		var->tmp_value = ft_strdup(value);
+	}
 	else
+	{
+		if (var->value)
+			free(var->value);
 		var->value = ft_strdup(value);
+	}
 	return (var);
 }
 
@@ -139,4 +147,20 @@ void
 		free(value);
 		i += 1;
 	}
+}
+
+void
+	sh_env_destroy(void)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < sh()->vars_size)
+	{
+		free(sh()->vars[i].value);
+		free(sh()->vars[i].tmp_value);
+		free(sh()->vars[i].key);
+		i += 1;
+	}
+	free(sh()->vars);
 }
