@@ -36,11 +36,10 @@ int
 }
 
 int
-	sh_exit(t_minishell *sh, int argc, char **argv, const int io[3])
+	sh_exit( int argc, char **argv, const int io[3])
 {
 	long	ex_code;
 
-	(void) sh;
 	if (argc <= 1)
 		exit(0);
 	if (argc >= 3)

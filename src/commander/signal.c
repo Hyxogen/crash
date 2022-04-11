@@ -45,20 +45,20 @@ void
 }
 
 int
-	cm_disable_reaper(t_minishell *sh)
+	cm_disable_reaper(void)
 {
-	sh->child_reaper.sa_handler = NULL;
-	sh_sigaction(SIGCHLD, &sh->child_reaper, NULL);
+	sh()->child_reaper.sa_handler = NULL;
+	sh_sigaction(SIGCHLD, &sh()->child_reaper, NULL);
 	return (0);
 }
 
 int
-	cm_enable_reaper(t_minishell *sh)
+	cm_enable_reaper(void)
 {
-	sigemptyset(&sh->child_reaper.sa_mask);
-	sh->child_reaper.sa_handler = _cm_child_reaper;
-	sh->child_reaper.sa_flags = SA_RESTART;
-	sh_sigaction(SIGCHLD, &sh->child_reaper, NULL);
+	sigemptyset(&sh()->child_reaper.sa_mask);
+	sh()->child_reaper.sa_handler = _cm_child_reaper;
+	sh()->child_reaper.sa_flags = SA_RESTART;
+	sh_sigaction(SIGCHLD, &sh()->child_reaper, NULL);
 	_cm_reap_childs();
 	return (0);
 }

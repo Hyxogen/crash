@@ -55,7 +55,7 @@ char **_array_add(char **array, char *value)
 	return (array);
 }
 
-char **cm_word_list_to_array(t_minishell *sh, t_snode *word_list)
+char **cm_word_list_to_array( t_snode *word_list)
 {
 	char	**ret;
 	char	**tmp;
@@ -68,7 +68,7 @@ char **cm_word_list_to_array(t_minishell *sh, t_snode *word_list)
 	i = 0;
 	while (i < word_list->childs_size)
 	{
-		tmp = cm_expand(sh, &word_list->childs[i]->token);
+		tmp = cm_expand(&word_list->childs[i]->token);
 		j = 0;
 		while (tmp[j] != NULL)
 		{
@@ -98,38 +98,18 @@ static t_cm_cmd_proc
 }
 
 pid_t
-	cm_unimplemented_cmd_command(t_minishell *sh, t_snode *node, const int io[3], int closefd)
+	cm_unimplemented_cmd_command( t_snode *node, const int io[3], int closefd)
 {
-	(void) sh;
 	(void) node;
 	(void) io;
 
 	(void) closefd;
-	ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: Executing this command type is not implemented yet\n", sh->name);
+	ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: Executing this command type is not implemented yet\n", sh()->name);
 	return (-1);
 }
 
-static void
-	print_open(void)
-{
-	int	i;
-	int count;
-	
-	count = 0;
-	for (i = 0; i < OPEN_MAX; i++) {
-		if (fcntl(i, F_GETFD) < 0) {
-			if (errno != EBADF)
-				fprintf(stderr, "Error\n");
-		} else {
-			printf("%d OPEN; ", i);
-			count++;
-		}
-	}
-	printf("\n%d/%d open\n", count, OPEN_MAX);
-}
-
 static pid_t
-	_cm_cmd(t_minishell *sh, t_snode *node, int in, int out)
+	_cm_cmd(t_snode *node, int in, int out)
 {
 	int				io[3];
 	t_cm_cmd_proc	proc;
@@ -138,7 +118,7 @@ static pid_t
 	io[SH_STDOUT_INDEX] = out;
 	io[SH_STDERR_INDEX] = STDERR_FILENO;
 	proc = _get_commandeer_cmd_procs()[node->type - sx_simple_cmd];
-	return (proc(sh, node, io, -1));
+	return (proc(node, io, -1));
 }
 
 static int
@@ -165,7 +145,6 @@ static int
 	return (-1);
 }
 
-/* Will not close begin_in and end_out */
 /* TODO make sure that child process also don't close begin_in and end_out */
 /* Check fd leak
 > echo Hallo | if true; then cat; fi
@@ -179,40 +158,39 @@ Will slowly build up more and more fds
 7/10240 open
 0 OPEN; 1 OPEN; 2 OPEN; 12 OPEN; 25 OPEN; 26 OPEN; 
 */
+/* Will not close begin_in and end_out */
 static int
-	_cm_pipe_sequence_iter(t_minishell *sh, t_snode *node, const int begin_in, const int end_out)
+	_cm_pipe_sequence_iter( t_snode *node, int begin_in, int end_out)
 {
 	pid_t			last_process;
-	size_t			count;
-	size_t			index;
-	int				prev_out;
-	int				pipe_io[2];
+	size_t			count_index[2];
+	int				prev_pipe_io[3];
 
-	index = 0;
-	count = node->childs_size;
-	prev_out = begin_in;
-	while (index < count)
+	count_index[1] = 0;
+	count_index[0] = node->childs_size;
+	prev_pipe_io[0] = begin_in;
+	while (count_index[1] < count_index[0])
 	{
-		if (index + 1 >= count)
-			last_process = _cm_cmd(sh, node->childs[index], prev_out, end_out);
+		if (count_index[1] + 1 >= count_index[0])
+			last_process = _cm_cmd(node->childs[count_index[1]], prev_pipe_io[0], end_out);
 		else
 		{
-			sh_pipe(pipe_io);
-			_cm_cmd(sh, node->childs[index], prev_out, pipe_io[1]);
-			if (prev_out != begin_in)
-				sh_close(prev_out);
-			prev_out = pipe_io[0];
-			sh_close(pipe_io[1]);
+			sh_pipe(&prev_pipe_io[1]);
+			_cm_cmd(node->childs[count_index[1]], prev_pipe_io[0], prev_pipe_io[2]);
+			if (prev_pipe_io[0] != begin_in)
+				sh_close(prev_pipe_io[0]);
+			prev_pipe_io[0] = prev_pipe_io[1];
+			sh_close(prev_pipe_io[2]);
 		}
-		index++;
+		count_index[1]++;
 	}
-	if (prev_out != begin_in)
-		sh_close(prev_out);
+	if (prev_pipe_io[0] != begin_in)
+		sh_close(prev_pipe_io[0]);
 	return (_cm_pipe_sequence_wait(last_process));
 }
 
 int
-	commandeer_pipe_sequence(t_minishell *sh, t_snode *seq_node, const int io[3])
+	commandeer_pipe_sequence( t_snode *seq_node, const int io[3])
 {
 	t_pipe_ctx	ctx;
 	int			rc;
@@ -221,8 +199,8 @@ int
 		return (0);
 	ctx.pipe_node = seq_node;
 	ft_memcpy(ctx.io, io, sizeof(int) * 3);
-	cm_disable_reaper(sh);
-	rc = _cm_pipe_sequence_iter(sh, seq_node, io[SH_STDIN_INDEX], io[SH_STDOUT_INDEX]);
-	cm_enable_reaper(sh);
+	cm_disable_reaper();
+	rc = _cm_pipe_sequence_iter(seq_node, io[SH_STDIN_INDEX], io[SH_STDOUT_INDEX]);
+	cm_enable_reaper();
 	return (rc);
 }

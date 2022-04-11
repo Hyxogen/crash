@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 int
-	expand_part(t_minishell *sh, t_expand *exp, t_tpart *part)
+	expand_part( t_expand *exp, t_tpart *part)
 {
 	size_t	i;
 	int		tmp;
@@ -16,13 +16,13 @@ int
 	else if (part->id == lx_normal)
 		expansion_add_part(exp, sh_strlst_new(ft_strdup("")), 0);
 	else if (part->id == lx_command)
-		tmp = expand_command(sh, exp, part->data);
+		tmp = expand_command(exp, part->data);
 	else if (part->id == lx_backtick)
-		tmp = expand_backtick(sh, exp, part->data);
+		tmp = expand_backtick(exp, part->data);
 	else if (part->id == lx_parameter)
-		tmp = expand_param(sh, exp, part->data);
+		tmp = expand_param(exp, part->data);
 	else
-		tmp = expand_arith(sh, exp, part->data);
+		tmp = expand_arith(exp, part->data);
 	while (tmp == 0 && i < exp->count)
 	{
 		exp->parts[i].normal = (part->id == lx_normal);
@@ -103,14 +103,14 @@ void
 }
 
 void
-	expand_collate(t_minishell *sh, t_expand *exp, char ***fields)
+	expand_collate(t_expand *exp, char ***fields)
 {
 	char	*ifs;
 	int		new;
 	size_t	i;
 	size_t	j;
 
-	ifs = sh_getenv(sh, "IFS", " \t\n");
+	ifs = sh_getenv("IFS", " \t\n");
 	new = 2;
 	i = 0;
 	while (i < exp->count)
@@ -175,7 +175,7 @@ void
 
 // TODO: check -1 when called
 int
-	cm_expand_list(t_minishell *sh, t_expand *exp, t_token *token)
+	cm_expand_list( t_expand *exp, t_token *token)
 {
 	size_t	i;
 
@@ -183,7 +183,7 @@ int
 	i = 0;
 	while (i < token->count)
 	{
-		if (expand_part(sh, exp, &token->parts[i]) < 0)
+		if (expand_part(exp, &token->parts[i]) < 0)
 		{
 			expansion_destroy(exp);
 			return (-1);
@@ -195,13 +195,13 @@ int
 
 // TODO: check null when called
 char
-	*cm_expand_str(t_minishell *sh, t_token *token, int **quote, int ch)
+	*cm_expand_str( t_token *token, int **quote, int ch)
 {
 	t_expand	exp;
 	char		*result;
 	size_t		i;
 
-	if (cm_expand_list(sh, &exp, token) < 0)
+	if (cm_expand_list(&exp, token) < 0)
 		return (NULL);
 	result = sh_safe_malloc(1);
 	result[0] = '\0';
@@ -217,15 +217,15 @@ char
 
 // TODO: check null when called
 char
-	**cm_expand(t_minishell *sh, t_token *token)
+	**cm_expand( t_token *token)
 {
 	t_expand	exp;
 	char		**fields;
 
-	if (cm_expand_list(sh, &exp, token) < 0)
+	if (cm_expand_list(&exp, token) < 0)
 		return (NULL);
 	fields = sh_strlst_empty();
-	expand_collate(sh, &exp, &fields);
+	expand_collate(&exp, &fields);
 	expansion_destroy(&exp);
 	return (fields);
 }

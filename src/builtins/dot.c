@@ -13,7 +13,7 @@ static int
 }
 
 int
-	sh_dot(t_minishell *sh, int argc, char **argv, const int io[3])
+	sh_dot( int argc, char **argv, const int io[3])
 {
 	t_input	in;
 	char	**old_args;
@@ -37,17 +37,17 @@ int
 	if (argc != 2)
 	{
 		old_argv_0 = argv[0];
-		old_args = sh->args;
-		sh->args = argv;
-		sh->args[0] = old_args[0];
+		old_args = sh()->args;
+		sh()->args = argv;
+		sh()->args[0] = old_args[0];
 	}
 	// TODO: should it be interactive?
 	input_new(&in, in_file, (void*)(unsigned long long) fd);
-	ret = sh_cm_run(sh, &in);
+	ret = sh_cm_run(&in);
 	if (argc != 2)
 	{
 		argv[0] = old_argv_0;
-		sh->args = old_args;
+		sh()->args = old_args;
 	}
 	return (ret);
 }

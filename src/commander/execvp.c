@@ -32,14 +32,14 @@ static void
 }
 
 static int
-	sh_exec(t_minishell *sh, char *name, char **argv)
+	sh_exec( char *name, char **argv)
 {
 	int		ret;
 	size_t	i;
 	char	**argv2;
 	char	**envp;
 
-	envp = sh_env(sh);
+	envp = sh_env();
 	ret = execve(name, argv, envp);
 	if (ret == -1 && errno == ENOEXEC)
 	{
@@ -53,8 +53,8 @@ static int
 			argv2[i] = ft_strdup(argv[i - 1]);
 			i -= 1;
 		}
-		argv2[0] = ft_strdup(sh->self);
-		ret = execve(sh->self, argv2, envp);
+		argv2[0] = ft_strdup(sh()->self);
+		ret = execve(sh()->self, argv2, envp);
 		sh_free_list(argv2);
 	}
 	sh_free_list(envp);
@@ -62,7 +62,7 @@ static int
 }
 
 int
-	sh_execvp(t_minishell *sh, char **argv)
+	sh_execvp( char **argv)
 {
 	size_t	i;
 	char	**path;
@@ -70,9 +70,9 @@ int
 	int		ret;
 
 	/* TODO: some of this needs to move before builtin check */
-	strings[0] = sh_getenv(sh, "PATH", NULL);
+	strings[0] = sh_getenv("PATH", NULL);
 	if (ft_strchr(argv[0], '/') != NULL || strings[0] == NULL)
-		return (sh_exec(sh, argv[0], argv));
+		return (sh_exec(argv[0], argv));
 	/* TODO: check if splitting by : is correct */
 	path = ft_split(strings[0], ':');
 	i = 0;
@@ -81,7 +81,7 @@ int
 		strings[1] = sh_join2(path[i], '/', argv[0]);
 		if (access(strings[1], X_OK) == 0)
 		{
-			ret = sh_exec(sh, strings[1], argv);
+			ret = sh_exec(strings[1], argv);
 			free(strings[1]);
 			sh_free_list(path);
 			return (ret);

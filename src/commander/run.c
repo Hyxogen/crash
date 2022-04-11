@@ -28,7 +28,7 @@ t_snode
 }
 
 int
-	sh_cm_run(t_minishell *sh, t_input *in)
+	sh_cm_run( t_input *in)
 {
 	t_source	src;
 	t_lexer		lex;
@@ -54,10 +54,10 @@ int
 			break ;
 		node = pr_parse(&pr);
 		if (node != NULL)
-			commandeer(sh, node, std_io);
+			commandeer(node, std_io);
 		node_destroy(node);
 		if (pr.lexer->error)
-			ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: Syntax error\n", sh->name);
+			ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: Syntax error\n", sh()->name);
 	}
 	pr_destroy(&pr);
 	// TODO: errors?

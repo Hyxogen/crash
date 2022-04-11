@@ -82,3 +82,11 @@ void
 	backtrace_symbols_fd(buffer + 1, count - 1, STDERR_FILENO);
 	free(buffer);
 }
+
+/* this is not a global */
+t_minishell *sh(void)
+{
+	static t_minishell	shell;
+
+	return (&shell);
+}

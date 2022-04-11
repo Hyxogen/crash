@@ -90,9 +90,8 @@ static int
 
 /* TODO implement */
 static int
-	_cm_handle_here_redi(t_minishell *sh, t_snode *redi_node, int io[3])
+	_cm_handle_here_redi( t_snode *redi_node, int io[3])
 {
-	(void) sh;
 	(void) redi_node;
 	(void) io;
 	return (0);
@@ -114,14 +113,13 @@ static int
 
 /* TODO: implement clobber check */
 static int
-	_cm_check_clobber(t_minishell *sh)
+	_cm_check_clobber(void)
 {
-	(void) sh;
 	return (0);
 }
 
 static int
-	_cm_handle_redi_node_noerr(t_minishell *sh, t_snode *redi_node, char *filen, int io[3])
+	_cm_handle_redi_node_noerr( t_snode *redi_node, char *filen, int io[3])
 {
 	int		io_index;
 
@@ -133,7 +131,7 @@ static int
 	if (redi_node->type == sx_greatand)
 		return (_cm_handle_greatand_redi(redi_node, io_index, filen, io));
 	if (redi_node->type == sx_io_here)
-		return (_cm_handle_here_redi(sh, redi_node, io));
+		return (_cm_handle_here_redi(redi_node, io));
 	if (redi_node->type == sx_less || redi_node->type == sx_clobber || redi_node->type == sx_lessgreat)
 	{
 		if (io_index == -1)
@@ -142,8 +140,8 @@ static int
 			_cm_get_redi_flags(redi_node->type),
 			0644 * (redi_node->type == sx_clobber || redi_node->type == sx_lessgreat)), 0) < 0);
 	}
-	if (sh_exists(filen) && _cm_check_clobber(sh))
-		return (ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: Cannot overwrite existing file\n", sh->name), -1);
+	if (sh_exists(filen) && _cm_check_clobber())
+		return (ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: Cannot overwrite existing file\n", sh()->name), -1);
 	if (io_index == -1)
 		io_index = SH_STDOUT_INDEX;
 	return ((io[io_index] = _cm_open_file(filen,
@@ -151,21 +149,21 @@ static int
 }
 
 static int
-	_cm_handle_redi_node(t_minishell *sh, t_snode *redi_node, int io[3])
+	_cm_handle_redi_node( t_snode *redi_node, int io[3])
 {
 	char	**filen;
 
 	if (redi_node->childs_size == 0)
-		return (ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: No file specified\n", sh->name), 1);
+		return (ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: No file specified\n", sh()->name), 1);
 	sh_assert(redi_node->childs[0]->token.id != tk_invalid);
-	filen = cm_expand(sh, &redi_node->childs[0]->token);
+	filen = cm_expand(&redi_node->childs[0]->token);
 	if (!filen || !*filen || *(filen + 1))
-		return (ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: Ambigious redirect\n", sh->name), 1);
-	return (_cm_handle_redi_node_noerr(sh, redi_node, *filen, io));
+		return (ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: Ambigious redirect\n", sh()->name), 1);
+	return (_cm_handle_redi_node_noerr(redi_node, *filen, io));
 }
 
 int
-	_cm_setup_builtin_redirects(t_minishell *sh, t_snode *redi_list, int io[3])
+	_cm_setup_builtin_redirects( t_snode *redi_list, int io[3])
 {
 	t_snode	*node;
 	size_t	size;
@@ -173,16 +171,15 @@ int
 	int		rc;
 
 	sh_assert(redi_list->type == sx_io_redirect_list);
-	(void) sh;
 	index = 0;
 	size = redi_list->childs_size;
 	while (index < size)
 	{
 		node = redi_list->childs[index];
-		rc  = _cm_handle_redi_node(sh, node, io);
+		rc  = _cm_handle_redi_node(node, io);
 		if (rc)
 		{
-			ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: Failed to setup redirect\n", sh->name);
+			ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: Failed to setup redirect\n", sh()->name);
 			return (rc);
 		}
 		index++;

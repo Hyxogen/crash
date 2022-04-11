@@ -24,7 +24,6 @@
 int
 	main(int argc, char **argv, char **envp)
 {
-	t_minishell	sh;
 	t_input		in;
 	char		*tmp;
 	int			fd;
@@ -42,24 +41,24 @@ int
 	builtins[4].key = "set";
 	builtins[4].fn = sh_set;
 	tmp = getcwd(NULL, 0);
-	sh.self = sh_join_path(tmp, argv[0]);
-	sh.builtins = builtins;
-	sh.builtins_size = 5;
-	sh.args = argv;
-	sh.interactive = 1;
+	sh()->self = sh_join_path(tmp, argv[0]);
+	sh()->builtins = builtins;
+	sh()->builtins_size = 5;
+	sh()->args = argv;
+	sh()->interactive = 1;
 	tmp = ft_strdup(argv[0]);
-	sh.name = basename(tmp); // TODO: can't use basename
+	sh()->name = basename(tmp); // TODO: can't use basename
 	free(tmp);
-	sh_env_init(&sh, envp);
-	cm_enable_reaper(&sh);
+	sh_env_init(envp);
+	cm_enable_reaper();
 	if (argc >= 2)
 	{
 		fd = open(argv[1], O_RDONLY);
-		sh.args = argv + 1;
-		sh.interactive = 0;
+		sh()->args = argv + 1;
+		sh()->interactive = 0;
 		input_new(&in, in_file, (void*)(unsigned long long) fd);
 	}
 	else
 		input_new(&in, in_readline, NULL);
-	return (sh_cm_run(&sh, &in), EXIT_SUCCESS);
+	return (sh_cm_run(&in), EXIT_SUCCESS);
 }

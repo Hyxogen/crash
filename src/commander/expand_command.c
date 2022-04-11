@@ -32,7 +32,7 @@ int
 }
 
 int
-	expand_backtick_int(t_minishell *sh, t_expand *exp, t_lexer *lex)
+	expand_backtick_int( t_expand *exp, t_lexer *lex)
 {
 	t_parser	pr;
 	t_snode		*node;
@@ -44,14 +44,14 @@ int
 	node = snode(sx_none);
 	pr_complete_cmdlst(&pr, node);
 	sh_assert(node->childs_size == 1);
-	result = expand_command(sh, exp, node->childs[0]);
+	result = expand_command(exp, node->childs[0]);
 	node_destroy(node);
 	pr_destroy(&pr);
 	return (result);
 }
 
 int
-	expand_command(t_minishell *sh, t_expand *exp, t_snode *node)
+	expand_command( t_expand *exp, t_snode *node)
 {
 	pid_t	pid;
 	int		pipe_in[2];
@@ -68,7 +68,7 @@ int
 		io[SH_STDIN_INDEX] = pipe_in[0];
 		io[SH_STDOUT_INDEX] = pipe_out[1];
 		io[SH_STDERR_INDEX] = 2;
-		commandeer(sh, node, io);
+		commandeer(node, io);
 		exit(EXIT_SUCCESS);
 	}
 	sh_close(pipe_in[0]);
@@ -78,7 +78,7 @@ int
 }
 
 int
-	expand_backtick(t_minishell *sh, t_expand *exp, char *str)
+	expand_backtick( t_expand *exp, char *str)
 {
 	t_input		in;
 	t_source	src;
@@ -89,7 +89,7 @@ int
 	src_init(&src, &in);
 	lex_init(&lex);
 	lex.src = &src;
-	result = expand_backtick_int(sh, exp, &lex);
+	result = expand_backtick_int(exp, &lex);
 	input_destroy(&in);
 	return (result);
 }

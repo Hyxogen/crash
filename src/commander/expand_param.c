@@ -58,18 +58,18 @@ size_t
 }
 
 int
-	expand_special(t_minishell *sh, t_expand *exp, char *key)
+	expand_special(t_expand *exp, char *key)
 {
 	char	*result;
 
 	// TODO: special parameters
 	if (key[0] == '@')
 	{
-		expansion_add_part(exp, sh_strlst_dup(sh->args + 1), 0);
+		expansion_add_part(exp, sh_strlst_dup(sh()->args + 1), 0);
 		exp->parts[exp->count - 1].array = 1;
 		return (0);
 	}
-	result = sh_getenv(sh, key, NULL);
+	result = sh_getenv(key, NULL);
 	if (result == NULL)
 		return (-1);
 	expansion_add_part(exp, sh_strlst_new(ft_strdup(result)), 0);
@@ -77,27 +77,27 @@ int
 }
 
 int
-	expand_error(t_minishell *sh, t_param_ctx *ctx, size_t i)
+	expand_error(t_param_ctx *ctx, size_t i)
 {
 	char	*str;
 
 	if (((char *) ctx->token->parts[0].data)[i] == '\0')
-		ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: %s: parameter not set\n", sh->name, ctx->key);
+		ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: %s: parameter not set\n", sh()->name, ctx->key);
 	else
 	{
 		ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + i;
-		str = cm_expand_str(sh, ctx->token, NULL, ' ');
+		str = cm_expand_str(ctx->token, NULL, ' ');
 		ctx->token->parts[0].data = (char*) ctx->token->parts[0].data - i;
-		ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: %s: %s\n", sh->name, ctx->key, str);
+		ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: %s: %s\n", sh()->name, ctx->key, str);
 		free(str);
 	}
-	if (!sh->interactive)
+	if (!sh()->interactive)
 		exit(EXIT_FAILURE);
 	return (-1);
 }
 
 int
-	expand_assign(t_minishell *sh, t_expand *exp, t_param_ctx *ctx, size_t i)
+	expand_assign(t_expand *exp, t_param_ctx *ctx, size_t i)
 {
 	char	*str;
 
@@ -110,25 +110,25 @@ int
 		|| ctx->key[0] == '!'
 		|| ft_isdigit(ctx->key[0]))
 	{
-		ft_fprintf(sh->io[SH_STDERR_INDEX], "%s: $%s: cannot assign in this way\n", sh->name, ctx->key);
+		ft_fprintf(sh()->io[SH_STDERR_INDEX], "%s: $%s: cannot assign in this way\n", sh()->name, ctx->key);
 		return (-1);
 	}
 	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + i;
-	str = cm_expand_str(sh, ctx->token, NULL, ' ');
+	str = cm_expand_str(ctx->token, NULL, ' ');
 	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data - i;
-	sh_setenv(sh, ctx->key, str, 0);
+	sh_setenv(ctx->key, str, 0);
 	expansion_add_part(exp, sh_strlst_new(str), 0);
 	return (0);
 }
 
 int
-	expand_right(t_minishell *sh, t_expand *exp, t_param_ctx *ctx, size_t i)
+	expand_right(t_expand *exp, t_param_ctx *ctx, size_t i)
 {
 	t_expand	tmp;
 	int			result;
 
 	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + i;
-	result = cm_expand_list(sh, &tmp, ctx->token);
+	result = cm_expand_list(&tmp, ctx->token);
 	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data - i;
 	expansion_copy_parts(exp, &tmp);
 	expansion_destroy(&tmp);
@@ -136,7 +136,7 @@ int
 }
 
 int
-	expand_pattern(t_minishell *sh, t_expand *exp,
+	expand_pattern(t_expand *exp,
 		t_param_ctx *ctx, t_expand *tmp)
 {
 	(void) sh;
@@ -159,17 +159,17 @@ int
 }
 
 int
-	expand_subst(t_minishell *sh, t_expand *exp, t_param_ctx *ctx)
+	expand_subst(t_expand *exp, t_param_ctx *ctx)
 {
 	t_expand	tmp;
 	int			empty;
 
 	expansion_init(&tmp);
-	expand_special(sh, &tmp, ctx->key);
+	expand_special(&tmp, ctx->key);
 	if (ctx->token->str[ctx->i] == '\0')
 		return (expand_promote(exp, &tmp));
 	if (ctx->token->str[ctx->i] == '%' || ctx->token->str[ctx->i] == '#')
-		return (expand_pattern(sh, exp, ctx, &tmp));
+		return (expand_pattern(exp, ctx, &tmp));
 	empty = expand_empty(&tmp, ctx->token->str[ctx->i] == ':');
 	ctx->i += ctx->token->str[ctx->i] == ':';
 	if (ctx->token->str[ctx->i] == '+' && empty
@@ -180,16 +180,16 @@ int
 		return (expand_promote(exp, &tmp));
 	expansion_destroy(&tmp);
 	if (ctx->token->str[ctx->i] == '+' || ctx->token->str[ctx->i] == '-')
-		return (expand_right(sh, exp, ctx, ctx->i + 1));
+		return (expand_right(exp, ctx, ctx->i + 1));
 	if (ctx->token->str[ctx->i] == '?')
-		return (expand_error(sh, ctx, ctx->i + 1));
+		return (expand_error(ctx, ctx->i + 1));
 	if (ctx->token->str[ctx->i] == '=')
-		return (expand_assign(sh, exp, ctx, ctx->i + 1));
+		return (expand_assign(exp, ctx, ctx->i + 1));
 	return (-1);
 }
 
 int
-	expand_param(t_minishell *sh, t_expand *exp, t_token *token)
+	expand_param(t_expand *exp, t_token *token)
 {
 	t_expand	tmp;
 	t_param_ctx	ctx;
@@ -203,7 +203,7 @@ int
 		if (token->str[ctx.i] != '\0')
 			return (-1);
 		expansion_init(&tmp);
-		expand_special(sh, &tmp, token->str + 1);
+		expand_special(&tmp, token->str + 1);
 		expansion_add_part(exp,
 			sh_strlst_new(ft_itoa(expand_length(&tmp))), 0);
 		expansion_destroy(&tmp);
@@ -212,7 +212,7 @@ int
 	ctx.i = expand_key_length(token->str);
 	ctx.key = ft_strdup(token->str);
 	ctx.key[ctx.i] = '\0';
-	result = expand_subst(sh, exp, &ctx);
+	result = expand_subst(exp, &ctx);
 	free(ctx.key);
 	return (result);
 }

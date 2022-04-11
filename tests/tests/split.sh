@@ -1,78 +1,114 @@
 IFS=": "
-printf \"%s\"\  ${CRASH-}${CRASH-}A${CRASH-}""${CRASH-}
+
+TMP=""
+printf \"%s\"\  $TMP$TMP.$TMP""$TMP
 printf \\n
-printf \"%s\"\  ${CRASH- }${CRASH- }A${CRASH- }""${CRASH- }
+printf \"%s\"\  "$TMP""$TMP"."$TMP""""$TMP"
 printf \\n
-printf \"%s\"\  "${CRASH-}""${CRASH-}"A"${CRASH-}""""${CRASH-}"
+printf \"%s\"\  " $TMP "" $TMP "." $TMP """" $TMP "
 printf \\n
-printf \"%s\"\  "${CRASH- }""${CRASH- }"A"${CRASH- }""""${CRASH- }"
+
+TMP=" "
+printf \"%s\"\  $TMP$TMP.$TMP""$TMP
 printf \\n
-printf \"%s\"\  " ${CRASH-} "" ${CRASH-} "A" ${CRASH-} """" ${CRASH-} "
+printf \"%s\"\  "$TMP""$TMP"."$TMP""""$TMP"
 printf \\n
-printf \"%s\"\  " ${CRASH- } "" ${CRASH- } "A" ${CRASH- } """" ${CRASH- } "
+printf \"%s\"\  " $TMP "" $TMP "." $TMP """" $TMP "
 printf \\n\\n
 
-printf \"%s\"\  ${CRASH-:}${CRASH-:}A${CRASH-:}""${CRASH-:}
+TMP=":"
+printf \"%s\"\  $TMP$TMP.$TMP""$TMP
 printf \\n
-printf \"%s\"\  ${CRASH- : }${CRASH- : }A${CRASH- : }""${CRASH- : }
+printf \"%s\"\  "$TMP""$TMP"."$TMP""""$TMP"
 printf \\n
-printf \"%s\"\  "${CRASH-:}""${CRASH-:}"A"${CRASH-:}""""${CRASH-:}"
+printf \"%s\"\  " $TMP "" $TMP "." $TMP """" $TMP "
+printf \\n\\n
 printf \\n
-printf \"%s\"\  "${CRASH- : }""${CRASH- : }"A"${CRASH- : }""""${CRASH- : }"
+
+TMP=" : "
+printf \"%s\"\  $TMP$TMP.$TMP""$TMP
 printf \\n
-printf \"%s\"\  " ${CRASH-:} "" ${CRASH-:} "A" ${CRASH-:} """" ${CRASH-:} "
+printf \"%s\"\  "$TMP""$TMP"."$TMP""""$TMP"
 printf \\n
-printf \"%s\"\  " ${CRASH- : } "" ${CRASH- : } "A" ${CRASH- : } """" ${CRASH- : } "
+printf \"%s\"\  " $TMP "" $TMP "." $TMP """" $TMP "
 printf \\n\\n
 
-printf \"%s\"\  ${CRASH-::}${CRASH-::}A${CRASH-::}""${CRASH-::}
+TMP="::"
+printf \"%s\"\  $TMP$TMP.$TMP""$TMP
 printf \\n
-printf \"%s\"\  ${CRASH- : : }${CRASH- : : }A${CRASH- : : }""${CRASH- : : }
+printf \"%s\"\  "$TMP""$TMP"."$TMP""""$TMP"
 printf \\n
-printf \"%s\"\  "${CRASH-::}""${CRASH-::}"A"${CRASH-::}""""${CRASH-::}"
-printf \\n
-printf \"%s\"\  "${CRASH- : : }""${CRASH- : : }"A"${CRASH- : : }""""${CRASH- : : }"
-printf \\n
-printf \"%s\"\  " ${CRASH-::} "" ${CRASH-::} "A" ${CRASH-::} """" ${CRASH-::} "
-printf \\n
-printf \"%s\"\  " ${CRASH- : : } "" ${CRASH- : : } "A" ${CRASH- : : } """" ${CRASH- : : } "
+printf \"%s\"\  " $TMP "" $TMP "." $TMP """" $TMP "
 printf \\n\\n
 
-printf \"%s\"\  ${CRASH-a:b}${CRASH-a:b}A${CRASH-a:b}""${CRASH-a:b}
+TMP=" : : "
+printf \"%s\"\  $TMP$TMP.$TMP""$TMP
 printf \\n
-printf \"%s\"\  ${CRASH- a : b }${CRASH- a : b }A${CRASH- a : b }""${CRASH- a : b }
+printf \"%s\"\  "$TMP""$TMP"."$TMP""""$TMP"
 printf \\n
-printf \"%s\"\  "${CRASH-a:b}""${CRASH-a:b}"A"${CRASH-a:b}""""${CRASH-a:b}"
-printf \\n
-printf \"%s\"\  "${CRASH- a : b }""${CRASH- a : b }"A"${CRASH- a : b }""""${CRASH- a : b }"
-printf \\n
-printf \"%s\"\  " ${CRASH-a:b} "" ${CRASH-a:b} "A" ${CRASH-a:b} """" ${CRASH-a:b} "
-printf \\n
-printf \"%s\"\  " ${CRASH- a : b } "" ${CRASH- a : b } "A" ${CRASH- a : b } """" ${CRASH- a : b } "
+printf \"%s\"\  " $TMP "" $TMP "." $TMP """" $TMP "
 printf \\n\\n
 
-printf \"%s\"\  ${CRASH-:a:b:}${CRASH-:a:b:}A${CRASH-:a:b:}""${CRASH-:a:b:}
+TMP="a:b"
+printf \"%s\"\  $TMP$TMP.$TMP""$TMP
 printf \\n
-printf \"%s\"\  ${CRASH- : a : b : }${CRASH- : a : b : }A${CRASH- : a : b : }""${CRASH- : a : b : }
+printf \"%s\"\  "$TMP""$TMP"."$TMP""""$TMP"
 printf \\n
-printf \"%s\"\  "${CRASH-:a:b:}""${CRASH-:a:b:}"A"${CRASH-:a:b:}""""${CRASH-:a:b:}"
-printf \\n
-printf \"%s\"\  "${CRASH- : a : b : }""${CRASH- : a : b : }"A"${CRASH- : a : b : }""""${CRASH- : a : b : }"
-printf \\n
-printf \"%s\"\  " ${CRASH-:a:b:} "" ${CRASH-:a:b:} "A" ${CRASH-:a:b:} """" ${CRASH-:a:b:} "
-printf \\n
-printf \"%s\"\  " ${CRASH- : a : b : } "" ${CRASH- : a : b : } "A" ${CRASH- : a : b : } """" ${CRASH- : a : b : } "
+printf \"%s\"\  " $TMP "" $TMP "." $TMP """" $TMP "
 printf \\n\\n
 
-printf \"%s\"\  ${CRASH-::a::b::}${CRASH-::a::b::}A${CRASH-::a::b::}""${CRASH-::a::b::}
+TMP=" a : b "
+printf \"%s\"\  $TMP$TMP.$TMP""$TMP
 printf \\n
-printf \"%s\"\  ${CRASH- : : a : : b : : }${CRASH- : : a : : b : : }A${CRASH- : : a : : b : : }""${CRASH- : : a : : b : : }
+printf \"%s\"\  "$TMP""$TMP"."$TMP""""$TMP"
 printf \\n
-printf \"%s\"\  "${CRASH-::a::b::}""${CRASH-::a::b::}"A"${CRASH-::a::b::}""""${CRASH-::a::b::}"
+printf \"%s\"\  " $TMP "" $TMP "." $TMP """" $TMP "
+printf \\n\\n
+
+TMP=":a:b:"
+printf \"%s\"\  $TMP$TMP.$TMP""$TMP
 printf \\n
-printf \"%s\"\  "${CRASH- : : a : : b : : }""${CRASH- : : a : : b : : }"A"${CRASH- : : a : : b : : }""""${CRASH- : : a : : b : : }"
+printf \"%s\"\  "$TMP""$TMP"."$TMP""""$TMP"
 printf \\n
-printf \"%s\"\  " ${CRASH-::a::b::} "" ${CRASH-::a::b::} "A" ${CRASH-::a::b::} """" ${CRASH-::a::b::} "
+printf \"%s\"\  " $TMP "" $TMP "." $TMP """" $TMP "
+printf \\n\\n
+
+TMP=" : a : b : "
+printf \"%s\"\  $TMP$TMP.$TMP""$TMP
 printf \\n
-printf \"%s\"\  " ${CRASH- : : a : : b : : } "" ${CRASH- : : a : : b : : } "A" ${CRASH- : : a : : b : : } """" ${CRASH- : : a : : b : : } "
+printf \"%s\"\  "$TMP""$TMP"."$TMP""""$TMP"
 printf \\n
+printf \"%s\"\  " $TMP "" $TMP "." $TMP """" $TMP "
+printf \\n\\n
+
+TMP="a::b"
+printf \"%s\"\  $TMP$TMP.$TMP""$TMP
+printf \\n
+printf \"%s\"\  "$TMP""$TMP"."$TMP""""$TMP"
+printf \\n
+printf \"%s\"\  " $TMP "" $TMP "." $TMP """" $TMP "
+printf \\n\\n
+
+TMP=" a : : b "
+printf \"%s\"\  $TMP$TMP.$TMP""$TMP
+printf \\n
+printf \"%s\"\  "$TMP""$TMP"."$TMP""""$TMP"
+printf \\n
+printf \"%s\"\  " $TMP "" $TMP "." $TMP """" $TMP "
+printf \\n\\n
+
+TMP="::a::b::"
+printf \"%s\"\  $TMP$TMP.$TMP""$TMP
+printf \\n
+printf \"%s\"\  "$TMP""$TMP"."$TMP""""$TMP"
+printf \\n
+printf \"%s\"\  " $TMP "" $TMP "." $TMP """" $TMP "
+printf \\n\\n
+
+TMP=" : : a : : b : : "
+printf \"%s\"\  $TMP$TMP.$TMP""$TMP
+printf \\n
+printf \"%s\"\  "$TMP""$TMP"."$TMP""""$TMP"
+printf \\n
+printf \"%s\"\  " $TMP "" $TMP "." $TMP """" $TMP "
+printf \\n\\n

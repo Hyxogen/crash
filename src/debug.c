@@ -278,15 +278,14 @@ int
 	t_lexer		lex;
 	t_parser	pr;
 	t_snode		*node;
-	t_minishell	sh;
 	char		*tmp;
 	int			std_io[3];
 
 	(void) argc;
 	tmp = getcwd(NULL, 0);
-	sh.self = sh_join_path(tmp, argv[0]);
+	sh()->self = sh_join_path(tmp, argv[0]);
 	free(tmp);
-	sh_env_init(&sh, envp);
+	sh_env_init(envp);
 	setbuf(stdout, NULL);
 	input_new(&in, in_readline, NULL);
 	src_init(&src, &in);
@@ -315,7 +314,7 @@ int
 		if (node != NULL)
 		{
 			print_node(node, 0);
-			commandeer(&sh, node, std_io);
+			commandeer(node, std_io);
 		}
 		node_destroy(node);
 		// TODO: use shell name from argv[0]

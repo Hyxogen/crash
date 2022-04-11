@@ -35,7 +35,7 @@ static t_commandeer_proc
 }
 
 int
-	commandeer_inner(t_minishell *sh, t_snode *node, const int io[3])
+	commandeer_inner( t_snode *node, const int io[3])
 {
 	size_t	index;
 	size_t	size;
@@ -46,7 +46,7 @@ int
 	index = 0;
 	while (index < size)
 	{
-		ret = (ret || get_command_table()[node->childs[index]->type](sh, node->childs[index], io));
+		ret = (ret || get_command_table()[node->childs[index]->type](node->childs[index], io));
 		index++;
 	}
 	return (!!ret);
@@ -54,9 +54,9 @@ int
 
 /* TODO fork the entire term when it runs in the background */
 int
-	commandeer(t_minishell *sh, t_snode *node, const int io[3])
+	commandeer( t_snode *node, const int io[3])
 {
-	return (get_command_table()[node->type](sh, node, io));
+	return (get_command_table()[node->type](node, io));
 }
 
 pid_t
