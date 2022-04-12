@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "commander.h"
+#include "minishell.h"
 
 #include <libft.h>
 #include <stdio.h>

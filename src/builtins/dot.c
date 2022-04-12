@@ -1,4 +1,5 @@
 #include "commander.h"
+#include "minishell.h"
 
 #include <stdio.h>
 #include <fcntl.h>

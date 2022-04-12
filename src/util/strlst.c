@@ -22,7 +22,7 @@ void
 }
 
 char
-	*sh_strlst_join(char **strs, char delim)
+	*sh_strlst_join(char **strs, int delim)
 {
 	char	*result;
 	char	**cpy;
@@ -33,21 +33,25 @@ char
 	cpy = strs;
 	while (*cpy)
 	{
-		tot_len += ft_strlen(*cpy) + 1;
+		tot_len += ft_strlen(*cpy) + (delim != '\0' && cpy != strs);
 		cpy += 1;
 	}
-	result = sh_safe_malloc(tot_len);
+	result = sh_safe_malloc(tot_len + 1);
 	cpy = strs;
 	while (*cpy)
 	{
+		if (delim != '\0' && cpy != strs)
+		{
+			result[0] = delim;
+			result += 1;
+		}
 		len = ft_strlen(*cpy);
 		ft_memcpy(result, *cpy, len);
-		result[len] = delim;
 		cpy += 1;
-		result += len + 1;
+		result += len;
 	}
 	*result = '\0';
-	return (result - (tot_len - 1));
+	return (result - tot_len);
 }
 
 char

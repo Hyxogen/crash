@@ -12,6 +12,7 @@
 
 #include "parser.h"
 #include "memory.h"
+#include "minishell.h"
 #include <stdlib.h>
 
 void

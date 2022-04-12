@@ -53,11 +53,11 @@ static int
 	if (!ft_strcmp("-", word))
 		return (io[io_index] = -1, 0);
 	target_fd = ft_atol(word);
-	if (target_fd < 0 || target_fd >= INT_MAX)
+	if (target_fd < 0 || target_fd > SH_STDERR_INDEX)
 		return (sh_err1("invalid file descriptor")), -1;
 	if (target_fd >= SH_STDERR_INDEX)
 		return (0);
-	io[io_index] = target_fd;
+	io[target_fd] = io_index;
 	return (0);
 }
 

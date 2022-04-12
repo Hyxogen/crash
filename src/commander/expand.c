@@ -216,6 +216,7 @@ char
 }
 
 // TODO: check null when called
+// TODO: tilde expansion and wildcards
 char
 	**cm_expand(t_token *token)
 {

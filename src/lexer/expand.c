@@ -13,6 +13,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "memory.h"
+#include "minishell.h"
 
 t_snode
 	*lexpr_parse(t_parser *pr)

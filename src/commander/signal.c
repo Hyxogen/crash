@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "commander.h"
+#include "minishell.h"
 
 #include <errno.h>
 #include <signal.h>

@@ -13,6 +13,8 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
+# include "parser.h"
+
 # include <stddef.h>
 # include <sys/types.h>
 # include <signal.h>
@@ -72,6 +74,13 @@
  * $USER is in the sudoers file.  This incident will not be reported.
  */
 
+// MAYBE TODO:
+// break in pipe sequence
+
+// FOR SURE TODO
+// fork in multi-command pipe sequence
+// 2.9.1; Command Search and Execution; 1.c (super extra special builtins)
+
 # define SH_ENV_EXPORT 1
 # define SH_ENV_READONLY 2
 
@@ -85,6 +94,7 @@
 typedef struct s_minishell	t_minishell;
 typedef struct s_envvar		t_envvar;
 typedef struct s_builtin	t_builtin;
+typedef struct s_function	t_function;
 /* return code should be: -return_code - 1 */
 typedef int					(*t_builtin_proc)(int argc, char **argv);
 
@@ -98,22 +108,36 @@ struct s_envvar
 
 struct s_builtin
 {
-	const char		*key;
+	char			*key;
 	t_builtin_proc	fn;
+};
+
+struct s_function
+{
+	char	*key;
+	t_snode	*body;
 };
 
 struct s_minishell
 {
 	t_envvar			*vars;
 	size_t				vars_size;
-	t_builtin			*builtins;
+	const t_builtin		*builtins;
 	size_t				builtins_size;
+	t_function			*functions;
+	size_t				functions_size;
+	const t_builtin		*utilities;
+	size_t				utilities_size;
 	char				*self;
 	char				**args;
 	int					interactive;
 	int					io[3];
+	int					breaking;
+	int					continuing;
+	int					loop_depth;
 	struct sigaction	child_reaper;
-	const char			*name;
+	char				*name;
+	int					return_code;
 };
 
 char		*sh_join2(char *lhs, char delim, char *rhs);
@@ -148,7 +172,7 @@ ssize_t		sh_write(int fildes, const void *buf, size_t nbyte);
 
 int			sh_exists(const char *filen);
 void		sh_strlst_clear(char **strs);
-char		*sh_strlst_join(char **strs, char delim);
+char		*sh_strlst_join(char **strs, int delim);
 char		**sh_strlst_new(char *str);
 char		**sh_strlst_empty(void);
 char		**sh_strlst_dup(char **strs);
@@ -158,12 +182,21 @@ int			sh_exit(int argc, char **argv);
 int			sh_dot(int argc, char **argv);
 int			sh_colon(int argc, char **argv);
 int			sh_set(int argc, char **argv);
+int			sh_break(int argc, char **argv);
+int			sh_continue(int argc, char **argv);
+int			sh_export(int argc, char **argv);
+int			sh_shift(int argc, char **argv);
 
 void		sh_backtrace(int count);
+int			sh_atol(const char *str, long *v);
 
 t_minishell	*sh(void);
 void		sh_err1(const char *s1);
 void		sh_err2(const char *s1, const char *s2);
 void		sh_err3(const char *s1, const char *s2, const char *s3);
+
+void		sh_init(char **argv, char **env);
+void		sh_destroy(void);
+void		sh_add_function(const char *key, t_snode *body);
 
 #endif

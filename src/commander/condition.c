@@ -1,5 +1,5 @@
 #include "commander.h"
-
+#include "minishell.h"
 #include "memory.h"
 #include <libft.h>
 #include <string.h>

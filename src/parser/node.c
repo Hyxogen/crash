@@ -34,3 +34,13 @@ void
 	node->childs[node->childs_size] = child;
 	node->childs_size++;
 }
+
+void
+	node_move(t_snode *dest, t_snode *src)
+{
+	if (dest == src)
+		return ;
+	ft_memcpy(dest, src, sizeof(*src));
+	ft_memset(src, 0, sizeof(*src));
+	src->type = sx_invalid;
+}

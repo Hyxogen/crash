@@ -13,6 +13,7 @@
 #include "commander.h"
 #include "memory.h"
 #include "libft.h"
+#include "minishell.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>

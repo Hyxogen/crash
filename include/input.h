@@ -13,7 +13,6 @@
 #ifndef INPUT_H
 # define INPUT_H
 
-# include "minishell.h"
 # include <sys/types.h>
 
 # define SH_INPUT_PROMPT_MORE "> "

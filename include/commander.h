@@ -34,6 +34,7 @@ typedef int						(*t_cm_cmd_wait)(pid_t pid);
 typedef struct s_cmd_base		t_cmd_base;
 typedef struct s_simple_cmd_ctx	t_simple_cmd_ctx;
 typedef struct s_pipe_ctx		t_pipe_ctx;
+typedef struct s_pipe_ctx		t_pipe_ctx;
 typedef struct s_param_ctx		t_param_ctx;
 typedef struct s_epart			t_epart;
 typedef struct s_expand			t_expand;
@@ -44,6 +45,12 @@ struct s_simple_cmd_ctx {
 	char		**args;
 	int			io[3];
 	int			closefd;
+};
+
+struct s_pipe_ctx {
+	t_snode	*node;
+	int		begin_in;
+	int		end_out;
 };
 
 struct s_epart {
@@ -80,6 +87,9 @@ pid_t			cm_simple_cmd_command(t_snode *cmd_node, const int io[3], int closefd);
 pid_t			cm_if_clause(t_snode *ifnode, const int io[3], int closefd);
 pid_t			cm_for_clause(t_snode *ifnode, const int io[3], int closefd);
 pid_t			cm_case_clause(t_snode *ifnode, const int io[3], int closefd);
+pid_t			cm_while_until_clause(t_snode *ifnode, const int io[3], int closefd);
+pid_t			cm_function(t_snode *ifnode, const int io[3], int closefd);
+pid_t			cm_function_define(t_snode *ifnode, const int io[3], int closefd);
 
 int				commandeer_pipe_sequence(t_snode *list_node, const int io[3]);
 int				commandeer_inner(t_snode *node, const int io[3]);

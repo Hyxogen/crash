@@ -1,6 +1,7 @@
 #include "commander.h"
 #include "minishell.h"
 #include "memory.h"
+#include "libft.h"
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -59,24 +60,70 @@ size_t
 int
 	expand_special(t_expand *exp, char *key)
 {
-	char	*result;
+	char	*str;
+	long	idx;
+	long	i;
 
 	// TODO: special parameters
+	i = 0;
+	while (sh()->args[i] != NULL)
+		i += 1;
+	if (key[0] == '*')
+	{
+		str = sh_getenv("IFS", NULL);
+		if (str == NULL)
+			str = sh_strlst_join(sh()->args + 1, ' ');
+		else
+			str = sh_strlst_join(sh()->args + 1, str[0]);
+		expansion_add_part(exp, sh_strlst_new(str), 0);
+		return (0);
+	}
 	if (key[0] == '@')
 	{
 		expansion_add_part(exp, sh_strlst_dup(sh()->args + 1), 0);
 		exp->parts[exp->count - 1].array = 1;
 		return (0);
 	}
-	else if (key[0] == '0')
+	if (key[0] == '#')
 	{
-		expansion_add_part(exp, sh_strlst_new(ft_strdup(sh()->args[0])), 0);
+		expansion_add_part(exp, sh_strlst_new(ft_itoa(i - 1)), 0);
 		return (0);
 	}
-	result = sh_getenv(key, NULL);
-	if (result == NULL)
+	if (key[0] == '?')
+	{
+		expansion_add_part(exp, sh_strlst_new(ft_itoa(sh()->return_code)), 0);
+		return (0);
+	}
+	if (key[0] == '-')
+	{
+		// TODO: option flags
+		expansion_add_part(exp, sh_strlst_new(ft_strdup("")), 0);
+		return (0);
+	}
+	if (key[0] == '$')
+	{
+		expansion_add_part(exp, sh_strlst_new(ft_itoa(getpid())), 0);
+		return (0);
+	}
+	if (key[0] == '!')
+	{
+		// TODO: background commands
+		expansion_add_part(exp, sh_strlst_new(ft_itoa(0)), 0);
+		return (0);
+	}
+	if (ft_isdigit(key[0]))
+	{
+		idx = ft_atol(key);
+		if (idx < 0 || idx >= i)
+			expansion_add_part(exp, sh_strlst_new(ft_strdup("")), 0);
+		else
+			expansion_add_part(exp, sh_strlst_new(ft_strdup(sh()->args[i])), 0);
+		return (0);
+	}
+	str = sh_getenv(key, NULL);
+	if (str == NULL)
 		return (-1);
-	expansion_add_part(exp, sh_strlst_new(ft_strdup(result)), 0);
+	expansion_add_part(exp, sh_strlst_new(ft_strdup(str)), 0);
 	return (0);
 }
 
@@ -92,6 +139,8 @@ int
 		ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + i;
 		str = cm_expand_str(ctx->token, NULL, ' ');
 		ctx->token->parts[0].data = (char*) ctx->token->parts[0].data - i;
+		if (str != NULL)
+			return (-1);
 		sh_err2(ctx->key, str);
 		free(str);
 	}
@@ -120,6 +169,8 @@ int
 	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + i;
 	str = cm_expand_str(ctx->token, NULL, ' ');
 	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data - i;
+	if (str == NULL)
+		return (-1);
 	sh_setenv(ctx->key, str, 0);
 	expansion_add_part(exp, sh_strlst_new(str), 0);
 	return (0);
@@ -140,18 +191,6 @@ int
 }
 
 int
-	expand_pattern(t_expand *exp,
-		t_param_ctx *ctx, t_expand *tmp)
-{
-	(void) exp;
-	(void) ctx;
-	(void) tmp;
-	// TODO: implement
-	expansion_destroy(tmp);
-	return (-1);
-}
-
-int
 	expand_promote(t_expand *exp, t_expand *tmp)
 {
 	if (tmp->count == 0)
@@ -159,6 +198,77 @@ int
 	else
 		expansion_copy_parts(exp, tmp);
 	expansion_destroy(tmp);
+	return (0);
+}
+
+/* TODO: this function is waaaaAAAYYYY too long */
+int
+	expand_pattern(t_expand *exp, t_param_ctx *ctx, t_expand *tmp)
+{
+	int		*info;
+	char	*pattern;
+	int		long_mode;
+	size_t	i;
+	size_t	j;
+	size_t	best;
+	char	*str;
+	int		ch;
+	int		match;
+
+	long_mode = ctx->token->str[ctx->i] == ctx->token->str[ctx->i + 1];
+	info = NULL;
+	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + ctx->i + long_mode + 1;
+	pattern = cm_expand_str(ctx->token, &info, ' ');
+	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data - ctx->i - long_mode - 1;
+	if (pattern == NULL)
+	{
+		expansion_destroy(tmp);
+		return (-1);
+	}
+	expand_promote(exp, tmp);
+	i = 0;
+	while (exp->parts[0].str[i] != NULL)
+	{
+		j = 0;
+		str = exp->parts[0].str[i];
+		if (ctx->token->str[ctx->i] == '%')
+		{
+			best = ft_strlen(str);
+			while (str[j] != '\0')
+			{
+				match = pattern_match(str + j, pattern, info);
+				if (match)
+				{
+					best = j;
+					if (long_mode)
+						break ;
+				}
+				j += 1;
+			}
+			str[best] = '\0';
+		}
+		else
+		{
+			best = 0;
+			while (str[j] != '\0')
+			{
+				ch = str[j];
+				str[j] = '\0';
+				match = pattern_match(str, pattern, info);
+				str[j] = ch;
+				if (match)
+				{
+					best = j;
+					if (!long_mode)
+						break ;
+				}
+				j += 1;
+			}
+			exp->parts[0].str[i] = ft_strdup(str + best);
+			free(str);
+		}
+		i += 1;
+	}
 	return (0);
 }
 
@@ -191,6 +301,8 @@ int
 		return (expand_assign(exp, ctx, ctx->i + 1));
 	return (-1);
 }
+
+// TODO: error for invalid pattern
 
 int
 	expand_param(t_expand *exp, t_token *token)

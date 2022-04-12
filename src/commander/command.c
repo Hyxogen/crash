@@ -1,4 +1,5 @@
 #include "commander.h"
+#include "minishell.h"
 
 #include <unistd.h>
 #include <errno.h>
@@ -107,13 +108,102 @@ static pid_t
 	return (pid);
 }
 
+/* Returns pid > 0 if none found */
+static pid_t
+	_cm_builtin(t_simple_cmd_ctx *ctx)
+{
+	size_t	index;
+	size_t	size;
+	pid_t	ret;
+
+	index = 0;
+	size = sh()->builtins_size;
+	while (index < size)
+	{
+		if (!ft_strcmp(ctx->args[0], sh()->builtins[index].key))
+		{
+			ret = _cm_simple_builtin_cmd(ctx, sh()->builtins[index].fn);
+			sh_env_clean();
+			sh_strlst_clear(ctx->args);
+			return (ret);
+		}
+		index++;
+	}
+	return (1);
+}
+
+/* Returns pid > 0 if none found */
+static pid_t
+	_cm_function(t_simple_cmd_ctx *ctx)
+{
+	size_t	index;
+	size_t	size;
+	pid_t	ret;
+
+	index = 0;
+	size = sh()->functions_size;
+	while (index < size)
+	{
+		if (!ft_strcmp(ctx->args[0], sh()->functions[index].key))
+		{
+			ret = cm_function(sh()->functions[index].body, ctx->io, -1);
+			sh_env_clean();
+			sh_strlst_clear(ctx->args);
+			return (ret);
+		}
+		index++;
+	}
+	return (1);
+}
+
+/* Returns pid > 0 if none found */
+static pid_t
+	_cm_utility(t_simple_cmd_ctx *ctx)
+{
+	size_t	index;
+	size_t	size;
+	pid_t	ret;
+
+	index = 0;
+	size = sh()->utilities_size;
+	while (index < size)
+	{
+		if (!ft_strcmp(ctx->args[0], sh()->utilities[index].key))
+		{
+			ret = _cm_simple_builtin_cmd(ctx, sh()->utilities[index].fn);
+			sh_env_clean();
+			sh_strlst_clear(ctx->args);
+			return (ret);
+		}
+		index++;
+	}
+	return (1);
+}
+
+/* Returns pid > 0 if none found */
+static pid_t
+	_cm_internal(t_simple_cmd_ctx *ctx)
+{
+	pid_t	pid;
+
+	pid = _cm_builtin(ctx);
+	if (pid <= 0)
+		return (pid);
+	pid = _cm_function(ctx);
+	if (pid <= 0)
+		return (pid);
+	pid = _cm_utility(ctx);
+	return (pid);
+}
+
 pid_t
 	cm_simple_cmd_command(t_snode *cmd_node, const int io[3], int closefd)
 {
-	size_t				i;
 	t_simple_cmd_ctx	ctx;
 	pid_t				ret;
 
+	if (sh()->continuing)
+		return (cm_convert_retcode(0));
 	ctx.args = cm_word_list_to_array(cmd_node->childs[0]);
 	if (ctx.args == 0 || _do_assignments(cmd_node->childs[2], !!ctx.args[0]))
 		return (sh_strlst_clear(ctx.args), cm_convert_retcode(1));
@@ -122,18 +212,9 @@ pid_t
 	ft_memcpy(ctx.io, io, sizeof(ctx.io));
 	ctx.cmd_node = cmd_node;
 	ctx.closefd = closefd;
-	i = 0;
-	while (i < sh()->builtins_size)
-	{
-		if (!ft_strcmp(ctx.args[0], sh()->builtins[i].key))
-		{
-			ret = _cm_simple_builtin_cmd(&ctx, sh()->builtins[i].fn);
-			sh_env_clean();
-			sh_strlst_clear(ctx.args);
-			return (ret);
-		}
-		i += 1;
-	}
+	ret = _cm_internal(&ctx);
+	if (ret <= 0)
+		return (ret);
 	ret = _cm_simple_extern_cmd(&ctx);
 	sh_env_clean();
 	sh_strlst_clear(ctx.args);

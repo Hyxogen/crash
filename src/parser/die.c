@@ -42,10 +42,11 @@ void
 {
 	if (!node)
 		return ;
-	node_destroy_childs(node);
-	if (node->token.id != tk_invalid)
+	if (node->type != sx_invalid)
+		node_destroy_childs(node);
+	if (node->type != sx_invalid && node->token.id != tk_invalid)
 		token_destroy(&node->token);
-	if (node->here_content.id != tk_invalid)
+	if (node->type != sx_invalid && node->here_content.id != tk_invalid)
 		token_destroy(&node->here_content);
 	free(node);
 }

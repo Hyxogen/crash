@@ -25,35 +25,9 @@ int
 	main(int argc, char **argv, char **envp)
 {
 	t_input		in;
-	char		*tmp;
 	int			fd;
-	t_builtin	builtins[5];
 
-	(void) argc;
-	builtins[0].key = "echo";
-	builtins[0].fn = sh_echo;
-	builtins[1].key = "exit";
-	builtins[1].fn = sh_exit;
-	builtins[2].key = ".";
-	builtins[2].fn = sh_dot;
-	builtins[3].key = ":";
-	builtins[3].fn = sh_colon;
-	builtins[4].key = "set";
-	builtins[4].fn = sh_set;
-	tmp = getcwd(NULL, 0);
-	sh()->self = sh_join_path(tmp, argv[0]);
-	free(tmp);
-	sh()->builtins = builtins;
-	sh()->builtins_size = 5;
-	sh()->args = argv;
-	sh()->interactive = 1;
-	sh()->io[SH_STDIN_INDEX] = STDIN_FILENO;
-	sh()->io[SH_STDOUT_INDEX] = STDOUT_FILENO;
-	sh()->io[SH_STDERR_INDEX] = STDERR_FILENO;
-	tmp = ft_strdup(argv[0]);
-	sh()->name = basename(tmp); // TODO: can't use basename
-	free(tmp);
-	sh_env_init(envp);
+	sh_init(argv, envp);
 	cm_enable_reaper();
 	if (argc >= 2)
 	{
@@ -64,5 +38,8 @@ int
 	}
 	else
 		input_new(&in, in_readline, NULL);
-	return (sh_cm_run(&in), EXIT_SUCCESS);
+	sh_cm_run(&in);
+	input_destroy(&in);
+	sh_destroy();
+	return (EXIT_SUCCESS);
 }

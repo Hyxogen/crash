@@ -11,8 +11,9 @@
 /* ************************************************************************** */
 
 #include "lexer.h"
-#include <stdlib.h>
+#include "minishell.h"
 #include "parser.h"
+#include <stdlib.h>
 
 ssize_t
 	_src_next_line(t_source *src, char **out)

@@ -1,12 +1,10 @@
 #!/bin/sh
 
 # TODO:
-# while loops
 # functions
-# break
-# export
-# pattern expansions
 # arithmetic expansions
+# super extra special utilities
+# shift builtin
 
 export eyes
 export tongue

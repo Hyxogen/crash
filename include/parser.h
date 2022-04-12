@@ -18,6 +18,7 @@
 
 enum e_syntax_id
 {
+	sx_invalid = -1,
 	sx_none,
 	sx_and,
 	sx_cmd_word,
@@ -166,6 +167,7 @@ void		node_resize_childs(t_snode *node, size_t newsize);
 t_snode		*node_init(t_snode *node, t_syntax_id syn_id);
 t_snode		*snode(t_syntax_id syn_id);
 void		node_add_child(t_snode *node, t_snode *child);
+void		node_move(t_snode *dest, t_snode *src);
 void		node_destroy_childs(t_snode *node);
 void		node_destroy(t_snode *node);
 int			pr_brace_group(t_parser *pr, t_snode *parent);

@@ -1,5 +1,5 @@
 #include "commander.h"
-
+#include "minishell.h"
 #include "memory.h"
 #include <libft.h>
 
@@ -37,6 +37,7 @@ static int
 	return (1);
 }
 
+/* Returns 1 on match */
 int
 	pattern_match(const char *str, char *pattern, int *info)
 {

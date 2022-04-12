@@ -24,11 +24,11 @@ COMMANDER_FILES	:= \
 	redirect_builtin.c run.c condition.c loop.c \
 	command.c expansion.c expand.c expand_param.c expand_command.c \
 	expand_arith.c new_pattern.c new_pattern_brackets.c new_pattern_class.c \
-	new_pattern_generate.c
+	new_pattern_generate.c function.c init.c
 BUILTINS_FILES	:= \
-	set.c echo.c dot.c colon.c exit.c
+	set.c echo.c dot.c colon.c exit.c break.c export.c continue.c shift.c
 UTIL_FILES		:= \
-	die.c memory.c op.c util.c wrap.c strlst.c err.c
+	die.c memory.c op.c util.c wrap.c strlst.c err.c atol.c
 
 FILE_NAMES		:= \
 	$(BASE_FILES) \
@@ -155,7 +155,7 @@ re: fclean
 
 test:
 	make CC=clang
-	ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=suppressions.txt ./crash < tests/scripts/bf.sh
+	# ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=suppressions.txt ./crash < tests/scripts/bf.sh
 	ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=suppressions.txt ./crash < tests/scripts/cowsay.sh
 	ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=suppressions.txt ./crash < tests/scripts/fib.sh
 	ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=suppressions.txt ./crash < tests/scripts/tableflip.sh

@@ -41,6 +41,23 @@ static int
 	return (WEXITSTATUS(status_code));
 }
 
+int
+	_cm_convert_builtin_pid(pid_t pid)
+{
+	return (-(pid + 1));
+}
+
+static int
+	_cm_wait_cmd(pid_t pid)
+{
+	int	status;
+
+	if (pid <= 0)
+		return (_cm_convert_builtin_pid(pid));
+	sh_waitpid(pid, &status, WUNTRACED);
+	return (_get_exit_code(status));	
+}
+
 char **_array_add(char **array, char *value)
 {
 	size_t	i;
@@ -88,11 +105,10 @@ static t_cm_cmd_proc
 	static t_cm_cmd_proc procs[] = {
 		cm_simple_cmd_command,
 		cm_if_clause,
-		cm_unimplemented_cmd_command,
+		cm_function_define,
 		cm_case_clause,
 		cm_for_clause,
-		cm_unimplemented_cmd_command,
-		cm_unimplemented_cmd_command
+		cm_while_until_clause
 	};
 
 	return (procs);
@@ -110,7 +126,7 @@ pid_t
 }
 
 static pid_t
-	_cm_cmd(t_snode *node, int in, int out, int pipe_write)
+	_cm_cmd_fork(t_snode *node, int in, int out, int pipe_write)
 {
 	int				io[3];
 	t_cm_cmd_proc	proc;
@@ -122,79 +138,65 @@ static pid_t
 	return (proc(node, io, pipe_write));
 }
 
-static int
-	_cm_pipe_sequence_wait(pid_t last_process)
+static pid_t
+	_cm_cmd_nofork(t_snode *node, int in, int out, int pipe_write)
 {
-	pid_t	pid;
-	int		return_code;
-	int		status_code;
+	int				io[3];
+	t_cm_cmd_proc	proc;
+	pid_t			pid;
 
-	if (last_process <= 0)
-		return_code = cm_convert_retcode(last_process);
-	while (1)
+	pid = sh_fork();
+	if (pid == 0)
 	{
-		pid = waitpid(0, &status_code, WUNTRACED);
-		if (pid < 0)
-		{
-			sh_assert(errno == ECHILD);
-			return (return_code);
-		}
-		if (pid == last_process)
-			return_code = _get_exit_code(status_code);
+		io[SH_STDIN_INDEX] = in;
+		io[SH_STDOUT_INDEX] = out;
+		io[SH_STDERR_INDEX] = STDERR_FILENO;
+		proc = _get_commandeer_cmd_procs()[node->type - sx_simple_cmd];
+		exit(_cm_wait_cmd(proc(node, io, pipe_write)));
 	}
-	sh_assert(0);
-	return (-1);
+	return (pid);
 }
 
-/* TODO make sure that child process also don't close begin_in and end_out */
-/* 
-> ./fdcheck 1>&2 | ./fdcheck 1>&2 | ./fdcheck
-0 OPEN; 1 OPEN; 2 OPEN; 3 OPEN; 12 OPEN; 25 OPEN; 26 OPEN; 
-7/10240 open
-0 OPEN; 1 OPEN; 2 OPEN; 4 OPEN; 12 OPEN; 25 OPEN; 26 OPEN; 
-7/10240 open
-0 OPEN; 1 OPEN; 2 OPEN; 12 OPEN; 25 OPEN; 26 OPEN; 
-*/
-/* Will not close begin_in and end_out */
 static int
-	_cm_pipe_sequence_iter(t_snode *node, int begin_in, int end_out)
+	_cm_pipe_sequence_rec(t_pipe_ctx *ctx, int prev_out, size_t index)
 {
-	pid_t			last_process;
-	size_t			count_index[2];
-	int				prev_pipe_io[3];
+	int		ret_code;
+	int		pipe_io[2];
+	pid_t	pid;
 
-	count_index[1] = 0;
-	count_index[0] = node->childs_size;
-	prev_pipe_io[0] = begin_in;
-	while (count_index[1] < count_index[0])
+	if (index + 1 >= ctx->node->childs_size)
 	{
-		if (count_index[1] + 1 >= count_index[0])
-			last_process = _cm_cmd(node->childs[count_index[1]], prev_pipe_io[0], end_out, -1);
-		else
-		{
-			sh_pipe(&prev_pipe_io[1]);
-			_cm_cmd(node->childs[count_index[1]], prev_pipe_io[0], prev_pipe_io[2], prev_pipe_io[1]);
-			if (prev_pipe_io[0] != begin_in)
-				sh_close(prev_pipe_io[0]);
-			prev_pipe_io[0] = prev_pipe_io[1];
-			sh_close(prev_pipe_io[2]);
-		}
-		count_index[1]++;
+		pid = _cm_cmd_fork(ctx->node->childs[index], prev_out, ctx->end_out, -1);
+		if (prev_out != ctx->begin_in)
+			sh_close(prev_out);
+		return (_cm_wait_cmd(pid));
 	}
-	if (prev_pipe_io[0] != begin_in)
-		sh_close(prev_pipe_io[0]);
-	return (_cm_pipe_sequence_wait(last_process));
+	sh_pipe(pipe_io);
+	pid = _cm_cmd_fork(ctx->node->childs[index], prev_out, pipe_io[1], pipe_io[0]);
+	if (prev_out != ctx->begin_in)
+		sh_close(prev_out);
+	sh_close(pipe_io[1]);
+	ret_code = _cm_pipe_sequence_rec(ctx, pipe_io[0], index + 1);
+	_cm_wait_cmd(pid);
+	return (ret_code);
 }
 
 int
 	commandeer_pipe_sequence(t_snode *seq_node, const int io[3])
 {
+	t_pipe_ctx	ctx;
 	int			rc;
 
-	if (seq_node->childs_size == 0)
+	if (seq_node->childs_size == 0 || sh()->breaking > 0)
 		return (0);
+	else if (seq_node->childs_size == 0)
+		return (_cm_cmd_nofork(seq_node->childs[0], io[SH_STDIN_INDEX], io[SH_STDOUT_INDEX], -1));
+	ctx.begin_in = io[SH_STDIN_INDEX];
+	ctx.end_out = io[SH_STDOUT_INDEX];
+	ctx.node = seq_node;
 	cm_disable_reaper();
-	rc = _cm_pipe_sequence_iter(seq_node, io[SH_STDIN_INDEX], io[SH_STDOUT_INDEX]);
+	rc = _cm_pipe_sequence_rec(&ctx, io[SH_STDIN_INDEX], 0);
 	cm_enable_reaper();
+	sh()->return_code = rc; /* TODO check if this should be here */
 	return (rc);
 }
