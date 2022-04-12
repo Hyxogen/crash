@@ -17,7 +17,7 @@ int
 	else if (argc >= 3)
 	{
 		sh_err2("continue", "too many arguments");
-		sh()->breaking = INT_MAX; /* TODO this should probably be handled differently (also check break.c)  */
+		sh()->breaking = sh()->loop_depth; /* TODO this should probably be handled differently (also check break.c)  */
 		return (1);
 	}
 	else if (sh_atol(argv[1], &count) < 0)

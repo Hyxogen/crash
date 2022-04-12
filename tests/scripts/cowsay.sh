@@ -1,10 +1,8 @@
 #!/bin/sh
 
 # TODO:
-# functions
 # arithmetic expansions
 # super extra special utilities
-# shift builtin
 
 export eyes
 export tongue

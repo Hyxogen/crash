@@ -29,5 +29,6 @@ int
 	sh()->breaking = count;
 	if (count > sh()->loop_depth)
 		sh()->breaking = sh()->loop_depth;
+	printf("I should be breaking\n");
 	return (0);
 }

@@ -118,6 +118,7 @@ pid_t
 	return (cm_convert_retcode(rc));
 }
 
+/* TODO make: "while true; do echo Hallo; while true; do echo daar; break 1; done; done" work */
 pid_t
 	cm_while_until_clause(t_snode *node, const int io[3], int closefd)
 {
@@ -135,8 +136,10 @@ pid_t
 		sh()->continuing = 0;
 		rc = commandeer(node->childs[1], loop_io);
 	}
-	if (sh()->breaking > 0)
+	printf("exiting loop %d\n", sh()->breaking);
+	if (sh()->breaking != 0)
 	{
+		printf("breaking %d\n", sh()->breaking);
 		sh()->breaking -= 1;
 		rc = 0;
 	}

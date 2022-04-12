@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-/* TODO implement */
+/* NOTE implement if we ever wish to do so. We decided we couldn't really be bothered */
 static int
 	_is_binary(const char *filen)
 {

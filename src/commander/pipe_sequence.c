@@ -126,7 +126,7 @@ pid_t
 }
 
 static pid_t
-	_cm_cmd_fork(t_snode *node, int in, int out, int pipe_write)
+	_cm_cmd_nofork(t_snode *node, int in, int out, int pipe_write)
 {
 	int				io[3];
 	t_cm_cmd_proc	proc;
@@ -139,7 +139,7 @@ static pid_t
 }
 
 static pid_t
-	_cm_cmd_nofork(t_snode *node, int in, int out, int pipe_write)
+	_cm_cmd_fork(t_snode *node, int in, int out, int pipe_write)
 {
 	int				io[3];
 	t_cm_cmd_proc	proc;

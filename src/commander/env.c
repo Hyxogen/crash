@@ -91,6 +91,26 @@ t_envvar
 	return (var);
 }
 
+void
+	sh_unset(const char *key)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < sh()->vars_size)
+	{
+		if (ft_strcmp(sh()->vars[i].key, key) == 0)
+		{
+			free(sh()->vars[i].value);
+			free(sh()->vars[i].tmp_value);
+			free(sh()->vars[i].key);
+			sh()->vars[i] = sh()->vars[sh()->vars_size - 1];
+			sh()->vars_size -= 1;
+		}
+		i += 1;
+	}
+}
+
 char
 	**sh_env(void)
 {

@@ -26,7 +26,8 @@ COMMANDER_FILES	:= \
 	expand_arith.c new_pattern.c new_pattern_brackets.c new_pattern_class.c \
 	new_pattern_generate.c function.c init.c
 BUILTINS_FILES	:= \
-	set.c echo.c dot.c colon.c exit.c break.c export.c continue.c shift.c
+	set.c echo.c dot.c colon.c exit.c break.c export.c continue.c shift.c \
+	getopts.c
 UTIL_FILES		:= \
 	die.c memory.c op.c util.c wrap.c strlst.c err.c atol.c
 

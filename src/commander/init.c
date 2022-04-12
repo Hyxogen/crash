@@ -19,7 +19,7 @@ static const t_builtin builtins[] = {
 };
 
 static const t_builtin utilities[] = {
-	{ "super_secret_utility", sh_echo }
+	{ "getopts", sh_getopts }
 };
 
 void
@@ -45,6 +45,7 @@ void
 	tmp = ft_strdup(argv[0]);
 	sh()->name = basename(tmp); // TODO: can't use basename
 	free(tmp);
+	sh_setenv("OPTIND", "1", 0);
 }
 
 void

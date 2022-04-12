@@ -57,6 +57,7 @@ size_t
 	return (i);
 }
 
+/* this function is waaaaaaaaAAAAAAYYYY too long */
 int
 	expand_special(t_expand *exp, char *key)
 {

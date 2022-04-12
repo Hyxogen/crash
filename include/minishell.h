@@ -148,6 +148,7 @@ t_envvar	*sh_setenv_int(const char *key);
 t_envvar	*sh_getenv_int(const char *key, int create);
 char		*sh_getenv(const char *key, const char *def);
 t_envvar	*sh_setenv(const char *key, const char *value, int tmp);
+void		sh_unset(const char *key);
 char		**sh_env(void);
 void		sh_env_clean(void);
 void		sh_env_init(char **env);
@@ -186,6 +187,7 @@ int			sh_break(int argc, char **argv);
 int			sh_continue(int argc, char **argv);
 int			sh_export(int argc, char **argv);
 int			sh_shift(int argc, char **argv);
+int			sh_getopts(int argc, char **argv);
 
 void		sh_backtrace(int count);
 int			sh_atol(const char *str, long *v);

@@ -55,9 +55,7 @@ static int
 	target_fd = ft_atol(word);
 	if (target_fd < 0 || target_fd > SH_STDERR_INDEX)
 		return (sh_err1("invalid file descriptor")), -1;
-	if (target_fd >= SH_STDERR_INDEX)
-		return (0);
-	io[target_fd] = io_index;
+	io[io_index] = io[target_fd];
 	return (0);
 }
 
