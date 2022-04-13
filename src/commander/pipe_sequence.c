@@ -130,6 +130,7 @@ static pid_t
 {
 	int				io[3];
 	t_cm_cmd_proc	proc;
+	pid_t			ret;
 
 	io[SH_STDIN_INDEX] = in;
 	io[SH_STDOUT_INDEX] = out;
@@ -189,8 +190,13 @@ int
 
 	if (seq_node->childs_size == 0 || sh()->breaking > 0)
 		return (0);
-	else if (seq_node->childs_size == 0)
-		return (_cm_cmd_nofork(seq_node->childs[0], io[SH_STDIN_INDEX], io[SH_STDOUT_INDEX], -1));
+	else if (seq_node->childs_size == 1)
+	{
+		cm_disable_reaper();
+		rc = _cm_wait_cmd(_cm_cmd_nofork(seq_node->childs[0], io[SH_STDIN_INDEX], io[SH_STDOUT_INDEX], -1));
+		cm_enable_reaper();
+		return (rc);
+	}
 	ctx.begin_in = io[SH_STDIN_INDEX];
 	ctx.end_out = io[SH_STDOUT_INDEX];
 	ctx.node = seq_node;

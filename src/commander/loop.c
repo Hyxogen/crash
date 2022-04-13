@@ -3,77 +3,6 @@
 
 #include <stdio.h>
 /*
-$ for name in 1 2 3 4; do
-> echo $name
-> done
-sx_list
-	sx_term
-		sx_pipe_sequence
-			sx_for_clause:
-				tk_name: name
-					lx_normal: name
-				sx_wordlist
-					sx_word:
-						tk_word: 1
-							lx_normal: 1
-					sx_word:
-						tk_word: 2
-							lx_normal: 2
-					sx_word:
-						tk_word: 3
-							lx_normal: 3
-					sx_word:
-						tk_word: 4
-							lx_normal: 4
-				sx_compound_list
-					sx_term \n
-						sx_pipe_sequence
-							sx_simple_cmd
-								sx_wordlist
-									sx_word:
-										tk_word: echo
-											lx_normal: echo
-									sx_word:
-										tk_word: $name
-											lx_normal: 
-											lx_parameter:
-												tk_word: name
-											lx_normal: 
-								sx_io_redirect_list
-								sx_ass_list
-				sx_io_redirect_list
-
-
-
-> while a; do b; done
-sx_list
-  sx_term
-    sx_pipe_sequence
-      sx_while_clause
-        sx_compound_list
-          sx_term ;
-            sx_pipe_sequence
-              sx_simple_cmd
-                sx_wordlist
-                  sx_word:
-                    tk_word: a
-                      lx_normal: a
-                sx_io_redirect_list
-                sx_ass_list
-        sx_compound_list
-          sx_term ;
-            sx_pipe_sequence
-              sx_simple_cmd
-                sx_wordlist
-                  sx_word:
-                    tk_word: b
-                      lx_normal: b
-                sx_io_redirect_list
-                sx_ass_list
-        sx_io_redirect_list
-*/
-
-/*
 TODO: Check this:
 > for name in 1 2 3 4; do
 > ./fdcheck
@@ -118,7 +47,6 @@ pid_t
 	return (cm_convert_retcode(rc));
 }
 
-/* TODO make: "while true; do echo Hallo; while true; do echo daar; break 1; done; done" work */
 pid_t
 	cm_while_until_clause(t_snode *node, const int io[3], int closefd)
 {
@@ -136,10 +64,8 @@ pid_t
 		sh()->continuing = 0;
 		rc = commandeer(node->childs[1], loop_io);
 	}
-	printf("exiting loop %d\n", sh()->breaking);
 	if (sh()->breaking != 0)
 	{
-		printf("breaking %d\n", sh()->breaking);
 		sh()->breaking -= 1;
 		rc = 0;
 	}
