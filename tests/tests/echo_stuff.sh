@@ -56,7 +56,34 @@ BEES=$(curl https://gist.githubusercontent.com/ElliotGluck/64b0b814293c09999f765
 echo $BEES | cat -e
 echo -n $BEES | cat -e
 
-WHUT=$(curl https://github.com/bits/UTF-8-Unicode-Test-Documents/blob/master/UTF-8_sequence_unseparated/utf8_sequence_0-0x10ffff_assigned_including-unprintable-asis_unseparated.txt)
+WHUT=$(curl https://raw.githubusercontent.com/bits/UTF-8-Unicode-Test-Documents/master/UTF-8_sequence_unseparated/utf8_sequence_0-0xff_assigned_including-unprintable-asis_unseparated.txt)
 
 echo $WHUT
 echo -n $WHUT
+
+echo "$WHUT"
+echo -n "$WHUT"
+
+WHUT=$(curl https://raw.githubusercontent.com/bits/UTF-8-Unicode-Test-Documents/master/UTF-8_sequence_unseparated/utf8_sequence_0-0xfff_assigned_including-unprintable-asis_unseparated.txt)
+
+echo $WHUT
+echo -n $WHUT
+
+echo "$WHUT"
+echo -n "$WHUT"
+
+# WHUT=$(curl https://raw.githubusercontent.com/bits/UTF-8-Unicode-Test-Documents/raw/master/UTF-8_sequence_unseparated/utf8_sequence_0-0xffff_including-unassigned_including-unprintable-replaced_unseparated.txt)
+
+# echo $WHUT
+# echo -n $WHUT
+
+# echo "$WHUT"
+# echo -n "$WHUT"
+
+# DO NOT TRY THIS TEST
+# YOUR PC WILL FREEZE
+# YOU HAVE BEEN WARNED
+# WHUT=$(curl https://raw.githubusercontent.com/bits/UTF-8-Unicode-Test-Documents/master/UTF-8_sequence_unseparated/utf8_sequence_0-0x10ffff_assigned_including-unprintable-asis_unseparated.txt)
+# NOW IS THE TIME TO TURN BACK
+# echo $WHUT
+# echo -n WHUT
