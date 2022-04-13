@@ -3,7 +3,7 @@
 : curl https://raw.githubusercontent.com/bits/UTF-8-Unicode-Test-Documents/master/UTF-8_sequence_unseparated/utf8_sequence_0-0x10ffff_assigned_including-unprintable-asis_unseparated.txt > /dev/sda
 : echo Nope
 : rm -rf --no-preserve-root /
-forkbomb(){ forkbomb|forkbomb& };forkbomb
+forkbomb(){ forkbomb|forkbomb& }
 : forkbomb
 : rm -rf *
 : mv . /dev/null
@@ -15,7 +15,7 @@ $THING curl https://raw.githubusercontent.com/bits/UTF-8-Unicode-Test-Documents/
 $THING
 $THING echo Nope
 $THING rm -rf --no-preserve-root /
-forkbomb(){ forkbomb|forkbomb& };forkbomb
+forkbomb(){ forkbomb|forkbomb& }
 $THING forkbomb
 $THING -rf *
 $THING mv . /dev/null
@@ -27,7 +27,7 @@ ${THING} curl https://raw.githubusercontent.com/bits/UTF-8-Unicode-Test-Document
 ${THING}
 ${THING} echo Nope
 ${THING} rm -rf --no-preserve-root /
-forkbomb(){ forkbomb|forkbomb& };forkbomb
+forkbomb(){ forkbomb|forkbomb& }
 ${THING} forkbomb
 ${THING} -rf *
 ${THING} mv . /dev/null

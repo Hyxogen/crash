@@ -1,3 +1,6 @@
+echo | cat -e
+echo -n | cat -e
+
 echo | cat - e
 echo -n | cat - e
 
