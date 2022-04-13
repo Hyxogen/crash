@@ -151,7 +151,6 @@ func2
 func3
 func4
 
-
 yes() {
 	echo *Teleports behind you*
 	yes() {
@@ -183,3 +182,8 @@ im_running_out_of_function_names() {
 	echo Hallo
 } | false | true | false
 echo $?
+
+wait_it_actually_executes_this_pipe_sequence() {
+	echo Yes
+} | echo It does
+wait_it_actually_executes_this_pipe_sequence
