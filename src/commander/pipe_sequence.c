@@ -99,6 +99,7 @@ char **cm_word_list_to_array(t_snode *word_list)
 	return (ret);
 }
 
+/* TODO implement subshells */
 static t_cm_cmd_proc
 	*_get_commandeer_cmd_procs(void)
 {
@@ -130,7 +131,6 @@ static pid_t
 {
 	int				io[3];
 	t_cm_cmd_proc	proc;
-	pid_t			ret;
 
 	io[SH_STDIN_INDEX] = in;
 	io[SH_STDOUT_INDEX] = out;
