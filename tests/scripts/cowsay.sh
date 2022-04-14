@@ -28,7 +28,10 @@ wrap() {
 			line="$line $word"
 		fi
 	done
-	[ -n "$line" ] && echo "$line"
+	echo before2
+	# echo "$line"
+	[ -n "$line" ]
+	echo after
 }
 
 list_cowfiles() {
@@ -39,6 +42,7 @@ list_cowfiles() {
 			if [ "${file%.cow}" != "$file" ]; then
 				files="$files ${file%.cow}"
 			fi
+			break # remove
 		done
 		wrap 80 $files
 	done
@@ -154,7 +158,7 @@ done
 shift $(($OPTIND - 1))
 message="${*:-`cat`}"
 if [ ! $nowrap ]; then
-	message=$(wrap $wrapcolumn $message)
+	message=$(wrap $wrapcolumn ${message:-""})
 else
 	message=$(echo "$message" | expand -t 8)
 fi
