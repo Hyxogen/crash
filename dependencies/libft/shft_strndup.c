@@ -23,7 +23,7 @@ char
 
 	len = 0;
 	cpy = s1;
-	while (*cpy && n)
+	while (n && *cpy)
 	{
 		len++;
 		cpy++;

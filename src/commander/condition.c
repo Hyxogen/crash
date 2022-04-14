@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 static pid_t
-	cm_elif_clause(t_snode *ifnode, const int io[3], int closefd)
+	cm_elif_clause(t_snode *ifnode, const int io[3])
 {
 	int	statement_ret;
 	int	body_ret;
@@ -19,7 +19,7 @@ static pid_t
 	if (!statement_ret)
 		body_ret = commandeer(ifnode->childs[1], io);
 	else if (ifnode->childs_size >= 3 && ifnode->childs[2]->type == sx_if_clause)
-		body_ret = cm_if_clause(ifnode->childs[2], io, closefd);
+		body_ret = cm_if_clause(ifnode->childs[2], io);
 	else if (ifnode->childs_size >= 3)
 		return (cm_convert_retcode(commandeer(ifnode->childs[2], io)));
 	return (cm_convert_retcode(body_ret));
@@ -27,7 +27,7 @@ static pid_t
 
 /* TODO setup redirects */
 pid_t
-	cm_if_clause(t_snode *ifnode, const int io[3], int closefd)
+	cm_if_clause(t_snode *ifnode, const int io[3])
 {
 	int	if_io[3];
 	int	statement_ret;
@@ -41,7 +41,7 @@ pid_t
 	if (!statement_ret)
 		body_ret = commandeer(ifnode->childs[1], if_io);
 	else if (ifnode->childs_size >= 3 && ifnode->childs[2]->type == sx_if_clause)
-		body_ret = cm_elif_clause(ifnode->childs[2], if_io, closefd);
+		body_ret = cm_elif_clause(ifnode->childs[2], if_io);
 	else if (ifnode->childs_size >= 3)
 		body_ret = commandeer(ifnode->childs[2], if_io);
 	cm_close_nstd_nred(io, if_io);
@@ -65,7 +65,7 @@ static int
 }
 
 pid_t
-	cm_case_clause(t_snode *node, const int io[3], int closefd)
+	cm_case_clause(t_snode *node, const int io[3])
 {
 	size_t	clauses;
 	size_t	index;
@@ -74,7 +74,6 @@ pid_t
 	int		cmp;
 	int		rc;
 
-	(void) closefd;
 	rc = 0;
 	sh_assert(node->type == sx_case_clause);
 	clauses = node->childs_size - 1;

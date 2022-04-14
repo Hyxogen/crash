@@ -172,7 +172,7 @@ done
 for i in $(for i in $(for i in "Segmentation success"
 do
 echo $i;
-./fdcheck
+./fdcheck | cat
 done) 
 do 
 echo $i;

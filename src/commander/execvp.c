@@ -41,6 +41,7 @@ static int
 	char	**envp;
 
 	envp = sh_env();
+	sh_fd_before_exec();
 	ret = execve(name, argv, envp);
 	if (ret == -1 && errno == ENOEXEC)
 	{

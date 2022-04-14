@@ -47,10 +47,28 @@ void
 }
 
 int
-	lex_lex(t_lexer *lex, t_token *tok)
+	lex_lex_int(t_lexer *lex, t_token *tok)
 {
 	int	status;
 
+	status = check_op(lex);
+	if (tok->id != tk_null)
+		return (status);
+	tok->id = tk_word;
+	status = lex_main(lex);
+	if (lex->src->cur == -1)
+		lex->has_eof = 1;
+	return (status);
+}
+
+int
+	lex_lex(t_lexer *lex, t_token *tok)
+{
+	if (lex->has_eof)
+	{
+		lex->has_eof = 0;
+		return (0);
+	}
 	lex->new_part = 1;
 	lex_skip(lex);
 	lex->tok = tok;
@@ -68,9 +86,5 @@ int
 			return (-1);
 		return (0);
 	}
-	status = check_op(lex);
-	if (tok->id != tk_null)
-		return (status);
-	tok->id = tk_word;
-	return (lex_main(lex));
+	return (lex_lex_int(lex, tok));
 }

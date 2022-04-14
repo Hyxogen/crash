@@ -25,7 +25,7 @@ int
 	}
 	if (lex->quote == 1 && lex->src->cur != '\'')
 		return (1);
-	if (lex->quote == 2)
+	if (lex->quote == 2 || lex->end != NULL)
 	{
 		if (lex->src->cur == '$')
 			return (0);
@@ -33,7 +33,7 @@ int
 			return (0);
 		if (lex->src->cur == '\\')
 			return (0);
-		if (lex->src->cur == '"')
+		if (lex->src->cur == '"' && lex->end == NULL)
 			return (0);
 		return (1);
 	}

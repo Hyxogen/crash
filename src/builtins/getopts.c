@@ -18,7 +18,7 @@ static int
 	}
 	while (*str != '\0')
 	{
-		if (*str == args[*ind][1])
+		if (*str == args[*ind][1] && *str != ':')
 		{
 			buf[0] = *str;
 			buf[1] = '\0';
@@ -54,10 +54,11 @@ int
 	optind_str = sh_getenv("OPTIND", "1");
 	if (sh_atol(optind_str, &optind) < 0)
 		optind = 1;
+	// TODO: check optind range
 	if (argc == 3)
 		result = sh_getopt(argv[1], argv[2], &optind, sh()->args);
 	else
-		result = sh_getopt(argv[1], argv[2], &optind, argv + 3);
+		result = sh_getopt(argv[1], argv[2], &optind, argv + 2);
 	optind_str = ft_itoa(optind); // TODO: long?
 	sh_setenv("OPTIND", optind_str, 0);
 	free(optind_str);

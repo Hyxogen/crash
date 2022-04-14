@@ -29,7 +29,7 @@
 # endif
 
 typedef int						(*t_commandeer_proc)(t_snode*, const int[3]);
-typedef pid_t					(*t_cm_cmd_proc)(t_snode*, const int[3], int);
+typedef pid_t					(*t_cm_cmd_proc)(t_snode*, const int[3]);
 typedef int						(*t_cm_cmd_wait)(pid_t pid);
 typedef struct s_cmd_base		t_cmd_base;
 typedef struct s_simple_cmd_ctx	t_simple_cmd_ctx;
@@ -44,7 +44,6 @@ struct s_simple_cmd_ctx {
 	t_snode		*cmd_node;
 	char		**args;
 	int			io[3];
-	int			closefd;
 };
 
 struct s_pipe_ctx {
@@ -85,13 +84,13 @@ void			_cm_close_nostd(int fd);
 void			cm_close_nstd_nred(const int original[3], const int redirect[3]);
 
 pid_t			cm_convert_retcode(int rc);
-pid_t			cm_simple_cmd_command(t_snode *cmd_node, const int io[3], int closefd);
-pid_t			cm_if_clause(t_snode *ifnode, const int io[3], int closefd);
-pid_t			cm_for_clause(t_snode *ifnode, const int io[3], int closefd);
-pid_t			cm_case_clause(t_snode *ifnode, const int io[3], int closefd);
-pid_t			cm_while_until_clause(t_snode *ifnode, const int io[3], int closefd);
-pid_t			cm_function(t_snode *ifnode, const int io[3], int closefd);
-pid_t			cm_function_define(t_snode *ifnode, const int io[3], int closefd);
+pid_t			cm_simple_cmd_command(t_snode *cmd_node, const int io[3]);
+pid_t			cm_if_clause(t_snode *ifnode, const int io[3]);
+pid_t			cm_for_clause(t_snode *ifnode, const int io[3]);
+pid_t			cm_case_clause(t_snode *ifnode, const int io[3]);
+pid_t			cm_while_until_clause(t_snode *ifnode, const int io[3]);
+pid_t			cm_function(t_snode *ifnode, const int io[3]);
+pid_t			cm_function_define(t_snode *ifnode, const int io[3]);
 
 int				commandeer_pipe_sequence(t_snode *list_node, const int io[3]);
 int				commandeer_inner(t_snode *node, const int io[3]);
@@ -109,7 +108,7 @@ int				expand_command(t_expand *exp, t_snode *node);
 int				expand_backtick(t_expand *exp, char *str);
 int				expand_arith(t_expand *exp, t_token *token);
 
-pid_t			cm_unimplemented_cmd_command(t_snode *node, const int io[3], int closefd);
+pid_t			cm_unimplemented_cmd_command(t_snode *node, const int io[3]);
 
 char			**cm_word_list_to_array(t_snode *word_list);
 
@@ -131,4 +130,6 @@ int				_pattern_process_brackets(char **pattern, t_pattern_node *node, int moved
 t_pattern_node	*_pattern_generate(char *pattern, int *info);
 int				pattern_match(const char *str, char *pattern, int *info);
 void			_pattern_destroy(t_pattern_node *node);
+void			pattern_debug_print_node(t_pattern_node *node);
+void			pattern_debug_print_chain(t_pattern_node *head);
 #endif

@@ -89,8 +89,6 @@ static pid_t
 	pid = sh_fork();
 	if (pid == 0)
 	{
-		if (ctx->closefd >= 0)
-			sh_close(ctx->closefd);
 		sh_dup2(ctx->io[SH_STDIN_INDEX], STDIN_FILENO);
 		sh_dup2(ctx->io[SH_STDOUT_INDEX], STDOUT_FILENO);
 		sh_dup2(ctx->io[SH_STDERR_INDEX], STDERR_FILENO);
@@ -146,7 +144,7 @@ static pid_t
 	{
 		if (!ft_strcmp(ctx->args[0], sh()->functions[index].key))
 		{
-			ret = cm_function(sh()->functions[index].body, ctx->io, -1);
+			ret = cm_function(sh()->functions[index].body, ctx->io);
 			sh_env_clean();
 			sh_strlst_clear(ctx->args);
 			return (ret);
@@ -197,7 +195,7 @@ static pid_t
 }
 
 pid_t
-	cm_simple_cmd_command(t_snode *cmd_node, const int io[3], int closefd)
+	cm_simple_cmd_command(t_snode *cmd_node, const int io[3])
 {
 	t_simple_cmd_ctx	ctx;
 	pid_t				ret;
@@ -211,7 +209,6 @@ pid_t
 		return (sh_strlst_clear(ctx.args), cm_convert_retcode(0));
 	ft_memcpy(ctx.io, io, sizeof(ctx.io));
 	ctx.cmd_node = cmd_node;
-	ctx.closefd = closefd;
 	ret = _cm_internal(&ctx);
 	if (ret <= 0)
 		return (ret);

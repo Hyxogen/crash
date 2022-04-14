@@ -84,7 +84,8 @@ int
 	sh_close(int fildes)
 {
 	int	ret;
-	
+
+	sh_fdctl(fildes, SH_FD_FIOCLEX, 0);
 	ret = close(fildes);
 	sh_check(ret >= 0, "close");
 	return (ret);

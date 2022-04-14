@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "lexer.h"
+#include <unistd.h>
 
 static int
 	lex_check_end(t_lexer *lex)
@@ -30,8 +31,8 @@ static int
 		return (lex->src->cur == -1 || end);
 	}
 	end = (ft_strchr(sep, lex->src->cur) != NULL && lex->src->cur != '\0');
-	if (lex->id == lx_command)
-		return ((end && !lex_quoted(lex)) && lex->src->cur != -1);
+	// if (lex->id == lx_command)
+	// 	return ((end && !lex_quoted(lex)) && lex->src->cur != -1);
 	return ((end && !lex_quoted(lex)) || lex->src->cur == -1);
 }
 

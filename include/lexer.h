@@ -129,6 +129,7 @@ struct s_lexer
 	int			error;
 	int			new_part;
 	int			empty_quote;
+	int			has_eof;
 };
 
 void		lex_append(t_lexer *lex, char **string, size_t *length, int esc);

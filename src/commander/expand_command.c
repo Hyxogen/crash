@@ -5,7 +5,29 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-// TODO: $(kdaushdf) doesn't work
+size_t
+	expand_command_sanitize(char *str, size_t size)
+{
+	size_t	i;
+	size_t	j;
+
+	while (size > 0 && str[size - 1] == '\n')
+		size -= 1;
+	i = 0;
+	j = 0;
+	while (i < size)
+	{
+		if (str[i] != '\0')
+		{
+			str[j] = str[i];
+			j += 1;
+		}
+		else
+			sh_err3("warning", "command substitution", "ignored null byte in input");
+		i += 1;
+	}
+	return (j);
+}
 
 int
 	expand_command_fd(t_expand *exp, pid_t pid, int fd)
@@ -19,13 +41,12 @@ int
 	ret = 1;
 	while (ret > 0)
 	{
-		str = sh_safe_realloc(str, size, size + 1024);
-		ret = read(fd, str + size, 1024);
+		str = sh_safe_realloc(str, size, size + 4096);
+		ret = read(fd, str + size, 4096);
 		if (ret >= 0)
 			size += ret;
 	}
-	while (size > 0 && str[size - 1] == '\n')
-		size -= 1;
+	size = expand_command_sanitize(str, size);
 	str[size] = '\0';
 	sh_close(fd);
 	sh_waitpid(pid, NULL, 0);

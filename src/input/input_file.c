@@ -17,6 +17,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+
+#include <stdio.h>
+
 t_file_handle
 	*start_read(int fd)
 {

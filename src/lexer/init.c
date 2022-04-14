@@ -39,6 +39,7 @@ void
 	lex->end = NULL;
 	lex->here_flags = 0;
 	lex->new_part = 1;
+	lex->has_eof = 0;
 }
 
 void

@@ -12,7 +12,7 @@ TODO: Check this:
 /* TODO implement no wordlist */
 /* TODO setup redirects */
 pid_t
-	cm_for_clause(t_snode *fornode, const int io[3], int closefd)
+	cm_for_clause(t_snode *fornode, const int io[3])
 {
 	char	*name;
 	char	**list;
@@ -22,7 +22,6 @@ pid_t
 	t_snode	*do_node;
 
 	sh()->loop_depth += 1;
-	(void) closefd;
 	rc = 0;
 	name = fornode->token.str;
 	list = cm_word_list_to_array(fornode->childs[0]);
@@ -48,13 +47,12 @@ pid_t
 }
 
 pid_t
-	cm_while_until_clause(t_snode *node, const int io[3], int closefd)
+	cm_while_until_clause(t_snode *node, const int io[3])
 {
 	int	rc;
 	int	loop_io[3];
 
 	sh()->loop_depth += 1;
-	(void) closefd;
 	rc = -1;
 	sh_assert(node->childs_size >= 3);
 	ft_memcpy(loop_io, io, sizeof(loop_io));

@@ -18,6 +18,7 @@
 # include <stddef.h>
 # include <sys/types.h>
 # include <signal.h>
+# include <limits.h>
 
 /* Constant Rage Again SHell */
 /* Can't Rest Again SHell */
@@ -76,6 +77,7 @@
 
 // MAYBE TODO:
 // break in pipe sequence
+// errors for unclosed stuff
 
 // FOR SURE TODO
 // fork in multi-command pipe sequence
@@ -97,6 +99,15 @@ typedef struct s_builtin	t_builtin;
 typedef struct s_function	t_function;
 /* return code should be: -return_code - 1 */
 typedef int					(*t_builtin_proc)(int argc, char **argv);
+
+# ifndef OPEN_MAX
+#  define OPEN_MAX 1024
+# endif
+
+# ifndef SH_FD_FIOCLEX
+#  define SH_FD_FIOCLEX 0x1
+# endif
+
 
 struct s_envvar
 {
@@ -138,6 +149,7 @@ struct s_minishell
 	struct sigaction	child_reaper;
 	char				*name;
 	int					return_code;
+	int					fd_flags[OPEN_MAX];
 };
 
 char		*sh_join2(char *lhs, char delim, char *rhs);
@@ -200,5 +212,8 @@ void		sh_err3(const char *s1, const char *s2, const char *s3);
 void		sh_init(char **argv, char **env);
 void		sh_destroy(void);
 void		sh_add_function(const char *key, t_snode *body);
+
+void		sh_fdctl(int fd, int flag, int on);
+void		sh_fd_before_exec(void);
 
 #endif

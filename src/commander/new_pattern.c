@@ -2,6 +2,11 @@
 #include "minishell.h"
 #include "memory.h"
 #include <libft.h>
+#include <ft_printf.h>
+#include <unistd.h>
+
+
+#include <stdio.h>
 
 static int
 	_is_match(char ch, t_pattern_node *const node)
@@ -35,6 +40,33 @@ static int
 		node = node->next;
 	}
 	return (1);
+}
+
+void
+	pattern_debug_print_node(t_pattern_node *node)
+{
+	int	index;
+
+	index = 1;
+	ft_fprintf(STDERR_FILENO, "[");
+	while (index < sizeof(node->chars)/sizeof(node->chars[0]))
+	{
+		if (node->chars[index])
+			ft_fprintf(STDERR_FILENO, "%c", index);
+		index++;
+	}
+	ft_fprintf(STDERR_FILENO, "]");
+}
+
+void
+	pattern_debug_print_chain(t_pattern_node *head)
+{
+	while (head)
+	{
+		pattern_debug_print_node(head);
+		head = head->next;
+	}
+	ft_fprintf(STDERR_FILENO, "\n");
 }
 
 /* Returns 1 on match */

@@ -58,14 +58,14 @@ int
 static void
 	_enable_chars(t_pattern_node *node, int (*isfunc)(int))
 {
-	size_t	index;
-	size_t	size;
+	unsigned int		index;
+	size_t				size;
 
 	index = 0;
 	size = sizeof(node->chars) / sizeof(node->chars[0]);
 	while (index < size)
 	{
-		if (isfunc(node->chars[index]))
+		if (isfunc(index))
 			node->chars[index] = 0x1;
 		index++;
 	}

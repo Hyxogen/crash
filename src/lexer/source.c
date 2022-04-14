@@ -41,6 +41,7 @@ int
 	{
 		free(src->str);
 		src->off = 0;
+		src->str = NULL;
 		ret = _src_next_line(src, &src->str);
 		if (ret < 0)
 			return (-1);

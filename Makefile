@@ -29,7 +29,7 @@ BUILTINS_FILES	:= \
 	set.c echo.c dot.c colon.c exit.c break.c export.c continue.c shift.c \
 	getopts.c
 UTIL_FILES		:= \
-	die.c memory.c op.c util.c wrap.c strlst.c err.c atol.c
+	die.c memory.c op.c util.c wrap.c strlst.c err.c atol.c file.c
 
 FILE_NAMES		:= \
 	$(BASE_FILES) \
@@ -138,7 +138,7 @@ $(FT_PRINTF_LIB):
 	$(SILENT)${MAKE} -C $(FT_PRINTF_DIR) bonus
 
 crash: $(NAME)
-	$(SILENT)ln -s $(NAME) $@
+	$(SILENT)#ln -s $(NAME) $@
 
 clean:
 	@printf $(CLEAN_COLOR)Cleaning\ object\ files\ and\ dependencies$(RESET)\\n

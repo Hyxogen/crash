@@ -109,25 +109,24 @@ static t_cm_cmd_proc
 		cm_function_define,
 		cm_case_clause,
 		cm_for_clause,
-		cm_while_until_clause
+		cm_while_until_clause,
 	};
 
 	return (procs);
 }
 
 pid_t
-	cm_unimplemented_cmd_command(t_snode *node, const int io[3], int closefd)
+	cm_unimplemented_cmd_command(t_snode *node, const int io[3])
 {
 	(void) node;
 	(void) io;
 
-	(void) closefd;
 	sh_err1("executing this command type is not implemented yet");
-	return (-1);
+	return (cm_convert_retcode(0));
 }
 
 static pid_t
-	_cm_cmd_nofork(t_snode *node, int in, int out, int pipe_write)
+	_cm_cmd_nofork(t_snode *node, int in, int out)
 {
 	int				io[3];
 	t_cm_cmd_proc	proc;
@@ -136,13 +135,14 @@ static pid_t
 	io[SH_STDIN_INDEX] = in;
 	io[SH_STDOUT_INDEX] = out;
 	io[SH_STDERR_INDEX] = STDERR_FILENO;
+	fprintf(stderr, "CMD NO FORK %d\n", node->type - sx_simple_cmd);
 	proc = _get_commandeer_cmd_procs()[node->type - sx_simple_cmd];
-	pid = proc(node, io, pipe_write);
+	pid = proc(node, io);
 	return (pid);
 }
 
 static pid_t
-	_cm_cmd_fork(t_snode *node, int in, int out, int pipe_write)
+	_cm_cmd_fork(t_snode *node, int in, int out)
 {
 	int				io[3];
 	t_cm_cmd_proc	proc;
@@ -154,8 +154,9 @@ static pid_t
 		io[SH_STDIN_INDEX] = in;
 		io[SH_STDOUT_INDEX] = out;
 		io[SH_STDERR_INDEX] = STDERR_FILENO;
+		ft_fprintf(STDERR_FILENO, "CMD FORK %d\n", node->type - sx_simple_cmd);
 		proc = _get_commandeer_cmd_procs()[node->type - sx_simple_cmd];
-		exit(_cm_wait_cmd(proc(node, io, pipe_write)));
+		exit(_cm_wait_cmd(proc(node, io)));
 	}
 	return (pid);
 }
@@ -169,13 +170,15 @@ static int
 
 	if (index + 1 >= ctx->node->childs_size)
 	{
-		pid = _cm_cmd_fork(ctx->node->childs[index], prev_out, ctx->end_out, -1);
+		pid = _cm_cmd_fork(ctx->node->childs[index], prev_out, ctx->end_out);
 		if (prev_out != ctx->begin_in)
 			sh_close(prev_out);
 		return (_cm_wait_cmd(pid));
 	}
 	sh_pipe(pipe_io);
-	pid = _cm_cmd_fork(ctx->node->childs[index], prev_out, pipe_io[1], pipe_io[0]);
+	sh_fdctl(pipe_io[0], SH_FD_FIOCLEX, 1);
+	sh_fdctl(pipe_io[1], SH_FD_FIOCLEX, 1);
+	pid = _cm_cmd_fork(ctx->node->childs[index], prev_out, pipe_io[1]);
 	if (prev_out != ctx->begin_in)
 		sh_close(prev_out);
 	sh_close(pipe_io[1]);
@@ -195,8 +198,9 @@ int
 	else if (seq_node->childs_size == 1)
 	{
 		cm_disable_reaper();
-		rc = _cm_wait_cmd(_cm_cmd_nofork(seq_node->childs[0], io[SH_STDIN_INDEX], io[SH_STDOUT_INDEX], -1));
+		rc = _cm_wait_cmd(_cm_cmd_nofork(seq_node->childs[0], io[SH_STDIN_INDEX], io[SH_STDOUT_INDEX]));
 		cm_enable_reaper();
+		sh()->return_code = rc; /* TODO check if this should be here */
 		return (rc);
 	}
 	ctx.begin_in = io[SH_STDIN_INDEX];

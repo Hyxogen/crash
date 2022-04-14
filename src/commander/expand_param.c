@@ -118,7 +118,7 @@ int
 		if (idx < 0 || idx >= i)
 			expansion_add_part(exp, sh_strlst_new(ft_strdup("")), 0);
 		else
-			expansion_add_part(exp, sh_strlst_new(ft_strdup(sh()->args[i])), 0);
+			expansion_add_part(exp, sh_strlst_new(ft_strdup(sh()->args[idx])), 0);
 		return (0);
 	}
 	str = sh_getenv(key, NULL);

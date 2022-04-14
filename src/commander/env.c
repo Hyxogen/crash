@@ -125,7 +125,7 @@ char
 	{
 		if (sh()->vars[i].tmp_value != NULL)
 			out[j++] = sh_join2(sh()->vars[i].key, '=', sh()->vars[i].tmp_value);
-		else if ((sh()->vars[i].attr & SH_ENV_EXPORT))
+		else if ((sh()->vars[i].attr & SH_ENV_EXPORT) && sh()->vars[i].value != NULL)
 			out[j++] = sh_join2(sh()->vars[i].key, '=', sh()->vars[i].value);
 		i += 1;
 	}
