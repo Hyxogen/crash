@@ -6,6 +6,7 @@
 #include <limits.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdlib.h>
 
 static int
 	_cm_open_file(const char *filen, int flags, int mode)
@@ -79,12 +80,29 @@ static int
 	return (0);
 }
 
-/* TODO implement */
 static int
 	_cm_handle_here_redi(t_snode *redi_node, int io[3])
 {
-	(void) redi_node;
-	(void) io;
+	char	*str;
+	int		here_pipe[2];
+	pid_t	pid;
+
+	str = cm_expand_str(&redi_node->childs[0]->here_content, NULL, ' ');
+	if (str == NULL)
+		return (-1);
+	sh_pipe(here_pipe);
+	io[SH_STDIN_INDEX] = here_pipe[0];
+	pid = sh_fork();
+	if (pid == 0)
+	{
+		sh_close(here_pipe[0]);
+		sh_write(here_pipe[1], str, ft_strlen(str));
+		free(str);
+		sh_close(here_pipe[1]);
+		exit(EXIT_SUCCESS);
+	}
+	sh_close(here_pipe[1]);
+	free(str);
 	return (0);
 }
 

@@ -86,6 +86,7 @@ static int
 	return (sh_dup2(target_fd, from_fd) < 0);
 }
 
+/* TODO check if here docs can be redirected to a specific file descriptor */
 static int
 	_cm_handle_here_redi(t_snode *redi_node)
 {

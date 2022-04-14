@@ -7,21 +7,45 @@
 
 #include <stdio.h>
 
+static pid_t
+	cm_elif_clause(t_snode *ifnode, const int io[3], int closefd)
+{
+	int	statement_ret;
+	int	body_ret;
+
+	sh_assert(ifnode->type == sx_if_clause);
+	statement_ret = commandeer(ifnode->childs[0], io);
+	body_ret = 0;
+	if (!statement_ret)
+		body_ret = commandeer(ifnode->childs[1], io);
+	else if (ifnode->childs_size >= 3 && ifnode->childs[2]->type == sx_if_clause)
+		body_ret = cm_if_clause(ifnode->childs[2], io, closefd);
+	else if (ifnode->childs_size >= 3)
+		return (cm_convert_retcode(commandeer(ifnode->childs[2], io)));
+	return (cm_convert_retcode(body_ret));
+}
+
 /* TODO setup redirects */
 pid_t
 	cm_if_clause(t_snode *ifnode, const int io[3], int closefd)
 {
-	int	rc;
+	int	if_io[3];
+	int	statement_ret;
+	int	body_ret;
 
 	sh_assert(ifnode->type == sx_if_clause);
-	rc = commandeer(ifnode->childs[0], io);
-	if (!rc)
-		return (cm_convert_retcode(commandeer(ifnode->childs[1], io)));
-	if (ifnode->childs_size >= 3 && ifnode->childs[2]->type == sx_if_clause)
-		return (cm_if_clause(ifnode->childs[2], io, closefd));
+	ft_memcpy(if_io, io, sizeof(int) * 3);
+	_cm_setup_builtin_redirects(ifnode->childs[ifnode->childs_size - 1], if_io);
+	statement_ret = commandeer(ifnode->childs[0], if_io);
+	body_ret = 0;
+	if (!statement_ret)
+		body_ret = commandeer(ifnode->childs[1], if_io);
+	else if (ifnode->childs_size >= 3 && ifnode->childs[2]->type == sx_if_clause)
+		body_ret = cm_elif_clause(ifnode->childs[2], if_io, closefd);
 	else if (ifnode->childs_size >= 3)
-		return (cm_convert_retcode(commandeer(ifnode->childs[2], io)));
-	return (cm_convert_retcode(0));
+		body_ret = commandeer(ifnode->childs[2], if_io);
+	cm_close_nstd_nred(io, if_io);
+	return (cm_convert_retcode(body_ret));
 }
 
 static int
@@ -48,8 +72,10 @@ pid_t
 	char	*lhs;
 	int		case_io[3];
 	int		cmp;
+	int		rc;
 
 	(void) closefd;
+	rc = 0;
 	sh_assert(node->type == sx_case_clause);
 	clauses = node->childs_size - 1;
 	lhs = cm_expand_str(&node->token, NULL, ' ');
@@ -62,10 +88,17 @@ pid_t
 	{
 		cmp = _cm_strlst_cmp(lhs, &node->childs[index]->token);
 		if (!cmp)
-			return (cm_convert_retcode(commandeer(node->childs[index], io)));
+		{
+			rc = commandeer(node->childs[index], case_io);
+			break;
+		}
 		else if (cmp < 0)
-			return (cm_convert_retcode(1));
+		{
+			rc =  1;
+			break;
+		}
 		index++;
 	}
-	return (cm_convert_retcode(0));
+	cm_close_nstd_nred(io, case_io);
+	return (cm_convert_retcode(rc));
 }

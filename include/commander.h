@@ -81,6 +81,8 @@ struct s_pattern_node {
 int				command(t_snode *cmd_node, int io[3]);
 
 void			_cm_close_nostd(int fd);
+/* Closes all the non std filedescriptors that differ between the orginal and redirect */
+void			cm_close_nstd_nred(const int original[3], const int redirect[3]);
 
 pid_t			cm_convert_retcode(int rc);
 pid_t			cm_simple_cmd_command(t_snode *cmd_node, const int io[3], int closefd);

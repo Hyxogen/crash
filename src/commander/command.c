@@ -85,7 +85,7 @@ static pid_t
 	_cm_simple_extern_cmd(t_simple_cmd_ctx *ctx)
 {
 	pid_t	pid;
-	
+
 	pid = sh_fork();
 	if (pid == 0)
 	{
@@ -219,4 +219,16 @@ pid_t
 	sh_env_clean();
 	sh_strlst_clear(ctx.args);
 	return (ret);
+}
+
+/* TODO move this to a different file */
+void
+	cm_close_nstd_nred(const int original[3], const int redirect[3])
+{
+	if (original[SH_STDIN_INDEX] != redirect[SH_STDIN_INDEX])
+		_cm_close_nostd(original[SH_STDIN_INDEX]);
+	if (original[SH_STDOUT_INDEX] != redirect[SH_STDOUT_INDEX])
+		_cm_close_nostd(original[SH_STDOUT_INDEX]);
+	if (original[SH_STDERR_INDEX] != redirect[SH_STDERR_INDEX])
+		_cm_close_nostd(original[SH_STDERR_INDEX]);
 }

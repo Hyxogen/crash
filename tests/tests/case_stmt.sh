@@ -72,7 +72,7 @@ case "abc" in
 
 case "abc" in
 	*d)
-		echo Nope
+		echo This is very wrong
 		;;
 	???*)
 		echo Ye boi

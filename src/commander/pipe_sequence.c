@@ -131,12 +131,14 @@ static pid_t
 {
 	int				io[3];
 	t_cm_cmd_proc	proc;
+	pid_t			pid;
 
 	io[SH_STDIN_INDEX] = in;
 	io[SH_STDOUT_INDEX] = out;
 	io[SH_STDERR_INDEX] = STDERR_FILENO;
 	proc = _get_commandeer_cmd_procs()[node->type - sx_simple_cmd];
-	return (proc(node, io, pipe_write));
+	pid = proc(node, io, pipe_write);
+	return (pid);
 }
 
 static pid_t
