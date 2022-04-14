@@ -15,7 +15,7 @@ static const t_builtin builtins[] = {
 	{ "break", sh_break },
 	{ "export", sh_export },
 	{ "continue", sh_continue },
-	{ "shift", sh_shift },
+	{ "shift", sh_shift }
 };
 
 static const t_builtin utilities[] = {

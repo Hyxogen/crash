@@ -223,9 +223,9 @@ void
 	cm_close_nstd_nred(const int original[3], const int redirect[3])
 {
 	if (original[SH_STDIN_INDEX] != redirect[SH_STDIN_INDEX])
-		_cm_close_nostd(original[SH_STDIN_INDEX]);
+		_cm_close_nostd(redirect[SH_STDIN_INDEX]);
 	if (original[SH_STDOUT_INDEX] != redirect[SH_STDOUT_INDEX])
-		_cm_close_nostd(original[SH_STDOUT_INDEX]);
+		_cm_close_nostd(redirect[SH_STDOUT_INDEX]);
 	if (original[SH_STDERR_INDEX] != redirect[SH_STDERR_INDEX])
-		_cm_close_nostd(original[SH_STDERR_INDEX]);
+		_cm_close_nostd(redirect[SH_STDERR_INDEX]);
 }

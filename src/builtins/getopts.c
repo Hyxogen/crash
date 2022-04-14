@@ -1,6 +1,8 @@
 #include "minishell.h"
 #include "commander.h"
 
+#include <stdlib.h>
+
 // TODO: this implementation is incomplete
 // TODO: this implementation does not work
 

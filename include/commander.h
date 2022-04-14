@@ -28,9 +28,30 @@
 #  define SH_STDERR_INDEX 2
 # endif
 
+enum e_arith_id {
+	ar_primary,
+	ar_conditional,
+	ar_assign,
+	ar_op_mul,
+	ar_op_div,
+	ar_op_mod,
+	ar_op_sub,
+	ar_op_add,
+	ar_bit_not,
+	ar_bit_shl,
+	ar_bit_shr,
+	ar_bit_and,
+	ar_bit_xor,
+	ar_bit_or,
+	ar_rel_lt,
+	ar_rel_gt,
+	ar_rel_eq
+};
+
 typedef int						(*t_commandeer_proc)(t_snode*, const int[3]);
 typedef pid_t					(*t_cm_cmd_proc)(t_snode*, const int[3]);
 typedef int						(*t_cm_cmd_wait)(pid_t pid);
+typedef enum e_arith_id			t_arith_id;
 typedef struct s_cmd_base		t_cmd_base;
 typedef struct s_simple_cmd_ctx	t_simple_cmd_ctx;
 typedef struct s_pipe_ctx		t_pipe_ctx;
@@ -39,6 +60,7 @@ typedef struct s_param_ctx		t_param_ctx;
 typedef struct s_epart			t_epart;
 typedef struct s_expand			t_expand;
 typedef struct s_pattern_node	t_pattern_node;
+typedef struct s_arith_node		t_arith_node;
 
 struct s_simple_cmd_ctx {
 	t_snode		*cmd_node;
@@ -75,6 +97,12 @@ struct s_pattern_node {
 	int				invert;
 	int				infinite;
 	t_pattern_node	*next;
+};
+
+struct s_arith_node {
+	t_arith_id		id;
+	t_arith_node	*children;
+	size_t			children_size;
 };
 
 int				command(t_snode *cmd_node, int io[3]);

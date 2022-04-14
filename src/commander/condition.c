@@ -6,6 +6,7 @@
 
 
 #include <stdio.h>
+#include <unistd.h>
 
 static pid_t
 	cm_elif_clause(t_snode *ifnode, const int io[3])

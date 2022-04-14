@@ -32,6 +32,7 @@ int
 	if (argc >= 2)
 	{
 		fd = open(argv[1], O_RDONLY);
+		sh_fdctl(fd, SH_FD_FIOCLEX, 1);
 		sh()->args = argv + 1;
 		sh()->interactive = 0;
 		input_new(&in, in_file, (void*)(unsigned long long) fd);

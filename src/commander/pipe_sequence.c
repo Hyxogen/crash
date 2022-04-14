@@ -29,7 +29,7 @@
 void
 	_cm_close_nostd(int fd)
 {
-	if (fd != STDIN_FILENO && fd != STDOUT_FILENO && fd != STDERR_FILENO)
+	if (fd >= 0 && fd != STDIN_FILENO && fd != STDOUT_FILENO && fd != STDERR_FILENO)
 		sh_close(fd);
 }
 
@@ -135,7 +135,6 @@ static pid_t
 	io[SH_STDIN_INDEX] = in;
 	io[SH_STDOUT_INDEX] = out;
 	io[SH_STDERR_INDEX] = STDERR_FILENO;
-	fprintf(stderr, "CMD NO FORK %d\n", node->type - sx_simple_cmd);
 	proc = _get_commandeer_cmd_procs()[node->type - sx_simple_cmd];
 	pid = proc(node, io);
 	return (pid);
@@ -154,7 +153,6 @@ static pid_t
 		io[SH_STDIN_INDEX] = in;
 		io[SH_STDOUT_INDEX] = out;
 		io[SH_STDERR_INDEX] = STDERR_FILENO;
-		ft_fprintf(STDERR_FILENO, "CMD FORK %d\n", node->type - sx_simple_cmd);
 		proc = _get_commandeer_cmd_procs()[node->type - sx_simple_cmd];
 		exit(_cm_wait_cmd(proc(node, io)));
 	}
