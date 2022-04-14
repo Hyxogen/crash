@@ -3,6 +3,8 @@
 #include "memory.h"
 #include <libft.h>
 
+
+#include <stdio.h>
 /**
  * Processes something called a collating symbols, which is (as far as I
  * understand) something to be handled as one character even though it
@@ -89,7 +91,7 @@ int
 		return (_enable_chars(node, ft_iscntrl), *pattern += 9, 7);
 	if (!ft_strncmp(*pattern + 2, "digit:]", 7))
 		return (_enable_chars(node, ft_isdigit), *pattern += 9, 7);
-	if (!ft_strncmp(*pattern + 2, "graqh:]", 7))
+	if (!ft_strncmp(*pattern + 2, "graph:]", 7))
 		return (_enable_chars(node, ft_isgraph), *pattern += 9, 7);
 	if (!ft_strncmp(*pattern + 2, "lower:]", 7))
 		return (_enable_chars(node, ft_islower), *pattern += 9, 7);
