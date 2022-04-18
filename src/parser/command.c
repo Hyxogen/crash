@@ -13,6 +13,9 @@
 #include "parser.h"
 #include <stdlib.h>
 
+
+#include <stdio.h>
+
 int
 	pr_compound_cmd(t_parser *pr, t_snode *parent)
 {
@@ -52,10 +55,11 @@ int
 		return (0);
 	if (pr_list(pr, parent))
 	{
-		if (pr->next.id == tk_invalid)
+		if (pr->next.id == tk_invalid) {
 			return (1);
+		}
 	}
-	if (pr->current.id != tk_newline)
+	if (pr->current.id != tk_newline && pr->current.id != tk_null)
 		pr->lexer->error = SH_PR_UNEXTOKEN;
 	return (0);
 }
@@ -66,10 +70,14 @@ int
 	t_snode	*node;
 
 	node = snode(sx_command_list);
+	while (pr->current.id == tk_newline)
+		pr_next_token(pr);
 	while (pr_complete_cmd(pr, node))
 	{
 		token_destroy(&pr->current);
 		pr_next_token(pr);
+		while (pr->current.id == tk_newline)
+			pr_next_token(pr);
 	}
 	node_add_child(parent, node);
 	return (1);
