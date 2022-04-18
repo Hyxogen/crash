@@ -43,15 +43,13 @@ int
 	size_t	index;
 	size_t	size;
 	int		ret;
-	int		ret2;
 
 	ret = 0;
 	size = node->childs_size;
 	index = 0;
 	while (index < size)
 	{
-		ret2 = get_command_table()[node->childs[index]->type](node->childs[index], io);
-		ret = (ret || ret2);
+		ret = get_command_table()[node->childs[index]->type](node->childs[index], io);
 		index++;
 	}
 	return (!!ret);
