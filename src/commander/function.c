@@ -42,5 +42,5 @@ pid_t
 
 	ft_memcpy(func_io, io, sizeof(func_io));
 	_cm_setup_builtin_redirects(node->childs[node->childs_size - 1], func_io);
-	return (cm_convert_retcode(commandeer(node->childs[0], io)));
+	return (cm_convert_retcode(commandeer(node->childs[0], func_io)));
 }
