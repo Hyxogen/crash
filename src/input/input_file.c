@@ -49,9 +49,10 @@ static int
 
 	if ((rh->beg + n) >= rh->size)
 	{
-		tmp = sh_safe_realloc(rh->buf, rh->size, rh->size + BUFFER_SIZE);
+		tmp = sh_safe_realloc(rh->buf, rh->size, rh->size * 2);
 		rh->size += BUFFER_SIZE;
 		rh->buf = tmp;
+		return (_push_strn(rh, str, n));
 	}
 	ft_memcpy(&rh->buf[rh->end], str, n);
 	rh->end += n;
