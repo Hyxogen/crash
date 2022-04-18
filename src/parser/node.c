@@ -41,6 +41,6 @@ void
 	if (dest == src)
 		return ;
 	ft_memcpy(dest, src, sizeof(*src));
-	ft_memset(src, 0, sizeof(*src));
+	// ft_memset(src, 0, sizeof(*src));
 	src->type = sx_invalid;
 }
