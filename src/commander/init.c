@@ -95,8 +95,11 @@ void
 			sizeof(*sh()->functions) * sh()->functions_size,
 			sizeof(*sh()->functions) * (sh()->functions_size + 1));
 		entry = &sh()->functions[sh()->functions_size];
+		entry->key = NULL;
+		entry->body = NULL;
 		sh()->functions_size += 1;
 	}
+	/* TODO free previous entry */
 	entry->key = ft_strdup(key);
 	entry->body = sh_safe_malloc(sizeof(*body));
 	node_move(entry->body, body);

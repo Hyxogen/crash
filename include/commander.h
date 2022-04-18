@@ -28,30 +28,72 @@
 #  define SH_STDERR_INDEX 2
 # endif
 
-enum e_arith_id {
-	ar_primary,
-	ar_conditional,
-	ar_assign,
-	ar_op_mul,
-	ar_op_div,
-	ar_op_mod,
-	ar_op_sub,
-	ar_op_add,
-	ar_bit_not,
-	ar_bit_shl,
-	ar_bit_shr,
-	ar_bit_and,
-	ar_bit_xor,
-	ar_bit_or,
-	ar_rel_lt,
-	ar_rel_gt,
-	ar_rel_eq
+enum e_arith_node_id {
+	ar_sx_primary,
+	ar_sx_conditional,
+	ar_sx_assign,
+	ar_sx_op_mul,
+	ar_sx_op_div,
+	ar_sx_op_mod,
+	ar_sx_op_sub,
+	ar_sx_op_add,
+	ar_sx_bit_not,
+	ar_sx_bit_shl,
+	ar_sx_bit_shr,
+	ar_sx_bit_and,
+	ar_sx_bit_xor,
+	ar_sx_bit_or,
+	ar_sx_rel_lt,
+	ar_sx_rel_gt,
+	ar_sx_rel_eq
+};
+
+enum e_arith_token_id {
+	ar_tk_null,
+	ar_tk_ident,
+	ar_tk_const,
+	ar_op_lparen,
+	ar_op_rparen,
+	ar_op_plus,
+	ar_op_minus,
+	ar_op_tilde,
+	ar_op_excl,
+	ar_op_star,
+	ar_op_slash,
+	ar_op_perc,
+	ar_op_less_less,
+	ar_op_great_great,
+	ar_op_less,
+	ar_op_great,
+	ar_op_less_eq,
+	ar_op_great_eq,
+	ar_op_eq_eq,
+	ar_op_excl_eq,
+	ar_op_amp,
+	ar_op_caret,
+	ar_op_pipe,
+	ar_op_amp_amp,
+	ar_op_pipe_pipe,
+	ar_op_quest,
+	ar_op_colon,
+	ar_op_eq,
+	ar_op_star_eq,
+	ar_op_slash_eq,
+	ar_op_perc_eq,
+	ar_op_plus_eq,
+	ar_op_minus_eq,
+	ar_op_less_less_eq,
+	ar_op_great_great_eq,
+	ar_op_amp_eq,
+	ar_op_caret_eq,
+	ar_op_pipe_eq
 };
 
 typedef int						(*t_commandeer_proc)(const t_snode*, const int[3]);
 typedef pid_t					(*t_cm_cmd_proc)(const t_snode*, const int[3]);
 typedef int						(*t_cm_cmd_wait)(pid_t pid);
-typedef enum e_arith_id			t_arith_id;
+typedef enum e_arith_node_id	t_arith_node_id;
+typedef enum e_arith_token_id	t_arith_token_id;
 typedef struct s_cmd_base		t_cmd_base;
 typedef struct s_simple_cmd_ctx	t_simple_cmd_ctx;
 typedef struct s_pipe_ctx		t_pipe_ctx;
@@ -61,17 +103,19 @@ typedef struct s_epart			t_epart;
 typedef struct s_expand			t_expand;
 typedef struct s_pattern_node	t_pattern_node;
 typedef struct s_arith_node		t_arith_node;
+typedef struct s_arith_token	t_arith_token;
+typedef struct s_arith_lexer	t_arith_lexer;
 
 struct s_simple_cmd_ctx {
-	t_snode		*cmd_node;
-	char		**args;
-	int			io[3];
+	const t_snode		*cmd_node;
+	char				**args;
+	int					io[3];
 };
 
 struct s_pipe_ctx {
-	t_snode	*node;
-	int		begin_in;
-	int		end_out;
+	const t_snode	*node;
+	int				begin_in;
+	int				end_out;
 };
 
 struct s_epart {
@@ -100,9 +144,20 @@ struct s_pattern_node {
 };
 
 struct s_arith_node {
-	t_arith_id		id;
+	t_arith_node_id	id;
 	t_arith_node	*children;
 	size_t			children_size;
+};
+
+struct s_arith_token {
+	t_arith_token_id	id;
+	const char			*str;
+	size_t				size;
+};
+
+struct s_arith_lexer {
+	t_arith_token	*tok;
+	const char		*str;
 };
 
 int				command(t_snode *cmd_node, int io[3]);

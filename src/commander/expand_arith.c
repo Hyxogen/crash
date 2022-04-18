@@ -6,7 +6,7 @@
 int
 	arith_lex_op1(t_arith_lexer *lex, int c)
 {
-	if (lex->str == c)
+	if (*lex->str == c)
 	{
 		lex->str += 1;
 		lex->tok->size += 1;
@@ -120,20 +120,28 @@ size_t
 size_t
 	arith_lex_const(const char *str)
 {
-	(void) str;
-	return (0);
+	size_t	i;
+
+	if (!ft_isdigit(*str))
+		return (0);
+	i = 1;
+	while (str[i] == '_' || ft_isalnum(str[i]))
+		i += 1;
+	return (i);
 }
 
 int
 	arith_lex(t_arith_lexer *lex, t_arith_token *tok)
 {
-	if (lex->str == '\0')
+	while (ft_isspace(*lex->str))
+		lex->str += 1;
+	if (*lex->str == '\0')
 		return (0);
 	lex->tok = tok;
 	tok->str = lex->str;
 	tok->size = 0;
 	tok->id = arith_lex_op(lex);
-	if (tok->id != NULL)
+	if (tok->id != ar_tk_null)
 		return (1);
 	tok->size = arith_lex_ident(lex->str);
 	if (tok->size != 0)
@@ -142,10 +150,10 @@ int
 	{
 		tok->size = arith_lex_const(lex->str);
 		if (tok->size != 0)
-			tok->id = ar_tk_ident;
+			tok->id = ar_tk_const;
 	}
 	lex->str += tok->size;
-	if (tok->id != ar_tk_null != 0)
+	if (tok->id != ar_tk_null)
 		return (1);
 	return (-1);
 }
@@ -153,12 +161,22 @@ int
 int
 	expand_arith(t_expand *exp, t_token *token)
 {
-	char	*str;
+	char			*str;
+	t_arith_lexer	lex;
+	t_arith_token	tok;
 
 	str = cm_expand_str(token, NULL, ' ');
 	if (str == NULL)
 		return (-1);
 	ft_fprintf(STDERR_FILENO, "arithmetic expansion: %s\n", str);
+	lex.str = str;
+	lex.tok = &tok;
+	while (1)
+	{
+		if (arith_lex(&lex, &tok) != 1)
+			break ;
+		ft_fprintf(STDERR_FILENO, "arithmetic token: %d\n", tok.id);
+	}
 	// TODO: implement
 	return (-1);
 }

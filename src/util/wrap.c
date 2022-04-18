@@ -14,9 +14,9 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+
+
 #include <stdio.h>
-
-
 #include <execinfo.h>
 
 int
@@ -85,9 +85,9 @@ int
 {
 	int	ret;
 
-	sh_fdctl(fildes, SH_FD_FIOCLEX, 0);
 	ret = close(fildes);
 	sh_check(ret >= 0, "close");
+	sh_fdctl(fildes, SH_FD_FIOCLEX, 0);
 	return (ret);
 }
 
