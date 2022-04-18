@@ -47,10 +47,10 @@ static int
 {
 	void	*tmp;
 
-	if ((rh->beg + n) >= rh->size)
+	if ((rh->end + n) >= rh->size)
 	{
 		tmp = sh_safe_realloc(rh->buf, rh->size, rh->size * 2);
-		rh->size += BUFFER_SIZE;
+		rh->size = rh->size * 2;
 		rh->buf = tmp;
 		return (_push_strn(rh, str, n));
 	}

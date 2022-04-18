@@ -28,24 +28,9 @@
 #  define SH_STDERR_INDEX 2
 # endif
 
-enum e_arith_node_id {
-	ar_sx_primary,
-	ar_sx_conditional,
-	ar_sx_assign,
-	ar_sx_op_mul,
-	ar_sx_op_div,
-	ar_sx_op_mod,
-	ar_sx_op_sub,
-	ar_sx_op_add,
-	ar_sx_bit_not,
-	ar_sx_bit_shl,
-	ar_sx_bit_shr,
-	ar_sx_bit_and,
-	ar_sx_bit_xor,
-	ar_sx_bit_or,
-	ar_sx_rel_lt,
-	ar_sx_rel_gt,
-	ar_sx_rel_eq
+enum e_associativity {
+	ass_left,
+	ass_right
 };
 
 enum e_arith_token_id {
@@ -93,7 +78,7 @@ enum e_arith_token_id {
 typedef int						(*t_commandeer_proc)(const t_snode*, const int[3]);
 typedef pid_t					(*t_cm_cmd_proc)(const t_snode*, const int[3]);
 typedef int						(*t_cm_cmd_wait)(pid_t pid);
-typedef enum e_arith_node_id	t_arith_node_id;
+typedef enum e_associativity	t_associativity;
 typedef enum e_arith_token_id	t_arith_token_id;
 typedef struct s_cmd_base		t_cmd_base;
 typedef struct s_simple_cmd_ctx	t_simple_cmd_ctx;
@@ -103,10 +88,11 @@ typedef struct s_param_ctx		t_param_ctx;
 typedef struct s_epart			t_epart;
 typedef struct s_expand			t_expand;
 typedef struct s_pattern_node	t_pattern_node;
-typedef struct s_arith_node		t_arith_node;
 typedef struct s_arith_token	t_arith_token;
 typedef struct s_arith_lexer	t_arith_lexer;
 typedef struct s_arith_parser	t_arith_parser;
+typedef struct s_arith_operator	t_arith_operator;
+typedef struct s_arith_optok	t_arith_optok;
 
 struct s_simple_cmd_ctx {
 	const t_snode		*cmd_node;
@@ -151,13 +137,6 @@ struct s_arith_token {
 	size_t				size;
 };
 
-struct s_arith_node {
-	t_arith_node_id	id;
-	t_arith_node	**children;
-	size_t			children_size;
-	t_arith_token	token;
-};
-
 struct s_arith_lexer {
 	t_arith_token	*tok;
 	const char		*str;
@@ -166,6 +145,17 @@ struct s_arith_lexer {
 struct s_arith_parser {
 	t_arith_lexer	*lex;
 	t_arith_token	next;
+};
+
+struct s_arith_operator {
+	t_arith_token_id	token;
+	int					precedence;
+	t_associativity		ass;
+};
+
+struct s_arith_optok {
+	const char			*str;
+	t_arith_token_id	id;
 };
 
 int				command(t_snode *cmd_node, int io[3]);
