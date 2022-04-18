@@ -7,7 +7,6 @@
 #include <stdlib.h>
 
 static const t_builtin builtins[] = {
-	{ "echo", sh_echo },
 	{ "exit", sh_exit },
 	{ ".", sh_dot },
 	{ ":", sh_colon },
@@ -19,7 +18,10 @@ static const t_builtin builtins[] = {
 };
 
 static const t_builtin utilities[] = {
-	{ "getopts", sh_getopts }
+	{ "getopts", sh_getopts },
+	/* technically echo is not a builtin utility, but the minishell subject */
+	/* requires that it is implemented within the shell */
+	{ "echo", sh_echo }
 };
 
 void
@@ -66,15 +68,37 @@ void
 	free(sh()->name);
 }
 
+static t_function
+	*sh_get_function(const char *key)
+{
+	size_t	index;
+
+	index = 0;
+	while (index < sh()->functions_size)
+	{
+		if (!ft_strcmp(sh()->functions[index].key, key))
+			return (&sh()->functions[index]);
+		index++;
+	}
+	return (NULL);
+}
+
 void
 	sh_add_function(const char *key, t_snode *body)
 {
-	sh()->functions = sh_safe_realloc(sh()->functions,
-		sizeof(*sh()->functions) * sh()->functions_size,
-		sizeof(*sh()->functions) * (sh()->functions_size + 1));
-	sh()->functions[sh()->functions_size].key = ft_strdup(key);
-	sh()->functions[sh()->functions_size].body = sh_safe_malloc(sizeof(*body));
-	node_move(sh()->functions[sh()->functions_size].body, body);
+	t_function	*entry;
+
+	entry = sh_get_function(key);
+	if (entry == NULL)
+	{
+		sh()->functions = sh_safe_realloc(sh()->functions,
+			sizeof(*sh()->functions) * sh()->functions_size,
+			sizeof(*sh()->functions) * (sh()->functions_size + 1));
+		entry = &sh()->functions[sh()->functions_size];
+		sh()->functions_size += 1;
+	}
+	entry->key = ft_strdup(key);
+	entry->body = sh_safe_malloc(sizeof(*body));
+	node_move(entry->body, body);
 	// sh()->functions[sh()->functions_size].body = body; // TODO: duplicate body?
-	sh()->functions_size += 1;
 }
