@@ -126,8 +126,8 @@ int				commandeer(t_snode *node, const int io[3]);
 
 int				sh_execvp(char **argv);
 
-int				_cm_setup_process_redirects(t_snode *redi_list);
-int				_cm_setup_builtin_redirects(t_snode *redi_list, int io[3]);
+int				_cm_setup_process_redirects(const t_snode *redi_list);
+int				_cm_setup_builtin_redirects(const t_snode *redi_list, int io[3]);
 int				cm_expand_list(t_expand *exp, t_token *token);
 char			**cm_expand(t_token *token);
 char			*cm_expand_str(t_token *token, int **quote, int ch);

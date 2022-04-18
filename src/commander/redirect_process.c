@@ -36,7 +36,7 @@ static int
 }
 
 static int
-	_cm_redi_get_from(t_snode *redi_node)
+	_cm_redi_get_from(const t_snode *redi_node)
 {
 	int	from_fd;
 
@@ -55,7 +55,7 @@ static int
 
 /* TODO check if correct */
 static int
-	_cm_handle_lessand_redi(t_snode *redi_node, int from_fd, char *word)
+	_cm_handle_lessand_redi(const t_snode *redi_node, int from_fd, char *word)
 {
 	long	target_fd;
 
@@ -71,7 +71,7 @@ static int
 }
 
 static int
-	_cm_handle_greatand_redi(t_snode *redi_node, int from_fd, char *word)
+	_cm_handle_greatand_redi(const t_snode *redi_node, int from_fd, char *word)
 {
 	long	target_fd;
 
@@ -88,7 +88,7 @@ static int
 
 /* TODO check if here docs can be redirected to a specific file descriptor */
 static int
-	_cm_handle_here_redi(t_snode *redi_node)
+	_cm_handle_here_redi(const t_snode *redi_node)
 {
 	char	*str;
 	int		here_pipe[2];
@@ -136,7 +136,7 @@ static int
 }
 
 static int
-	_cm_handle_redi_node_noerr(t_snode *redi_node, char *filen)
+	_cm_handle_redi_node_noerr(const t_snode *redi_node, char *filen)
 {
 	int		from_fd;
 
@@ -166,7 +166,7 @@ static int
 }
 
 static int
-	_cm_handle_redi_node(t_snode *redi_node)
+	_cm_handle_redi_node(const t_snode *redi_node)
 {
 	char	**filen;
 
@@ -181,7 +181,7 @@ static int
 }
 
 int
-	_cm_setup_process_redirects(t_snode *redi_list)
+	_cm_setup_process_redirects(const t_snode *redi_list)
 {
 	t_snode	*node;
 	size_t	size;

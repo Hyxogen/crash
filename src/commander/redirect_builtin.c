@@ -18,7 +18,7 @@ static int
 }
 
 static int
-	_cm_redi_get_from_index(t_snode *redi_node)
+	_cm_redi_get_from_index(const t_snode *redi_node)
 {
 	int	from_fd;
 
@@ -44,7 +44,7 @@ static int
 }
 
 static int
-	_cm_handle_greatand_redi(t_snode *redi_node, int io_index, char *word, int io[3])
+	_cm_handle_greatand_redi(const t_snode *redi_node, int io_index, char *word, int io[3])
 {
 	long	target_fd;
 
@@ -62,7 +62,7 @@ static int
 
 /* TODO check if this works */
 static int
-	_cm_handle_lessand_redi(t_snode *redi_node, int io_index, char *word, int io[3])
+	_cm_handle_lessand_redi(const t_snode *redi_node, int io_index, char *word, int io[3])
 {
 	long	target_fd;
 
@@ -81,7 +81,7 @@ static int
 }
 
 static int
-	_cm_handle_here_redi(t_snode *redi_node, int io[3])
+	_cm_handle_here_redi(const t_snode *redi_node, int io[3])
 {
 	char	*str;
 	int		here_pipe[2];
@@ -129,7 +129,7 @@ static int
 }
 
 static int
-	_cm_handle_redi_node_noerr(t_snode *redi_node, char *filen, int io[3])
+	_cm_handle_redi_node_noerr(const t_snode *redi_node, char *filen, int io[3])
 {
 	int		io_index;
 
@@ -159,7 +159,7 @@ static int
 }
 
 static int
-	_cm_handle_redi_node(t_snode *redi_node, int io[3])
+	_cm_handle_redi_node(const t_snode *redi_node, int io[3])
 {
 	char	**filen;
 
@@ -175,7 +175,7 @@ static int
 }
 
 int
-	_cm_setup_builtin_redirects(t_snode *redi_list, int io[3])
+	_cm_setup_builtin_redirects(const t_snode *redi_list, int io[3])
 {
 	t_snode	*node;
 	size_t	size;
