@@ -68,7 +68,7 @@ static int
 
 	(void) redi_node;
 	if (io_index < 0)
-		io_index = SH_STDOUT_INDEX;
+		io_index = SH_STDIN_INDEX;
 	if (!ft_strcmp("-", word))
 		return (io[io_index] = -1, 0);
 	target_fd = ft_atol(word);
