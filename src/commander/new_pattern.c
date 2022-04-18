@@ -77,7 +77,8 @@ int
 	int				match;
 
 	head = _pattern_generate(pattern, info);
-	sh_assert(head != NULL);
+	if (head == NULL)
+		return (0);
 	match = _pattern_match(str, head);
 	_pattern_destroy(head);
 	return (match);
