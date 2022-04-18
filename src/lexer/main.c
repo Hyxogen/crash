@@ -43,6 +43,15 @@ int
 	{
 		if (lex->src->cur == -1)
 			return (-1);
+		if (lex->id == lx_arithmetic)
+		{
+			if (lex->src->cur == '(')
+				lex->depth += 1;
+			if (lex->src->cur == ')')
+				lex->depth -= 1;
+			if (lex->depth < 0)
+				return (-1);
+		}
 		if (lex_quoted(lex) || !lex_special(lex))
 		{
 			if (!lex->quote && lex->src->bslash)

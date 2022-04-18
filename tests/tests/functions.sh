@@ -183,11 +183,13 @@ wait_it_actually_executes_this_pipe_sequence() {
 } | echo It does
 wait_it_actually_executes_this_pipe_sequence
 
-# # if true;
-# # then
-# # 	space() {
-# # 		cat 
-# # 	}
-# # fi <<SPACE
-# # SPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACE!!
-# # SPACE
+if true;
+then
+	space() {
+		echo Hallo
+	}
+fi <<SPACE
+SPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACE!!
+SPACE
+
+space

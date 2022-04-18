@@ -136,7 +136,10 @@ int
 	while (ft_isspace(*lex->str))
 		lex->str += 1;
 	if (*lex->str == '\0')
+	{
+		tok->id = ar_tk_eof;
 		return (0);
+	}
 	lex->tok = tok;
 	tok->str = lex->str;
 	tok->size = 0;
@@ -156,6 +159,80 @@ int
 	if (tok->id != ar_tk_null)
 		return (1);
 	return (-1);
+}
+
+int
+	arith_pr_assume(t_arith_parser *pr, t_arith_token_id id)
+{
+	if (pr->next.id == id)
+	{
+		arith_lex(pr->lex, &pr->next);
+		return (1);
+	}
+	return (0);
+}
+
+int	arith_pr_main(t_arith_parser *pr, t_arith_node *parent);
+
+t_arith_node
+	*arith_node(t_arith_node_id id)
+{
+	t_arith_node	*node;
+
+	node = sh_safe_malloc(sizeof(*node));
+	node->id = id;
+	node->children = NULL;
+	node->children_size = 0;
+	return (node);
+}
+
+void
+	arith_node_add(t_arith_node *parent, t_arith_node *node)
+{
+	parent->children = sh_safe_realloc(parent->children,
+		sizeof(*parent->children) * parent->children_size,
+		sizeof(*parent->children) * (parent->children_size + 1));
+	parent->children[parent->children_size] = node;
+	parent->children_size += 1;
+}
+
+void
+	arith_node_destroy(t_arith_node *node)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < node->children_size)
+	{
+		arith_node_destroy(node->children[i]);
+		i += 1;
+	}
+	free(node->children);
+	free(node);
+}
+
+int
+	arith_pr_paren(t_arith_parser *pr, t_arith_node *parent)
+{
+	t_arith_node	*node;
+
+	node = arith_node(ar_sx_primary);
+	if (arith_pr_primary(pr, node)
+		&& arith_pr_assume(pr, ar_op_rparen))
+	{
+		arith_node_add(parent, node);
+		return (1);
+	}
+	arith_node_destroy(node);
+	return (0);
+}
+
+int
+	arith_pr_primary(t_arith_parser *pr, t_arith_node *parent)
+{
+	if (arith_pr_assume(pr, ar_op_lparen))
+		return (arith_pr_paren(pr, parent));
+	return (0);
 }
 
 int

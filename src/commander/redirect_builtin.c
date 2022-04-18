@@ -96,20 +96,6 @@ static int
 	return (0);
 }
 
-static int
-	_cm_get_redi_flags(t_syntax_id type)
-{
-	if (type == sx_great || type == sx_lessgreat)
-		return (O_WRONLY | O_TRUNC | O_CREAT);
-	if (type == sx_dgreat)
-		return (O_WRONLY | O_APPEND | O_CREAT);
-	if (type == sx_less)
-		return (O_RDONLY);
-	if (type == sx_lessgreat)
-		return (O_RDWR | O_TRUNC | O_CREAT);
-	return (0);
-}
-
 /* TODO: implement clobber check */
 static int
 	_cm_check_clobber(void)

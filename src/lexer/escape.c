@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "lexer.h"
+#include "parser.h"
 
 int
 	lex_quoted(t_lexer *lex)
@@ -27,11 +28,11 @@ int
 		return (1);
 	if (lex->quote == 2 || lex->end != NULL)
 	{
-		if (lex->src->cur == '$')
+		if (lex->src->cur == '$' && !(lex->here_flags & flag_quote))
 			return (0);
-		if (lex->src->cur == '`')
+		if (lex->src->cur == '`' && !(lex->here_flags & flag_quote))
 			return (0);
-		if (lex->src->cur == '\\')
+		if (lex->src->cur == '\\' && !(lex->here_flags & flag_quote))
 			return (0);
 		if (lex->src->cur == '"' && lex->end == NULL)
 			return (0);

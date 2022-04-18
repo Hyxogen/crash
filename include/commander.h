@@ -49,6 +49,7 @@ enum e_arith_node_id {
 };
 
 enum e_arith_token_id {
+	ar_tk_eof = -1,
 	ar_tk_null,
 	ar_tk_ident,
 	ar_tk_const,
@@ -105,6 +106,7 @@ typedef struct s_pattern_node	t_pattern_node;
 typedef struct s_arith_node		t_arith_node;
 typedef struct s_arith_token	t_arith_token;
 typedef struct s_arith_lexer	t_arith_lexer;
+typedef struct s_arith_parser	t_arith_parser;
 
 struct s_simple_cmd_ctx {
 	const t_snode		*cmd_node;
@@ -143,21 +145,27 @@ struct s_pattern_node {
 	t_pattern_node	*next;
 };
 
-struct s_arith_node {
-	t_arith_node_id	id;
-	t_arith_node	*children;
-	size_t			children_size;
-};
-
 struct s_arith_token {
 	t_arith_token_id	id;
 	const char			*str;
 	size_t				size;
 };
 
+struct s_arith_node {
+	t_arith_node_id	id;
+	t_arith_node	**children;
+	size_t			children_size;
+	t_arith_token	token;
+};
+
 struct s_arith_lexer {
 	t_arith_token	*tok;
 	const char		*str;
+};
+
+struct s_arith_parser {
+	t_arith_lexer	*lex;
+	t_arith_token	next;
 };
 
 int				command(t_snode *cmd_node, int io[3]);
@@ -181,6 +189,7 @@ int				commandeer(const t_snode *node, const int io[3]);
 
 int				sh_execvp(char **argv);
 
+int				_cm_get_redi_flags(t_syntax_id type);
 int				_cm_create_and_write_here(const char *str, int skip_leading_tabs);
 int				_cm_setup_process_redirects(const t_snode *redi_list);
 int				_cm_setup_builtin_redirects(const t_snode *redi_list, int io[3]);

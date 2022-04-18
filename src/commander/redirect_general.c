@@ -1,12 +1,12 @@
 #include "minishell.h"
 
 #include <stdlib.h>
+#include <fcntl.h>
 
 static void
 	_cm_write_here(int fd, const char *str, int skip_leading_tabs)
 {
 	const char	*next_newline;
-	size_t		length;
 
 	if (!skip_leading_tabs)
 	{
@@ -46,4 +46,18 @@ int
 	}
 	sh_close(here_pipe[1]);
 	return (here_pipe[0]);
+}
+
+int
+	_cm_get_redi_flags(t_syntax_id type)
+{
+	if (type == sx_great || type == sx_lessgreat)
+		return (O_WRONLY | O_TRUNC | O_CREAT);
+	if (type == sx_dgreat)
+		return (O_WRONLY | O_APPEND | O_CREAT);
+	if (type == sx_less)
+		return (O_RDONLY);
+	if (type == sx_lessgreat)
+		return (O_RDWR | O_TRUNC | O_CREAT);
+	return (0);
 }
