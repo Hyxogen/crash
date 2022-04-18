@@ -24,7 +24,7 @@ COMMANDER_FILES	:= \
 	redirect_builtin.c run.c condition.c loop.c \
 	command.c expansion.c expand.c expand_param.c expand_command.c \
 	expand_arith.c new_pattern.c new_pattern_brackets.c new_pattern_class.c \
-	new_pattern_generate.c function.c init.c
+	new_pattern_generate.c function.c init.c redirect_general.c
 BUILTINS_FILES	:= \
 	set.c echo.c dot.c colon.c exit.c break.c export.c continue.c shift.c \
 	getopts.c

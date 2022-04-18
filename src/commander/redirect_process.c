@@ -91,24 +91,11 @@ static int
 	_cm_handle_here_redi(const t_snode *redi_node)
 {
 	char	*str;
-	int		here_pipe[2];
-	pid_t	pid;
 
 	str = cm_expand_str(&redi_node->childs[0]->here_content, NULL, ' ');
 	if (str == NULL)
 		return (-1);
-	sh_pipe(here_pipe);
-	sh_dup2(here_pipe[0], STDIN_FILENO);
-	pid = sh_fork();
-	if (pid == 0)
-	{
-		sh_close(here_pipe[0]);
-		sh_write(here_pipe[1], str, ft_strlen(str));
-		free(str);
-		sh_close(here_pipe[1]);
-		exit(EXIT_SUCCESS);
-	}
-	sh_close(here_pipe[1]);
+	sh_dup2(_cm_create_and_write_here(str, redi_node->childs[0]->flags & flag_trim), STDIN_FILENO);
 	free(str);
 	return (0);
 }

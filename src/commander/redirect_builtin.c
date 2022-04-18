@@ -84,25 +84,14 @@ static int
 	_cm_handle_here_redi(const t_snode *redi_node, int io[3])
 {
 	char	*str;
-	int		here_pipe[2];
-	pid_t	pid;
+	int		here_read;
 
 	str = cm_expand_str(&redi_node->childs[0]->here_content, NULL, ' ');
 	if (str == NULL)
 		return (-1);
-	sh_pipe(here_pipe);
-	io[SH_STDIN_INDEX] = here_pipe[0];
-	pid = sh_fork();
-	if (pid == 0)
-	{
-		sh_close(here_pipe[0]);
-		sh_write(here_pipe[1], str, ft_strlen(str));
-		free(str);
-		sh_close(here_pipe[1]);
-		exit(EXIT_SUCCESS);
-	}
-	sh_close(here_pipe[1]);
-	sh_fdctl(here_pipe[0], SH_FD_FIOCLEX, 1);
+	here_read = _cm_create_and_write_here(str, redi_node->childs[0]->flags & flag_trim);
+	io[SH_STDIN_INDEX] = here_read;
+	sh_fdctl(here_read, SH_FD_FIOCLEX, 1);
 	free(str);
 	return (0);
 }
