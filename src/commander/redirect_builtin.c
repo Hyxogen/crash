@@ -102,6 +102,7 @@ static int
 		exit(EXIT_SUCCESS);
 	}
 	sh_close(here_pipe[1]);
+	sh_fdctl(here_pipe[0], SH_FD_FIOCLEX, 1);
 	free(str);
 	return (0);
 }
