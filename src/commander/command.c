@@ -81,6 +81,16 @@ static pid_t
 	return (cm_convert_retcode(rc));
 }
 
+/* Closes the tofd if the fromfd is equal to -1. Otherwise it will dup2(formfd, tofd) */
+static void
+	_cm_close_or_dup2(int fromfd, int tofd)
+{
+	if (fromfd == -1)
+		sh_close(tofd);
+	else
+		sh_dup2(fromfd, tofd);
+}
+
 static pid_t
 	_cm_simple_extern_cmd(t_simple_cmd_ctx *ctx)
 {
@@ -89,16 +99,16 @@ static pid_t
 	pid = sh_fork();
 	if (pid == 0)
 	{
-		sh_dup2(ctx->io[SH_STDIN_INDEX], STDIN_FILENO);
-		sh_dup2(ctx->io[SH_STDOUT_INDEX], STDOUT_FILENO);
-		sh_dup2(ctx->io[SH_STDERR_INDEX], STDERR_FILENO);
+		_cm_close_or_dup2(ctx->io[SH_STDIN_INDEX], STDIN_FILENO);
+		_cm_close_or_dup2(ctx->io[SH_STDOUT_INDEX], STDOUT_FILENO);
+		_cm_close_or_dup2(ctx->io[SH_STDERR_INDEX], STDERR_FILENO);
 		if (_cm_setup_process_redirects(ctx->cmd_node->childs[1]))
 			exit(1);
-		if (ctx->io[SH_STDIN_INDEX] != STDIN_FILENO)
+		if (ctx->io[SH_STDIN_INDEX] != STDIN_FILENO && ctx->io[SH_STDIN_INDEX] >= 0)
 			sh_close(ctx->io[SH_STDIN_INDEX]);
-		if (ctx->io[SH_STDOUT_INDEX] != STDOUT_FILENO)
+		if (ctx->io[SH_STDOUT_INDEX] != STDOUT_FILENO && ctx->io[SH_STDOUT_INDEX] >= 0)
 			sh_close(ctx->io[SH_STDOUT_INDEX]);
-		if (ctx->io[SH_STDERR_INDEX] != STDERR_FILENO)
+		if (ctx->io[SH_STDERR_INDEX] != STDERR_FILENO && ctx->io[SH_STDERR_INDEX] >= 0)
 			sh_close(ctx->io[SH_STDERR_INDEX]);
 		sh_execvp(ctx->args);
 		_sh_execvp_error_handler(ctx->args[0], errno);
