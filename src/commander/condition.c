@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 static pid_t
-	cm_elif_clause(t_snode *ifnode, const int io[3])
+	cm_elif_clause(const t_snode *ifnode, const int io[3])
 {
 	int	statement_ret;
 	int	body_ret;
@@ -28,7 +28,7 @@ static pid_t
 
 /* TODO setup redirects */
 pid_t
-	cm_if_clause(t_snode *ifnode, const int io[3])
+	cm_if_clause(const t_snode *ifnode, const int io[3])
 {
 	int	if_io[3];
 	int	statement_ret;
@@ -66,7 +66,7 @@ static int
 }
 
 pid_t
-	cm_case_clause(t_snode *node, const int io[3])
+	cm_case_clause(const t_snode *node, const int io[3])
 {
 	size_t	clauses;
 	size_t	index;

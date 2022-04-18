@@ -71,7 +71,7 @@ char **_array_add(char **array, char *value)
 	return (array);
 }
 
-char **cm_word_list_to_array(t_snode *word_list)
+char **cm_word_list_to_array(const t_snode *word_list)
 {
 	char	**ret;
 	char	**tmp;
@@ -116,7 +116,7 @@ static t_cm_cmd_proc
 }
 
 pid_t
-	cm_unimplemented_cmd_command(t_snode *node, const int io[3])
+	cm_unimplemented_cmd_command(const t_snode *node, const int io[3])
 {
 	(void) node;
 	(void) io;
@@ -126,7 +126,7 @@ pid_t
 }
 
 static pid_t
-	_cm_cmd_nofork(t_snode *node, int in, int out)
+	_cm_cmd_nofork(const t_snode *node, int in, int out)
 {
 	int				io[3];
 	t_cm_cmd_proc	proc;
@@ -141,7 +141,7 @@ static pid_t
 }
 
 static pid_t
-	_cm_cmd_fork(t_snode *node, int in, int out)
+	_cm_cmd_fork(const t_snode *node, int in, int out)
 {
 	int				io[3];
 	t_cm_cmd_proc	proc;
@@ -186,7 +186,7 @@ static int
 }
 
 int
-	commandeer_pipe_sequence(t_snode *seq_node, const int io[3])
+	commandeer_pipe_sequence(const t_snode *seq_node, const int io[3])
 {
 	t_pipe_ctx	ctx;
 	int			rc;

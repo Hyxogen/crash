@@ -10,7 +10,7 @@
 #include <stdio.h>
 
 static int
-	_do_assignments(t_snode *ass_list, int is_tmp)
+	_do_assignments(const t_snode *ass_list, int is_tmp)
 {
 	size_t	i;
 	size_t	j;
@@ -91,6 +91,7 @@ static void
 		sh_dup2(fromfd, tofd);
 }
 
+/* TODO Test something like closing a fd and then reopening that fd <&- <file.txt */
 static pid_t
 	_cm_simple_extern_cmd(t_simple_cmd_ctx *ctx)
 {
@@ -205,7 +206,7 @@ static pid_t
 }
 
 pid_t
-	cm_simple_cmd_command(t_snode *cmd_node, const int io[3])
+	cm_simple_cmd_command(const t_snode *cmd_node, const int io[3])
 {
 	t_simple_cmd_ctx	ctx;
 	pid_t				ret;

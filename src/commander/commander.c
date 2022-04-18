@@ -38,7 +38,7 @@ static t_commandeer_proc
 
 /* functions have the wrong return values */
 int
-	commandeer_inner(t_snode *node, const int io[3])
+	commandeer_inner(const t_snode *node, const int io[3])
 {
 	size_t	index;
 	size_t	size;
@@ -57,7 +57,7 @@ int
 
 /* TODO fork the entire term when it runs in the background */
 int
-	commandeer(t_snode *node, const int io[3])
+	commandeer(const t_snode *node, const int io[3])
 {
 	return (get_command_table()[node->type](node, io));
 }

@@ -12,7 +12,7 @@ TODO: Check this:
 /* TODO implement no wordlist */
 /* TODO setup redirects */
 pid_t
-	cm_for_clause(t_snode *fornode, const int io[3])
+	cm_for_clause(const t_snode *fornode, const int io[3])
 {
 	char	*name;
 	char	**list;
@@ -47,7 +47,7 @@ pid_t
 }
 
 pid_t
-	cm_while_until_clause(t_snode *node, const int io[3])
+	cm_while_until_clause(const t_snode *node, const int io[3])
 {
 	int	rc;
 	int	loop_io[3];
