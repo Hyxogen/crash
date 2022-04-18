@@ -55,6 +55,8 @@ int
 		if (pr->next.id == tk_invalid)
 			return (1);
 	}
+	if (pr->current.id != tk_newline)
+		pr->lexer->error = SH_PR_UNEXTOKEN;
 	return (0);
 }
 
