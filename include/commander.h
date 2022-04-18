@@ -128,9 +128,9 @@ int				sh_execvp(char **argv);
 
 int				_cm_setup_process_redirects(const t_snode *redi_list);
 int				_cm_setup_builtin_redirects(const t_snode *redi_list, int io[3]);
-int				cm_expand_list(t_expand *exp, t_token *token);
-char			**cm_expand(t_token *token);
-char			*cm_expand_str(t_token *token, int **quote, int ch);
+int				cm_expand_list(t_expand *exp, const t_token *token);
+char			**cm_expand(const t_token *token);
+char			*cm_expand_str(const t_token *token, int **quote, int ch);
 int				expand_param(t_expand *exp, t_token *token);
 int				expand_command(t_expand *exp, t_snode *node);
 int				expand_backtick(t_expand *exp, char *str);

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 int
-	expand_part(t_expand *exp, t_tpart *part)
+	expand_part(t_expand *exp, const t_tpart *part)
 {
 	size_t	i;
 	int		tmp;
@@ -175,7 +175,7 @@ void
 
 // TODO: check -1 when called
 int
-	cm_expand_list(t_expand *exp, t_token *token)
+	cm_expand_list(t_expand *exp, const t_token *token)
 {
 	size_t	i;
 
@@ -195,7 +195,7 @@ int
 
 // TODO: check null when called
 char
-	*cm_expand_str(t_token *token, int **quote, int ch)
+	*cm_expand_str(const t_token *token, int **quote, int ch)
 {
 	t_expand	exp;
 	char		*result;
@@ -218,7 +218,7 @@ char
 // TODO: check null when called
 // TODO: tilde expansion and wildcards
 char
-	**cm_expand(t_token *token)
+	**cm_expand(const t_token *token)
 {
 	t_expand	exp;
 	char		**fields;
