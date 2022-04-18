@@ -88,6 +88,8 @@ int
 	{
 		sh_close(pipe_in[1]);
 		sh_close(pipe_out[0]);
+		sh_fdctl(pipe_in[0], SH_FD_FIOCLEX, 1);
+		sh_fdctl(pipe_out[1], SH_FD_FIOCLEX, 1);
 		io[SH_STDIN_INDEX] = pipe_in[0];
 		io[SH_STDOUT_INDEX] = pipe_out[1];
 		io[SH_STDERR_INDEX] = 2;
