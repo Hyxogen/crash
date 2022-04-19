@@ -24,7 +24,9 @@ COMMANDER_FILES	:= \
 	redirect_builtin.c run.c condition.c loop.c \
 	command.c expansion.c expand.c expand_param.c expand_command.c \
 	expand_arith.c new_pattern.c new_pattern_brackets.c new_pattern_class.c \
-	new_pattern_generate.c function.c init.c redirect_general.c
+	new_pattern_generate.c function.c init.c redirect_general.c and_or_if.c
+ARITH_FILES		:= \
+	arith_plus.c
 BUILTINS_FILES	:= \
 	set.c echo.c dot.c colon.c exit.c break.c export.c continue.c shift.c \
 	getopts.c
@@ -37,6 +39,7 @@ FILE_NAMES		:= \
 	$(patsubst %,input/%,$(INPUT_FILES)) \
 	$(patsubst %,parser/%,$(PARSER_FILES)) \
 	$(patsubst %,commander/%,$(COMMANDER_FILES)) \
+	$(patsubst %,arith/%,$(ARITH_FILES)) \
 	$(patsubst %,builtins/%,$(BUILTINS_FILES)) \
 	$(patsubst %,util/%,$(UTIL_FILES))
 

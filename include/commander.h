@@ -78,6 +78,7 @@ enum e_arith_token_id {
 typedef int						(*t_commandeer_proc)(const t_snode*, const int[3]);
 typedef pid_t					(*t_cm_cmd_proc)(const t_snode*, const int[3]);
 typedef int						(*t_cm_cmd_wait)(pid_t pid);
+typedef long					(*t_cm_eval_proc)(const char *ptr, long a, long b, long c);
 typedef enum e_associativity	t_associativity;
 typedef enum e_arith_token_id	t_arith_token_id;
 typedef struct s_cmd_base		t_cmd_base;
@@ -93,6 +94,7 @@ typedef struct s_arith_lexer	t_arith_lexer;
 typedef struct s_arith_parser	t_arith_parser;
 typedef struct s_arith_operator	t_arith_operator;
 typedef struct s_arith_optok	t_arith_optok;
+typedef struct s_arith_value	t_arith_value;
 
 struct s_simple_cmd_ctx {
 	const t_snode		*cmd_node;
@@ -145,17 +147,25 @@ struct s_arith_lexer {
 struct s_arith_parser {
 	t_arith_lexer	*lex;
 	t_arith_token	next;
+	int				error;
 };
 
 struct s_arith_operator {
 	t_arith_token_id	token;
-	int					precedence;
+	int					prec;
 	t_associativity		ass;
+	t_cm_eval_proc		proc;
 };
 
 struct s_arith_optok {
 	const char			*str;
 	t_arith_token_id	id;
+};
+
+struct s_arith_value {
+	long		value;
+	const char	*str;
+	size_t		size;
 };
 
 int				command(t_snode *cmd_node, int io[3]);
@@ -217,4 +227,7 @@ int				pattern_match(const char *str, char *pattern, int *info);
 void			_pattern_destroy(t_pattern_node *node);
 void			pattern_debug_print_node(t_pattern_node *node);
 void			pattern_debug_print_chain(t_pattern_node *head);
+
+long			arith_plus(const char *str, long lhs, long rhs, long c);
+long			arith_get_val(const char *key);
 #endif

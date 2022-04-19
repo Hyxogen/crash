@@ -54,6 +54,7 @@
  * Snake? SNAAAAAAAAKE!!!
  * Illegal instruction
  * $USER is not in the sudoers file.  This incident will be reported.
+ * Substitution failure is an error
  * 
  * Success:
  * Command entered, did yes
@@ -73,6 +74,7 @@
  * Hello, World!
  * A winner is you
  * $USER is in the sudoers file.  This incident will not be reported.
+ * Substitution failure is not an error
  */
 
 // MAYBE TODO:
@@ -203,6 +205,7 @@ int			sh_getopts(int argc, char **argv);
 
 void		sh_backtrace(int count);
 int			sh_atol(const char *str, long *v);
+void		sh_ltoa(long value, char *str, size_t len);
 
 t_minishell	*sh(void);
 void		sh_err1(const char *s1);
