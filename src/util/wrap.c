@@ -15,10 +15,6 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 
-
-#include <stdio.h>
-#include <execinfo.h>
-
 int
 	sh_dup2(int fildes, int fildes2)
 {
@@ -67,60 +63,5 @@ int
 
 	ret = execve(path, argv, envp);
 	sh_check(ret >= 0, "execve");
-	return (ret);
-}
-
-int
-	sh_waitpid(pid_t pid, int *stat_loc, int options)
-{
-	int	ret;
-
-	ret = waitpid(pid, stat_loc, options);
-	sh_check(ret >= 0, "waitpid");
-	return (ret);
-}
-
-int
-	sh_close(int fildes)
-{
-	int	ret;
-
-	ret = close(fildes);
-	sh_check(ret >= 0, "close");
-	sh_fdctl(fildes, SH_FD_FIOCLEX, 0);
-	return (ret);
-}
-
-/* TODO: Handle errors that should crash CraSH */
-int
-	sh_open(const char *path, int oflag, mode_t mode)
-{
-	int	ret;
-
-	if (oflag & O_CREAT)
-		ret = open(path, oflag, mode);
-	else
-		ret = open(path, oflag);
-	sh_check(ret >= 0, "open");
-	return (ret);
-}
-
-int
-	sh_sigaction(int sig, const struct sigaction *act, struct sigaction *oact)
-{
-	int	ret;
-
-	ret = sigaction(sig, act, oact);
-	sh_check(ret >= 0, "sigaction");
-	return (ret);
-}
-
-ssize_t
-	sh_write(int fildes, const void *buf, size_t nbyte)
-{
-	int	ret;
-
-	ret = write(fildes, buf, nbyte);
-	sh_check(ret >= 0, "write");
 	return (ret);
 }

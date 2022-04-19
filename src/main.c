@@ -35,7 +35,7 @@ int
 		sh_fdctl(fd, SH_FD_FIOCLEX, 1);
 		sh()->args = argv + 1;
 		sh()->interactive = 0;
-		input_new(&in, in_file, (void*)(unsigned long long) fd);
+		input_new(&in, in_file, (void *)(unsigned long long) fd);
 	}
 	else
 		input_new(&in, in_readline, NULL);

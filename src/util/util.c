@@ -69,15 +69,16 @@ int
 	if (!stat(filen, &info))
 		return (1);
 	sh_assert(errno == ENOENT);
-	return (0);	
+	return (0);
 }
 
 // TODO: debug function, remove!!!
 void
 	sh_backtrace(int count)
 {
-	void	**buffer = malloc(sizeof(*buffer) * (count + 1));
+	void	**buffer;
 
+	buffer = malloc(sizeof(*buffer) * (count + 1));
 	count = backtrace(buffer, count + 1);
 	backtrace_symbols_fd(buffer + 1, count - 1, STDERR_FILENO);
 	free(buffer);
