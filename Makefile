@@ -26,12 +26,15 @@ COMMANDER_FILES	:= \
 	expand_arith.c new_pattern.c new_pattern_brackets.c new_pattern_class.c \
 	new_pattern_generate.c function.c init.c redirect_general.c and_or_if.c
 ARITH_FILES		:= \
-	arith_plus.c
+	arith_plus.c arith_minus.c arith_modulo.c arith_divide.c arith_multiply.c \
+	arith_ternary.c arith_shift.c arith_inequality.c arith_equality.c \
+	arith_bitwise.c arith_bitwise_assign.c arith_condition.c arith_unary.c \
+	arith_assign.c
 BUILTINS_FILES	:= \
 	set.c echo.c dot.c colon.c exit.c break.c export.c continue.c shift.c \
 	getopts.c
 UTIL_FILES		:= \
-	die.c memory.c op.c util.c wrap.c strlst.c err.c atol.c file.c
+	die.c memory.c op.c util.c wrap.c strlst.c err.c atol.c file.c ltoa.c
 
 FILE_NAMES		:= \
 	$(BASE_FILES) \
@@ -111,8 +114,8 @@ else ifeq ($(config), release)
 	CFLAGS		+= -g3 -O2
 	LFLAGS		+=
 else ifeq ($(config), distr)
-	CFLAGS		+= -Werror -g0 -Ofast
-	LFLAGS		+= -Werror 
+	CFLAGS		+= -g0 -Ofast
+	LFLAGS		+= 
 else
 $(error "invalid config $(config"))
 endif

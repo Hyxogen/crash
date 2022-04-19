@@ -148,6 +148,8 @@ static pid_t
 	size_t	index;
 	size_t	size;
 	pid_t	ret;
+	char	**old_args;
+	char	*old_arg0;
 
 	index = 0;
 	size = sh()->functions_size;
@@ -155,7 +157,13 @@ static pid_t
 	{
 		if (!ft_strcmp(ctx->args[0], sh()->functions[index].key))
 		{
+			old_arg0 = ctx->args[0];
+			ctx->args[0] = sh()->args[0];
+			old_args = sh()->args;
+			sh()->args = ctx->args;
 			ret = cm_function(sh()->functions[index].body, ctx->io);
+			ctx->args[0] = old_arg0;
+			sh()->args = old_args;
 			sh_env_clean();
 			sh_strlst_clear(ctx->args);
 			return (ret);

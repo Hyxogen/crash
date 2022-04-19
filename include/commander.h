@@ -148,6 +148,7 @@ struct s_arith_parser {
 	t_arith_lexer	*lex;
 	t_arith_token	next;
 	int				error;
+	int				is_fake;
 };
 
 struct s_arith_operator {
@@ -155,6 +156,7 @@ struct s_arith_operator {
 	int					prec;
 	t_associativity		ass;
 	t_cm_eval_proc		proc;
+	int					is_assignment;
 };
 
 struct s_arith_optok {
@@ -229,5 +231,39 @@ void			pattern_debug_print_node(t_pattern_node *node);
 void			pattern_debug_print_chain(t_pattern_node *head);
 
 long			arith_plus(const char *str, long lhs, long rhs, long c);
-long			arith_get_val(const char *key);
+long			arith_plus_eq(const char *str, long rhs, long b, long c);
+long			arith_minus(const char *str, long lhs, long rhs, long c);
+long			arith_minus_eq(const char *str, long lhs, long rhs, long c);
+long			arith_decrement(const char *str, long a, long b, long c);
+long			arith_modulo(const char *str, long dividend, long divisor, long c);
+long			arith_modulo_eq(const char *str, long lhs, long rhs, long c);
+long			arith_multiple_eq(const char *str, long lhs, long rhs, long c);
+long			arith_multiply(const char *str, long lhs, long rhs, long c);
+long			arith_multiple_eq(const char *str, long lhs, long rhs, long c);
+long			arith_divide(const char *str, long dividend, long divisor, long c);
+long			arith_divide_eq(const char *str, long lhs, long rhs, long c);
+long			arith_ternary(const char *str, long lhs, long rhs, long super_rhs);
+long			arith_shift_left(const char *ptr, long lhs, long rhs, long c);
+long			arith_shift_left_eq(const char *str, long lhs, long rhs, long c);
+long			arith_shift_right(const char *ptr, long lhs, long rhs, long c);
+long			arith_shift_right_eq(const char *str, long lhs, long rhs, long c);
+long			arith_less_than(const char *str, long lhs, long rhs, long c);
+long			arith_less_than_or_eq(const char *str, long lhs, long rhs, long c);
+long			arith_greater_than(const char *str, long lhs, long rhs, long c);
+long			arith_greater_than_or_eq(const char *str, long lhs, long rhs, long c);
+long			arith_equal(const char *str, long lhs, long rhs, long c);
+long			arith_not_equal(const char *str, long lhs, long rhs, long c);
+long			arith_bitwise_or(const char *ptr, long lhs, long rhs, long c);
+long			arith_bitwise_and(const char *ptr, long lhs, long rhs, long c);
+long			arith_bitwise_xor(const char *ptr, long lhs, long rhs, long c);
+long			arith_bitwise_or_eq(const char *str, long lhs, long rhs, long c);
+long			arith_bitwise_and_eq(const char *str, long lhs, long rhs, long c);
+long			arith_bitwise_xor_eq(const char *str, long lhs, long rhs, long c);
+long			arith_logical_and(const char *str, long lhs, long rhs, long c);
+long			arith_logical_or(const char *str, long lhs, long rhs, long c);
+long			arith_identity(const char *str, long lhs, long b, long c);
+long			arith_negate(const char *str, long lhs, long b, long c);
+long			arith_logical_not(const char *str, long lhs, long b, long c);
+long			arith_bitwise_not(const char *str, long lhs, long b, long c);
+long			arith_assign(const char *str, long old_value, long value, long c);
 #endif

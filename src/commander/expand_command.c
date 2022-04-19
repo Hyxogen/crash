@@ -77,27 +77,21 @@ int
 	expand_command(t_expand *exp, t_snode *node)
 {
 	pid_t	pid;
-	int		pipe_in[2];
 	int		pipe_out[2];
 	int		io[3];
 
-	sh_pipe(pipe_in);
 	sh_pipe(pipe_out);
 	pid = sh_fork();
 	if (pid == 0)
 	{
-		sh_close(pipe_in[1]);
 		sh_close(pipe_out[0]);
-		sh_fdctl(pipe_in[0], SH_FD_FIOCLEX, 1);
 		sh_fdctl(pipe_out[1], SH_FD_FIOCLEX, 1);
-		io[SH_STDIN_INDEX] = pipe_in[0];
+		io[SH_STDIN_INDEX] = 0;
 		io[SH_STDOUT_INDEX] = pipe_out[1];
 		io[SH_STDERR_INDEX] = 2;
 		commandeer(node, io);
 		exit(EXIT_SUCCESS);
 	}
-	sh_close(pipe_in[0]);
-	sh_close(pipe_in[1]);
 	sh_close(pipe_out[1]);
 	return (expand_command_fd(exp, pid, pipe_out[0]));
 }

@@ -205,6 +205,7 @@ int			sh_getopts(int argc, char **argv);
 
 void		sh_backtrace(int count);
 int			sh_atol(const char *str, long *v);
+int			sh_arith_atol(const char *str, long *v);
 void		sh_ltoa(long value, char *str, size_t len);
 
 t_minishell	*sh(void);

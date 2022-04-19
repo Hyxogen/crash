@@ -1,4 +1,4 @@
-mem_size=50
+mem_size=10
 stride=3
 dataptr=0
 
@@ -167,7 +167,7 @@ do
 		# 	cond_bj=0
 		# 	break
 		else
-			cur=$((cur + 1))
+			cur=$(($cur + 1))
 		fi
 	done
 	debugprint "instr:$instr"

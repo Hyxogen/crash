@@ -9,22 +9,14 @@ long
 }
 
 long
-	arith_modulo_eq(const char *str, long divisor, long b, long c)
+	arith_modulo_eq(const char *str, long lhs, long rhs, long c)
 {
 	char	remainder_str[32];
-	long	dividend;
 	long	remainder;
 
 	(void) c;
-	if (sh_atol(str, dividend))
-	{
-		remainder = dividend % divisor ;
-		sh_ltoa(remainder, remainder_str, 32);
-		sh_setenv(remainder, remainder_str, 0);
-	}
-	else
-	{
-		sh_assert(0); /* Something weird */
-	}
-	return (-1);
+	remainder = lhs % rhs;
+	sh_ltoa(remainder, remainder_str, 32);
+	sh_setenv(str, remainder_str, 0);
+	return (remainder);
 }

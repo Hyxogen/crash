@@ -9,23 +9,14 @@ long
 }
 
 long
-	arith_minus_eq(const char *str, long rhs, long b, long c)
+	arith_minus_eq(const char *str, long lhs, long rhs, long c)
 {
-	char	diff_str[32];
-	long	lhs;
-	long	diff;
+	char	difference_str[32];
+	long	difference;
 
-	(void) b;
 	(void) c;
-	if (sh_atol(str, lhs))
-	{
-		diff = lhs - rhs;
-		sh_ltoa(diff, diff_str, 32);
-		sh_setenv(diff, diff_str, 0);
-	}
-	else
-	{
-		sh_assert(0); /* Something weird */
-	}
-	return (-1);
+	difference = lhs + rhs;
+	sh_ltoa(difference, difference_str, 32);
+	sh_setenv(str, difference_str, 0);
+	return (difference);
 }

@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# TODO:
-# arithmetic expansions
-
 export eyes
 export tongue
 export full
@@ -30,7 +27,6 @@ wrap() {
 	[ -n "$line" ] && echo "$line"
 }
 
-
 list_cowfiles() {
 	for d in $(IFS=: echo $cowpath); do
 		echo "Cow files in $d:"
@@ -39,7 +35,6 @@ list_cowfiles() {
 			if [ "${file%.cow}" != "$file" ]; then
 				files="$files ${file%.cow}"
 			fi
-			break # remove
 		done
 		wrap 80 $files
 	done
@@ -63,7 +58,7 @@ maxlength() {
 	done
 	echo $max
 }
-	
+
 repeat() {
 	if [ $1 -gt 0 ]; then
 		for i in $(seq 1 $1); do

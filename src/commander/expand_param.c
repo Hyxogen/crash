@@ -228,10 +228,10 @@ int
 	}
 	expand_promote(exp, tmp);
 	i = 0;
-	while (exp->parts[0].str[i] != NULL)
+	while (exp->parts[exp->count - 1].str[i] != NULL)
 	{
 		j = 0;
-		str = exp->parts[0].str[i];
+		str = exp->parts[exp->count - 1].str[i];
 		if (ctx->token->str[ctx->i] == '%')
 		{
 			best = ft_strlen(str);
@@ -265,7 +265,7 @@ int
 				}
 				j += 1;
 			}
-			exp->parts[0].str[i] = ft_strdup(str + best);
+			exp->parts[exp->count - 1].str[i] = ft_strdup(str + best);
 			free(str);
 		}
 		i += 1;
