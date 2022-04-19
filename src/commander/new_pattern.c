@@ -11,6 +11,8 @@
 static int
 	_is_match(char ch, t_pattern_node *const node)
 {
+	if (node->invert)
+		return (!node->chars[(size_t) ch]);
 	return (!!node->chars[(size_t) ch]);
 }
 
