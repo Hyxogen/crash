@@ -51,7 +51,8 @@ int
 	index = 0;
 	while (index < size)
 	{
-		ret = get_command_table()[node->childs[index]->type](node->childs[index], io);
+		ret = get_command_table()[node->childs[index]->type]
+			(node->childs[index], io);
 		index++;
 	}
 	return (!!ret);

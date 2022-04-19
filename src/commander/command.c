@@ -33,7 +33,7 @@ static int
 		free(tmp);
 		i += 1;
 	}
-	return (0);	
+	return (0);
 }
 
 static void
@@ -53,7 +53,7 @@ static void
 	{
 		sh_err3(name, "unknown error", strerror(errno));
 		sh_abort();
-	}   
+	}
 }
 
 static pid_t
@@ -105,11 +105,14 @@ static pid_t
 		_cm_close_or_dup2(ctx->io[SH_STDERR_INDEX], STDERR_FILENO);
 		if (_cm_setup_process_redirects(ctx->cmd_node->childs[1]))
 			exit(1);
-		if (ctx->io[SH_STDIN_INDEX] != STDIN_FILENO && ctx->io[SH_STDIN_INDEX] >= 0)
+		if (ctx->io[SH_STDIN_INDEX]
+			!= STDIN_FILENO && ctx->io[SH_STDIN_INDEX] >= 0)
 			sh_close(ctx->io[SH_STDIN_INDEX]);
-		if (ctx->io[SH_STDOUT_INDEX] != STDOUT_FILENO && ctx->io[SH_STDOUT_INDEX] >= 0)
+		if (ctx->io[SH_STDOUT_INDEX]
+			!= STDOUT_FILENO && ctx->io[SH_STDOUT_INDEX] >= 0)
 			sh_close(ctx->io[SH_STDOUT_INDEX]);
-		if (ctx->io[SH_STDERR_INDEX] != STDERR_FILENO && ctx->io[SH_STDERR_INDEX] >= 0)
+		if (ctx->io[SH_STDERR_INDEX]
+			!= STDERR_FILENO && ctx->io[SH_STDERR_INDEX] >= 0)
 			sh_close(ctx->io[SH_STDERR_INDEX]);
 		sh_execvp(ctx->args);
 		_sh_execvp_error_handler(ctx->args[0], errno);

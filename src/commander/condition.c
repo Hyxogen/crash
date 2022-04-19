@@ -57,7 +57,6 @@ static int
 	int		match;
 
 	escape_info = NULL;
-	
 	rhs_str = cm_expand_str(tok, &escape_info, ' ');
 	if (rhs_str == NULL)
 		return (-1);
@@ -90,12 +89,12 @@ pid_t
 		if (!cmp)
 		{
 			rc = commandeer(node->childs[index], case_io);
-			break;
+			break ;
 		}
 		else if (cmp < 0)
 		{
 			rc =  1;
-			break;
+			break ;
 		}
 		index++;
 	}
