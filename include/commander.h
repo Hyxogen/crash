@@ -174,6 +174,8 @@ pid_t			cm_function(const t_snode *ifnode, const int io[3]);
 pid_t			cm_function_define(const t_snode *ifnode, const int io[3]);
 
 int				commandeer_pipe_sequence(const t_snode *list_node, const int io[3]);
+int				cm_and_if(const t_snode *node, const int io[3]);
+int				cm_or_if(const t_snode *node, const int io[3]);
 int				commandeer_inner(const t_snode *node, const int io[3]);
 int				commandeer(const t_snode *node, const int io[3]);
 
