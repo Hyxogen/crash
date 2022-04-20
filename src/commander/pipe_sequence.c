@@ -33,31 +33,6 @@ void
 		sh_close(fd);
 }
 
-static int
-	_get_exit_code(int status_code)
-{
-	if (WIFSIGNALED(status_code))
-		return (128 + WTERMSIG(status_code));
-	return (WEXITSTATUS(status_code));
-}
-
-int
-	_cm_convert_builtin_pid(pid_t pid)
-{
-	return (-(pid + 1));
-}
-
-static int
-	_cm_wait_cmd(pid_t pid)
-{
-	int	status;
-
-	if (pid <= 0)
-		return (_cm_convert_builtin_pid(pid));
-	sh_waitpid(pid, &status, WUNTRACED);
-	return (_get_exit_code(status));	
-}
-
 char **_array_add(char **array, char *value)
 {
 	size_t	i;
@@ -99,22 +74,6 @@ char **cm_word_list_to_array(const t_snode *word_list)
 	return (ret);
 }
 
-/* TODO implement subshells */
-static t_cm_cmd_proc
-	*_get_commandeer_cmd_procs(void)
-{
-	static t_cm_cmd_proc procs[] = {
-		cm_simple_cmd_command,
-		cm_if_clause,
-		cm_function_define,
-		cm_case_clause,
-		cm_for_clause,
-		cm_while_until_clause,
-	};
-
-	return (procs);
-}
-
 pid_t
 	cm_unimplemented_cmd_command(const t_snode *node, const int io[3])
 {
@@ -125,88 +84,180 @@ pid_t
 	return (cm_convert_retcode(0));
 }
 
-static pid_t
-	_cm_cmd_nofork(const t_snode *node, int in, int out)
+#define SH_RETCODE_SIGNALLED_OFFSET 128
+
+static int
+	command_is_internal(pid_t command_pid)
 {
-	int				io[3];
-	t_cm_cmd_proc	proc;
-	pid_t			pid;
-
-	io[SH_STDIN_INDEX] = in;
-	io[SH_STDOUT_INDEX] = out;
-	io[SH_STDERR_INDEX] = STDERR_FILENO;
-	proc = _get_commandeer_cmd_procs()[node->type - sx_simple_cmd];
-	pid = proc(node, io);
-	return (pid);
-}
-
-static pid_t
-	_cm_cmd_fork(const t_snode *node, int in, int out)
-{
-	int				io[3];
-	t_cm_cmd_proc	proc;
-	pid_t			pid;
-
-	pid = sh_fork();
-	if (pid == 0)
-	{
-		io[SH_STDIN_INDEX] = in;
-		io[SH_STDOUT_INDEX] = out;
-		io[SH_STDERR_INDEX] = STDERR_FILENO;
-		proc = _get_commandeer_cmd_procs()[node->type - sx_simple_cmd];
-		exit(_cm_wait_cmd(proc(node, io)));
-	}
-	return (pid);
+	if (command_pid <= 0)
+		return (1);
+	return (0);
 }
 
 static int
-	_cm_pipe_sequence_rec(t_pipe_ctx *ctx, int prev_out, size_t index)
+	status_code_to_return_code(int status_code)
 {
-	int		ret_code;
-	int		pipe_io[2];
-	pid_t	pid;
+	if (WIFSIGNALED(status_code))
+		return (SH_RETCODE_SIGNALLED_OFFSET + WTERMSIG(status_code));
+	return (WEXITSTATUS(status_code));
+}
 
-	if (index + 1 >= ctx->node->childs_size)
-	{
-		pid = _cm_cmd_fork(ctx->node->childs[index], prev_out, ctx->end_out);
-		if (prev_out != ctx->begin_in)
-			sh_close(prev_out);
-		return (_cm_wait_cmd(pid));
-	}
+static int
+	internal_pid_to_return_code(pid_t command_pid)
+{
+	return (-(command_pid + 1));
+}
+
+static int
+	internal_wait_and_get_return_code(pid_t command_pid)
+{
+	return (internal_pid_to_return_code(command_pid));
+}
+
+static int
+	process_wait_and_get_return_code(pid_t pid)
+{
+	int	status_code;
+
+	sh_waitpid(pid, &status_code, WUNTRACED);
+	return (status_code_to_return_code(status_code));
+}
+
+static int
+	wait_and_get_return_code(pid_t command_pid)
+{
+	if (command_is_internal(command_pid))
+		return (internal_wait_and_get_return_code(command_pid));
+	return (process_wait_and_get_return_code(command_pid));
+}
+
+static t_command
+	get_command_function(const t_snode *command)
+{
+	static t_command functions[] = {
+		cm_simple_cmd_command,
+		cm_if_clause,
+		cm_function_define,
+		cm_case_clause,
+		cm_for_clause,
+		cm_while_until_clause
+	};
+
+	return (functions[command->type - sx_simple_cmd]);
+}
+
+static int
+	pipe_seq_should_execute(const t_snode *pipe_seq)
+{
+	if (pipe_seq->childs_size == 0 || sh()->breaking > 0)
+		return (0);
+	return (1);
+}
+
+static int
+	execute_command(const t_snode *command, const int io[SH_STDIO_SIZE])
+{
+	pid_t		command_pid;
+	t_command	command_func;
+
+	command_func = get_command_function(command);
+	command_pid = command_func(command, io);
+	return (command_pid);
+}
+
+static int
+	create_pipe_and_execute_command(const t_snode *command, pid_t *command_pid, int input_fd)
+{
+	int	pipe_io[2];
+	int	command_io[SH_STDIO_SIZE];
+
 	sh_pipe(pipe_io);
 	sh_fdctl(pipe_io[0], SH_FD_FIOCLEX, 1);
 	sh_fdctl(pipe_io[1], SH_FD_FIOCLEX, 1);
-	pid = _cm_cmd_fork(ctx->node->childs[index], prev_out, pipe_io[1]);
-	if (prev_out != ctx->begin_in)
-		sh_close(prev_out);
+	command_io[SH_STDIN_INDEX] = input_fd;
+	command_io[SH_STDOUT_INDEX] = pipe_io[1];
+	command_io[SH_STDERR_INDEX] = STDERR_FILENO;
+	*command_pid = execute_command(command, command_io);
 	sh_close(pipe_io[1]);
-	ret_code = _cm_pipe_sequence_rec(ctx, pipe_io[0], index + 1);
-	_cm_wait_cmd(pid);
-	return (ret_code);
+	return (pipe_io[0]);
+}
+
+static int
+	execute_commands_recursive(const t_snode *pipe_seq, const int final_out_fd, int previous_out_fd, size_t index);
+
+static int
+	execute_commands_recursive_not_last(const t_snode *pipe_seq, const int final_out_fd, int previous_out_fd, size_t index)
+{
+	pid_t	command_pid;
+	int		last_return_code;
+	int		current_out_fd;
+
+	current_out_fd = create_pipe_and_execute_command(pipe_seq->childs[index], &command_pid, previous_out_fd);
+	last_return_code = execute_commands_recursive(pipe_seq, final_out_fd, current_out_fd, index + 1);
+	wait_and_get_return_code(command_pid);
+	return (last_return_code);
+}
+
+static int
+	execute_commands_recursive_last(const t_snode *pipe_seq, const int final_out_fd, int previous_out_fd, size_t index)
+{
+	pid_t	command_pid;
+	int		return_code;
+	int		command_io[SH_STDIO_SIZE];
+
+	command_io[SH_STDIN_INDEX] = previous_out_fd;
+	command_io[SH_STDOUT_INDEX] = final_out_fd;
+	command_io[SH_STDERR_INDEX] = STDERR_FILENO;
+	command_pid = execute_command(pipe_seq->childs[index], command_io);
+	return_code = wait_and_get_return_code(command_pid);
+	return (return_code);
+}
+
+static int
+	execute_commands_recursive(const t_snode *pipe_seq, const int final_out_fd, int previous_out_fd, size_t index)
+{
+	if (index + 1 == pipe_seq->childs_size)
+		return (execute_commands_recursive_last(pipe_seq, final_out_fd, previous_out_fd, index));
+	else
+		return (execute_commands_recursive_not_last(pipe_seq, final_out_fd, previous_out_fd, index));
+}
+
+static int
+	execute_pipe_seq_one_command(const t_snode *pipe_seq, const int io[SH_STDIO_SIZE])
+{
+	return (execute_commands_recursive(pipe_seq, io[SH_STDOUT_INDEX], io[SH_STDIN_INDEX], 0));
+}
+
+static int
+	execute_pipe_seq_multiple_commands(const t_snode *pipe_seq, const int io[SH_STDIO_SIZE])
+{
+	pid_t	pipe_pid;
+	int		return_code;
+
+	pipe_pid = sh_fork();
+	if (pipe_pid == 0)
+	{
+		return_code = execute_commands_recursive(pipe_seq, io[SH_STDOUT_INDEX], io[SH_STDIN_INDEX], 0);
+		exit(return_code);
+	}
+	return_code = process_wait_and_get_return_code(pipe_pid);
+	return (return_code);
 }
 
 int
-	commandeer_pipe_sequence(const t_snode *seq_node, const int io[3])
+	execute_pipe_seq(const t_snode *pipe_seq, const int io[SH_STDIO_SIZE])
 {
-	t_pipe_ctx	ctx;
-	int			rc;
+	int	return_code;
 
-	if (seq_node->childs_size == 0 || sh()->breaking > 0)
+	if (!pipe_seq_should_execute(pipe_seq))
 		return (0);
-	else if (seq_node->childs_size == 1)
-	{
-		cm_disable_reaper();
-		rc = _cm_wait_cmd(_cm_cmd_nofork(seq_node->childs[0], io[SH_STDIN_INDEX], io[SH_STDOUT_INDEX]));
-		cm_enable_reaper();
-		sh()->return_code = rc; /* TODO check if this should be here */
-		return (rc);
-	}
-	ctx.begin_in = io[SH_STDIN_INDEX];
-	ctx.end_out = io[SH_STDOUT_INDEX];
-	ctx.node = seq_node;
 	cm_disable_reaper();
-	rc = _cm_pipe_sequence_rec(&ctx, io[SH_STDIN_INDEX], 0);
+	if (pipe_seq->childs_size == 1)
+		return_code = execute_pipe_seq_one_command(pipe_seq, io);
+	else
+		return_code = execute_pipe_seq_multiple_commands(pipe_seq, io);
 	cm_enable_reaper();
-	sh()->return_code = rc; /* TODO check if this should be here */
-	return (rc);
+	sh()->return_code = return_code;
+	return (return_code);
 }
+

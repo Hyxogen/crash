@@ -13,3 +13,4 @@ stdall
 *.diff
 *.d
 /.cache
+*.swp

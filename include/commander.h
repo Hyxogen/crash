@@ -18,14 +18,23 @@
 # include "lexer.h"
 # include <sys/wait.h>
 
+# ifndef SH_STDIO_SIZE
+#  define SH_STDIO_SIZE 3
+# endif
 # ifndef SH_STDIN_INDEX
 #  define SH_STDIN_INDEX 0
+# elif SH_STDIN_INDEX >= SH_STDIO_SIZE
+#  error "SH_STDIO_SIZE must be at least one larger than SH_STDIN_INDEX"
 # endif
 # ifndef SH_STDOUT_INDEX
 #  define SH_STDOUT_INDEX 1
+# elif SH_STDOUT_INDEX >= SH_STDIO_SIZE
+#  error "SH_STDIO_SIZE must be at least one larger than SH_STDOUT_INDEX"
 # endif
 # ifndef SH_STDERR_INDEX
 #  define SH_STDERR_INDEX 2
+# elif SH_STDERR_INDEX >= SH_STDIO_SIZE
+#  error "SH_STDIO_SIZE must be at least one larger than SH_STDERR_INDEX"
 # endif
 
 enum e_associativity {
@@ -77,6 +86,7 @@ enum e_arith_token_id {
 
 typedef int						(*t_commandeer_proc)(const t_snode*, const int[3]);
 typedef pid_t					(*t_cm_cmd_proc)(const t_snode*, const int[3]);
+typedef pid_t					(*t_command)(const t_snode *, const int[3]);
 typedef int						(*t_cm_cmd_wait)(pid_t pid);
 typedef long					(*t_cm_eval_proc)(const char *ptr, long a, long b, long c);
 typedef enum e_associativity	t_associativity;
@@ -185,7 +195,7 @@ pid_t			cm_while_until_clause(const t_snode *ifnode, const int io[3]);
 pid_t			cm_function(const t_snode *ifnode, const int io[3]);
 pid_t			cm_function_define(const t_snode *ifnode, const int io[3]);
 
-int				commandeer_pipe_sequence(const t_snode *list_node, const int io[3]);
+int				execute_pipe_seq(const t_snode *list_node, const int io[3]);
 int				cm_and_if(const t_snode *node, const int io[3]);
 int				cm_or_if(const t_snode *node, const int io[3]);
 int				commandeer_inner(const t_snode *node, const int io[3]);
