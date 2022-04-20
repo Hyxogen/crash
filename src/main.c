@@ -28,7 +28,7 @@ int
 	int			fd;
 
 	sh_init(argv, envp);
-	cm_enable_reaper();
+	enable_signal_child_reaper_handler();
 	if (argc >= 2)
 	{
 		fd = open(argv[1], O_RDONLY);

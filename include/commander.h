@@ -219,8 +219,10 @@ pid_t			cm_unimplemented_cmd_command(const t_snode *node, const int io[3]);
 
 char			**cm_word_list_to_array(const t_snode *word_list);
 
-int				cm_enable_reaper(void);
-int				cm_disable_reaper(void);
+int				child_reaper_lock(void);
+int				child_reaper_unlock(void);
+void			disable_signal_child_reaper_handler(void);
+void			enable_signal_child_reaper_handler(void);
 
 int				sh_cm_run(t_input *in);
 int				match_pattern(const char *str, const char *pattern, const char *info);

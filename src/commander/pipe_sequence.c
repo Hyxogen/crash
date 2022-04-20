@@ -223,13 +223,13 @@ static int
 }
 
 static int
-	execute_pipe_seq_one_command(const t_snode *pipe_seq, const int io[SH_STDIO_SIZE])
+	execute_pipe_seq_nofork(const t_snode *pipe_seq, const int io[SH_STDIO_SIZE])
 {
 	return (execute_commands_recursive(pipe_seq, io[SH_STDOUT_INDEX], io[SH_STDIN_INDEX], 0));
 }
 
 static int
-	execute_pipe_seq_multiple_commands(const t_snode *pipe_seq, const int io[SH_STDIO_SIZE])
+	execute_pipe_seq_fork(const t_snode *pipe_seq, const int io[SH_STDIO_SIZE])
 {
 	pid_t	pipe_pid;
 	int		return_code;
@@ -237,7 +237,7 @@ static int
 	pipe_pid = sh_fork();
 	if (pipe_pid == 0)
 	{
-		return_code = execute_commands_recursive(pipe_seq, io[SH_STDOUT_INDEX], io[SH_STDIN_INDEX], 0);
+		return_code = execute_pipe_seq_nofork(pipe_seq, io);
 		exit(return_code);
 	}
 	return_code = process_wait_and_get_return_code(pipe_pid);
@@ -251,12 +251,12 @@ int
 
 	if (!pipe_seq_should_execute(pipe_seq))
 		return (0);
-	cm_disable_reaper();
+	child_reaper_lock();
 	if (pipe_seq->childs_size == 1)
-		return_code = execute_pipe_seq_one_command(pipe_seq, io);
+		return_code = execute_pipe_seq_nofork(pipe_seq, io);
 	else
-		return_code = execute_pipe_seq_multiple_commands(pipe_seq, io);
-	cm_enable_reaper();
+		return_code = execute_pipe_seq_fork(pipe_seq, io);
+	child_reaper_unlock();
 	sh()->return_code = return_code;
 	return (return_code);
 }
