@@ -95,20 +95,6 @@ static int
 }
 
 static int
-	status_code_to_return_code(int status_code)
-{
-	if (WIFSIGNALED(status_code))
-		return (SH_RETCODE_SIGNALLED_OFFSET + WTERMSIG(status_code));
-	return (WEXITSTATUS(status_code));
-}
-
-static int
-	internal_pid_to_return_code(pid_t command_pid)
-{
-	return (-(command_pid + 1));
-}
-
-static int
 	internal_wait_and_get_return_code(pid_t command_pid)
 {
 	return (internal_pid_to_return_code(command_pid));

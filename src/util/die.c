@@ -40,6 +40,7 @@ void
 {
 	if (!test)
 	{
+		sh_backtrace(64);
 		sh_err2(s, strerror(errno));
 		exit(EXIT_FAILURE);
 	}

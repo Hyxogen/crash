@@ -110,6 +110,16 @@ typedef int					(*t_builtin_proc)(int argc, char **argv);
 #  define SH_FD_FIOCLEX 0x1
 # endif
 
+# ifndef SH_INVALID_INTERNAL_PID
+#  define SH_INVALID_INTERNAL_PID 1
+# endif
+# ifndef SH_ERROR_INTERNAL_PID
+#  define SH_ERROR_INTERNAL_PID 2
+# endif
+
+# ifndef SH_CLOSED_FD
+#  define SH_CLOSED_FD -1
+# endif
 
 struct s_envvar
 {

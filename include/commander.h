@@ -37,6 +37,10 @@
 #  error "SH_STDIO_SIZE must be at least one larger than SH_STDERR_INDEX"
 # endif
 
+# ifndef SH_RETCODE_SIGNALLED_OFFSET
+#  define SH_RETCODE_SIGNALLED_OFFSET 128
+# endif
+
 enum e_associativity {
 	ass_left,
 	ass_right
@@ -195,6 +199,7 @@ pid_t			cm_while_until_clause(const t_snode *ifnode, const int io[3]);
 pid_t			cm_function(const t_snode *ifnode, const int io[3]);
 pid_t			cm_function_define(const t_snode *ifnode, const int io[3]);
 
+pid_t			execute_simple_command(const t_snode *command, const int io[SH_STDIO_SIZE]);
 int				execute_pipe_seq(const t_snode *list_node, const int io[3]);
 int				cm_and_if(const t_snode *node, const int io[3]);
 int				cm_or_if(const t_snode *node, const int io[3]);
@@ -223,6 +228,10 @@ int				child_reaper_lock(void);
 int				child_reaper_unlock(void);
 void			disable_signal_child_reaper_handler(void);
 void			enable_signal_child_reaper_handler(void);
+
+int				status_code_to_return_code(int status_code);
+int				internal_pid_to_return_code(pid_t command_pid);
+int				return_code_to_internal_pid(int return_code);
 
 int				sh_cm_run(t_input *in);
 int				match_pattern(const char *str, const char *pattern, const char *info);

@@ -251,3 +251,254 @@ void
 	if (original[SH_STDERR_INDEX] != redirect[SH_STDERR_INDEX])
 		_cm_close_nostd(redirect[SH_STDERR_INDEX]);
 }
+
+/* NOTE: Ik was bezig met het refactoren van deze file, maar het nieuwe systeem werkt nog niet helemaal
+ * for the time being heb ik even het oude systeem nog aan laten staan */
+
+static int
+	command_should_execute(const t_snode *command)
+{
+	(void) command;
+	if (sh()->continuing)
+		return (0);
+	return (1);
+}
+
+static int
+	get_argument_count(char * const *args)
+{
+	int	argument_count;
+
+	argument_count = 0;
+	while (*args != NULL)
+	{
+		args += 1;
+		argument_count += 1;
+	}
+	return (argument_count);
+}
+
+static char
+	**command_get_arguments(const t_snode *command)
+{
+	return (cm_word_list_to_array(command->childs[0]));
+}
+
+static int
+	close_nostd_fd(int fd)
+{
+	if (fd != STDIN_FILENO && fd != STDOUT_FILENO && fd != STDERR_FILENO)
+		return (sh_close(fd));
+	return (0);
+}
+
+static int
+	command_setup_internal_redirects(const t_snode *command, const int io[SH_STDIO_SIZE], int old_io[SH_STDIO_SIZE])
+{
+	const t_snode	*redirect_list;
+
+	ft_memcpy(old_io, sh()->io, sizeof(sh()->io));
+	ft_memcpy(sh()->io, io, sizeof(sh()->io));
+	redirect_list = command->childs[1];
+	if (_cm_setup_builtin_redirects(redirect_list, sh()->io))
+		return (-1);
+	return (0);
+}
+
+static void
+	close_or_dup2_fd(int fromfd, int tofd)
+{
+	if (fromfd == SH_CLOSED_FD)
+		sh_close(tofd);
+	else
+		sh_dup2(fromfd, tofd);
+}
+
+static int
+	command_setup_external_redirects(const t_snode *command, const int io[SH_STDIO_SIZE])
+{
+	const t_snode	*redirect_list;
+
+	redirect_list = command->childs[1];
+	close_or_dup2_fd(io[SH_STDIN_INDEX], STDIN_FILENO);
+	close_or_dup2_fd(io[SH_STDOUT_INDEX], STDOUT_FILENO);
+	close_or_dup2_fd(io[SH_STDERR_INDEX], STDERR_FILENO);
+	if (_cm_setup_process_redirects(redirect_list))
+		return (-1);
+	return (0);
+}
+
+static int
+	command_restore_internal_redirects(const t_snode *command, const int io[SH_STDIO_SIZE])
+{
+	int	*shell_io;
+
+	(void) command;
+	shell_io = sh()->io;
+	if (shell_io[SH_STDIN_INDEX] != io[SH_STDIN_INDEX] && shell_io[SH_STDIN_INDEX] != SH_CLOSED_FD)
+		close_nostd_fd(shell_io[SH_STDIN_INDEX]);
+	if (shell_io[SH_STDOUT_INDEX] != io[SH_STDOUT_INDEX] && shell_io[SH_STDOUT_INDEX] != SH_CLOSED_FD)
+		close_nostd_fd(shell_io[SH_STDOUT_INDEX]);
+	if (shell_io[SH_STDERR_INDEX] != io[SH_STDERR_INDEX] && shell_io[SH_STDERR_INDEX] != SH_CLOSED_FD)
+		close_nostd_fd(shell_io[SH_STDERR_INDEX]);
+	return (0);
+}
+
+static pid_t
+	execute_internal_function(const t_snode *command, const t_builtin *function, char **args, const int io[SH_STDIO_SIZE])
+{
+	int	return_code;
+	int	argc;
+	int	old_io[SH_STDIO_SIZE];
+
+	argc = get_argument_count(args);
+	if (command_setup_internal_redirects(command, io, old_io))
+		return (SH_ERROR_INTERNAL_PID);
+	return_code = function->fn(argc, args);
+	command_restore_internal_redirects(command, old_io);
+	sh_env_clean();
+	return (return_code_to_internal_pid(return_code));
+}
+
+static pid_t
+	execute_defined_function(const t_snode *command, t_function *function, char **args, const int io[SH_STDIO_SIZE])
+{
+	int		return_code;
+	char	**old_args;
+	char	*old_arg0;
+
+	(void) command;
+	old_arg0 = args[0];
+	args[0] = sh()->args[0];
+	old_args = sh()->args;
+	sh()->args = args;
+	return_code = cm_function(function->body, io);
+	args[0] = old_arg0;
+	sh()->args = old_args;
+	sh_env_clean();
+	return (return_code_to_internal_pid(return_code));
+}
+
+static pid_t
+	find_and_execute_builtin(const t_snode *command, char **args, const int io[SH_STDIO_SIZE])
+{
+	size_t			index;
+	size_t			size;
+	const t_builtin	*builtin_func;
+
+	index = 0;
+	size = sh()->builtins_size;
+	while (index < size)
+	{
+		builtin_func = &sh()->builtins[index];
+		if (ft_strcmp(args[0], builtin_func->key) == 0)
+		{
+			return (execute_internal_function(command, builtin_func, args, io));
+		}
+		index++;
+	}
+	return (SH_INVALID_INTERNAL_PID);
+}
+
+static pid_t
+	find_and_execute_utility(const t_snode *command, char **args, const int io[SH_STDIO_SIZE])
+{
+	size_t			index;
+	size_t			size;
+	const t_builtin	*utility_func;
+
+	index = 0;
+	size = sh()->utilities_size;;
+	while (index < size)
+	{
+		utility_func = &sh()->utilities[index];
+		if (ft_strcmp(args[0], utility_func->key) == 0)
+		{
+			return (execute_internal_function(command, utility_func, args, io));
+		}
+		index++;
+	}
+	return (SH_INVALID_INTERNAL_PID);
+}
+
+static pid_t
+	find_and_execute_defined_function(const t_snode *command, char **args, const int io[SH_STDIO_SIZE])
+{
+	size_t		index;
+	size_t		size;
+	t_function	*function_func;
+
+	index = 0;
+	size = sh()->functions_size;
+	while (index < size)
+	{
+		function_func = &sh()->functions[index];
+		if (ft_strcmp(args[0], function_func->key) == 0)
+		{
+			return (execute_defined_function(command, function_func, args, io));
+		}
+		index++;
+	}
+	return (SH_INVALID_INTERNAL_PID);
+}
+
+static pid_t
+	execute_internal_command(const t_snode *command, char **args, const int io[SH_STDIO_SIZE])
+{
+	pid_t	command_pid;
+
+	command_pid = find_and_execute_builtin(command, args, io);
+	if (command_pid != SH_INVALID_INTERNAL_PID)
+		return (command_pid);
+	command_pid = find_and_execute_defined_function(command, args, io);
+	if (command_pid != SH_INVALID_INTERNAL_PID)
+		return (command_pid);
+	command_pid = find_and_execute_utility(command, args, io);
+	if (command_pid != SH_INVALID_INTERNAL_PID)
+		return (command_pid);
+	return (SH_INVALID_INTERNAL_PID);
+}
+
+static void
+	setup_and_try_execve_command(const t_snode *command, char **args, const int io[SH_STDIO_SIZE])
+{
+	if (command_setup_external_redirects(command, io))
+		exit(EXIT_FAILURE);
+	sh_execvp(args);
+}
+
+static pid_t
+	execute_external_command(const t_snode *command, char **args, const int io[SH_STDIO_SIZE])
+{
+	pid_t	command_pid;
+
+	command_pid = sh_fork();
+	if (command_pid == 0)
+	{
+		setup_and_try_execve_command(command, args, io);
+		sh_assert(0);
+	}
+	return (command_pid);
+}
+
+pid_t
+	execute_simple_command(const t_snode *command, const int io[SH_STDIO_SIZE])
+{
+	pid_t	command_pid;
+	char	**args;
+
+	if (!command_should_execute(command))
+		return (return_code_to_internal_pid(0));
+	args = command_get_arguments(command);
+	if (args == NULL)
+		return (return_code_to_internal_pid(1));
+	if (args[0] == NULL)
+		return (return_code_to_internal_pid(0));
+	command_pid = execute_internal_command(command, args, io);
+	if (command_pid == SH_INVALID_INTERNAL_PID)
+	{
+		command_pid = execute_external_command(command, args, io);
+	}
+	sh_strlst_clear(args);
+	return (command_pid);
+}
