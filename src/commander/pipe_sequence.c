@@ -140,14 +140,31 @@ static int
 	return (1);
 }
 
-static int
-	execute_command(const t_snode *command, const int io[SH_STDIO_SIZE])
+static pid_t
+	execute_command_fork(const t_snode *command, const int io[SH_STDIO_SIZE])
+{
+	pid_t		command_pid;
+	pid_t		fork_pid;
+	t_command	command_func;
+
+	fork_pid = sh_fork();
+	if (fork_pid == 0)
+	{
+		command_func = get_command_function(command);
+		command_pid = command_func(command, io);
+		exit(wait_and_get_return_code(command_pid));
+	}
+	return (fork_pid);
+}
+
+static pid_t
+	execute_command_nofork(const t_snode *command, const int io[SH_STDIO_SIZE])
 {
 	pid_t		command_pid;
 	t_command	command_func;
 
-	command_func = get_command_function(command);
-	command_pid = command_func(command, io);
+		command_func = get_command_function(command);
+		command_pid = command_func(command, io);
 	return (command_pid);
 }
 
@@ -163,7 +180,7 @@ static int
 	command_io[SH_STDIN_INDEX] = input_fd;
 	command_io[SH_STDOUT_INDEX] = pipe_io[1];
 	command_io[SH_STDERR_INDEX] = STDERR_FILENO;
-	*command_pid = execute_command(command, command_io);
+	*command_pid = execute_command_fork(command, command_io);
 	sh_close(pipe_io[1]);
 	return (pipe_io[0]);
 }
@@ -194,7 +211,7 @@ static int
 	command_io[SH_STDIN_INDEX] = previous_out_fd;
 	command_io[SH_STDOUT_INDEX] = final_out_fd;
 	command_io[SH_STDERR_INDEX] = STDERR_FILENO;
-	command_pid = execute_command(pipe_seq->childs[index], command_io);
+	command_pid = execute_command_fork(pipe_seq->childs[index], command_io);
 	return_code = wait_and_get_return_code(command_pid);
 	return (return_code);
 }
@@ -215,7 +232,7 @@ static int
 }
 
 static int
-	execute_pipe_seq_fork(const t_snode *pipe_seq, const int io[SH_STDIO_SIZE])
+	execute_multi_command_pipe_seq(const t_snode *pipe_seq, const int io[SH_STDIO_SIZE])
 {
 	pid_t	pipe_pid;
 	int		return_code;
@@ -230,6 +247,17 @@ static int
 	return (return_code);
 }
 
+static int
+	execute_single_command_pipe_seq(const t_snode *pipe_seq, const int io[SH_STDIO_SIZE])
+{
+	pid_t	command_pid;
+	int		return_code;
+
+	command_pid = execute_command_nofork(pipe_seq->childs[0], io);
+	return_code = wait_and_get_return_code(command_pid);
+	return (return_code);
+}
+
 int
 	execute_pipe_seq(const t_snode *pipe_seq, const int io[SH_STDIO_SIZE])
 {
@@ -239,9 +267,9 @@ int
 		return (0);
 	child_reaper_lock();
 	if (pipe_seq->childs_size == 1)
-		return_code = execute_pipe_seq_nofork(pipe_seq, io);
+		return_code = execute_single_command_pipe_seq(pipe_seq, io);
 	else
-		return_code = execute_pipe_seq_fork(pipe_seq, io);
+		return_code = execute_multi_command_pipe_seq(pipe_seq, io);
 	child_reaper_unlock();
 	sh()->return_code = return_code;
 	return (return_code);
