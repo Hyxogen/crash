@@ -6,6 +6,10 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <readline/readline.h>
+
+extern int rl_catch_signals;
+extern void (*rl_event_hook)(void);
 
 t_snode
 	*pr_parse(t_parser *pr)
@@ -35,6 +39,8 @@ int
 	t_snode		*node;
 	int			std_io[3];
 
+	rl_catch_signals = 1;
+	rl_event_hook = sh_nop1;
 	src_init(&src, in);
 	lex_init(&lex);
 	pr_init(&pr);
@@ -43,6 +49,7 @@ int
 	std_io[SH_STDIN_INDEX] = STDIN_FILENO;
 	std_io[SH_STDOUT_INDEX] = STDOUT_FILENO;
 	std_io[SH_STDERR_INDEX] = STDERR_FILENO;
+	sh()->last_command = NULL;
 	while (!pr.lexer->error)
 	{
 		in->more = 0;
@@ -58,6 +65,8 @@ int
 		node_destroy(node);
 		if (pr.lexer->error)
 			sh_err1("syntax error");
+		add_history(history_get_last());
+		history_clear();
 	}
 	pr_destroy(&pr);
 	// TODO: errors?

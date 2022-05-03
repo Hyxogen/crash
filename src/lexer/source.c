@@ -51,7 +51,7 @@ int
 		return (-1);
 	c = (unsigned char) src->str[src->off];
 	src->off += 1;
-	if (c == '\0')
+	if (c == '\0' && src->force_newline)
 		return ('\n');
 	return (c);
 }

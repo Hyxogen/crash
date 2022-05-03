@@ -20,7 +20,7 @@
 #include <execinfo.h>
 
 char
-	*sh_join2(char *lhs, char delim, char *rhs)
+	*sh_join2(const char *lhs, char delim, const char *rhs)
 {
 	size_t	size;
 	char	*str;

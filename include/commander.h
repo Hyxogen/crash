@@ -208,6 +208,9 @@ int				commandeer(const t_snode *node, const int io[3]);
 
 int				sh_execvp(char **argv);
 
+int				command_restore_internal_redirects(const int io[SH_STDIO_SIZE]);
+int				command_setup_internal_redirects(const t_snode *redirect_list, const int io[SH_STDIO_SIZE], int old_io[SH_STDIO_SIZE]);
+
 int				_cm_get_redi_flags(t_syntax_id type);
 int				_cm_create_and_write_here(const char *str, int skip_leading_tabs);
 int				_cm_setup_process_redirects(const t_snode *redi_list);

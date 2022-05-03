@@ -21,6 +21,29 @@
 #include <stdio.h>
 #include <libgen.h>
 
+void
+	run_start_scripts(void)
+{
+	t_input		in;
+	int			fd;
+	const char	*home;
+	char		*rc;
+
+	home = sh_getenv("HOME", NULL);
+	if (home != NULL)
+	{
+		rc = ft_strjoin(home, "/.crashrc");
+		fd = open(rc, O_RDONLY);
+		if (fd >= 0)
+		{
+			input_new(&in, in_file, (void*)(unsigned long long) fd);
+			sh_cm_run(&in);
+			input_destroy(&in);
+			close(fd);
+		}
+	}	
+}
+
 int
 	main(int argc, char **argv, char **envp)
 {
@@ -29,6 +52,8 @@ int
 
 	sh_init(argv, envp);
 	enable_signal_child_reaper_handler();
+	setup_default_signal_handlers();
+	run_start_scripts();
 	if (argc >= 2)
 	{
 		fd = open(argv[1], O_RDONLY);

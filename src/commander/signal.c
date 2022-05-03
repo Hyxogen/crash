@@ -15,6 +15,11 @@
 
 #include <errno.h>
 #include <signal.h>
+#include <readline/readline.h>
+#include <libft.h>
+#include <unistd.h>
+
+#include <stdio.h>
 
 static void
 	try_reap_all_childs(void)
@@ -33,6 +38,17 @@ static void
 			break ;
 	}
 }
+
+static void
+	sigint_handler(int signal)
+{
+	// (void) signal;
+	ft_putchar_fd('\n', STDOUT_FILENO);
+	rl_replace_line("", 1);
+	rl_on_new_line();
+	rl_redisplay();
+}
+
 
 void
 	signal_try_reap_all_childs(int sig)
@@ -99,3 +115,15 @@ int
 	return (0);
 }
 
+void
+	setup_default_signal_handlers(void)
+{
+	struct sigaction action;
+
+	sigemptyset(&action.sa_mask);
+	action.sa_handler = SIG_IGN;
+	sh_sigaction(SIGQUIT, &action, NULL);
+	action.sa_handler = sigint_handler;
+	action.sa_flags = SA_RESTART;
+	sh_sigaction(SIGINT, &action, NULL);
+}

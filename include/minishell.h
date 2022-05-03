@@ -81,10 +81,14 @@
 // break in pipe sequence
 // errors for unclosed stuff
 
-// FOR SURE TODO
-// fork in multi-command pipe sequence
-// 2.9.1; Command Search and Execution; 1.c (super extra special builtins)
-
+/*
+ * FOR SURE TODO:
+ * fork in multi-command pipe sequence
+ * 2.9.1; Command Search and Execution; 1.c (super extra special builtins)
+ * handle all the shell variables
+ * history
+ * return value of lex_main is rarely checked
+ */
 # define SH_ENV_EXPORT 1
 # define SH_ENV_READONLY 2
 
@@ -162,9 +166,11 @@ struct s_minishell
 	char				*name;
 	int					return_code;
 	int					fd_flags[OPEN_MAX];
+	size_t				command_count;
+	char				*last_command;
 };
 
-char		*sh_join2(char *lhs, char delim, char *rhs);
+char		*sh_join2(const char *lhs, char delim, const char *rhs);
 void		sh_split2(char *str, char delim, char **lhs, char **rhs);
 char		*sh_join_path(char *lhs, char *rhs);
 
@@ -183,6 +189,7 @@ void		sh_assert_impl(int test);
 void		sh_check(int test, const char *s);
 void		sh_abort(void);
 void		sh_nop(void *ptr);
+void		sh_nop1(void);
 
 pid_t		sh_fork(void);
 int			sh_execve(const char *path, char *const argv[], char *const envp[]);
@@ -230,4 +237,9 @@ void		sh_add_function(const char *key, t_snode *body);
 void		sh_fdctl(int fd, int flag, int on);
 void		sh_fd_before_exec(void);
 
+void		history_append(const char *line);
+const char	*history_get_last(void);
+void		history_clear(void);
+
+void		setup_default_signal_handlers(void);
 #endif

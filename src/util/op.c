@@ -17,3 +17,8 @@ void
 {
 	(void) ptr;
 }
+
+void
+	sh_nop1(void)
+{
+}

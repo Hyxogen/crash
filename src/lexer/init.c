@@ -23,6 +23,7 @@ void
 	src->nex = -1;
 	src->lst = NULL;
 	src->in = in;
+	src->force_newline = 1;
 }
 
 void
@@ -40,6 +41,7 @@ void
 	lex->here_flags = 0;
 	lex->new_part = 1;
 	lex->has_eof = 0;
+	lex->env_lexer = 0;
 }
 
 void

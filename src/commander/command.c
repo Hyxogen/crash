@@ -292,14 +292,11 @@ static int
 	return (0);
 }
 
-static int
-	command_setup_internal_redirects(const t_snode *command, const int io[SH_STDIO_SIZE], int old_io[SH_STDIO_SIZE])
+int
+	command_setup_internal_redirects(const t_snode *redirect_list, const int io[SH_STDIO_SIZE], int old_io[SH_STDIO_SIZE])
 {
-	const t_snode	*redirect_list;
-
 	ft_memcpy(old_io, sh()->io, sizeof(sh()->io));
 	ft_memcpy(sh()->io, io, sizeof(sh()->io));
-	redirect_list = command->childs[1];
 	if (_cm_setup_builtin_redirects(redirect_list, sh()->io))
 		return (-1);
 	return (0);
@@ -315,11 +312,8 @@ static void
 }
 
 static int
-	command_setup_external_redirects(const t_snode *command, const int io[SH_STDIO_SIZE])
+	command_setup_external_redirects(const t_snode *redirect_list, const int io[SH_STDIO_SIZE])
 {
-	const t_snode	*redirect_list;
-
-	redirect_list = command->childs[1];
 	close_or_dup2_fd(io[SH_STDIN_INDEX], STDIN_FILENO);
 	close_or_dup2_fd(io[SH_STDOUT_INDEX], STDOUT_FILENO);
 	close_or_dup2_fd(io[SH_STDERR_INDEX], STDERR_FILENO);
@@ -328,12 +322,11 @@ static int
 	return (0);
 }
 
-static int
-	command_restore_internal_redirects(const t_snode *command, const int io[SH_STDIO_SIZE])
+int
+	command_restore_internal_redirects(const int io[SH_STDIO_SIZE])
 {
 	int	*shell_io;
 
-	(void) command;
 	shell_io = sh()->io;
 	if (shell_io[SH_STDIN_INDEX] != io[SH_STDIN_INDEX] && shell_io[SH_STDIN_INDEX] != SH_CLOSED_FD)
 		close_nostd_fd(shell_io[SH_STDIN_INDEX]);
@@ -352,10 +345,10 @@ static pid_t
 	int	old_io[SH_STDIO_SIZE];
 
 	argc = get_argument_count(args);
-	if (command_setup_internal_redirects(command, io, old_io))
+	if (command_setup_internal_redirects(command->childs[1], io, old_io))
 		return (SH_ERROR_INTERNAL_PID);
 	return_code = function->fn(argc, args);
-	command_restore_internal_redirects(command, old_io);
+	command_restore_internal_redirects(old_io);
 	sh_env_clean();
 	return (return_code_to_internal_pid(return_code));
 }
@@ -490,7 +483,7 @@ pid_t
 	if (!command_should_execute(command))
 		return (return_code_to_internal_pid(0));
 	args = command_get_arguments(command);
-	if (args == NULL)
+	if (args == NULL || _do_assignments(command->childs[command->childs_size - 1], !!args[0]))
 		return (return_code_to_internal_pid(1));
 	if (args[0] == NULL)
 		return (return_code_to_internal_pid(0));

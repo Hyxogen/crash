@@ -31,7 +31,6 @@ int
 		sh_err3(".", argv[1], "cannot execute binary file");
 		return (-1);
 	}
-	fd = sh_open(argv[1], O_RDONLY, 0);
 	if (argc != 2)
 	{
 		old_argv_0 = argv[0];
@@ -40,8 +39,11 @@ int
 		sh()->args[0] = old_args[0];
 	}
 	// TODO: should it be interactive?
+	fd = sh_open(argv[1], O_RDONLY, 0);
 	input_new(&in, in_file, (void*)(unsigned long long) fd);
 	ret = sh_cm_run(&in);
+	input_destroy(&in);
+	sh_close(fd);
 	if (argc != 2)
 	{
 		argv[0] = old_argv_0;

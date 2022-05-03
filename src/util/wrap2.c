@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/wait.h>
+#include <ft_printf.h>
 
 int
 	sh_waitpid(pid_t pid, int *stat_loc, int options)

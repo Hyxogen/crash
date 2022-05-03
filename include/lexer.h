@@ -113,6 +113,7 @@ struct s_source
 	int		nex;
 	t_list	*lst;
 	t_input	*in;
+	int		force_newline;
 };
 
 struct s_lexer
@@ -130,6 +131,7 @@ struct s_lexer
 	int			new_part;
 	int			empty_quote;
 	int			has_eof;
+	int			env_lexer;
 };
 
 void		lex_append(t_lexer *lex, char **string, size_t *length, int esc);

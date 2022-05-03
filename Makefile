@@ -4,7 +4,7 @@ BASE_FILES		:=
 
 ifndef debug
 	BASE_FILES	+= \
-		main.c
+		main.c history.c
 else
 	BASE_FILES	+= \
 		debug.c
@@ -132,7 +132,7 @@ endif
 
 $(NAME): $(OBJECTS) $(LIBFT_LIB) $(FT_PRINTF_LIB)
 	@printf $(LINK_COLOR)Linking$(RESET)\ $(OBJECT_COLOR)$(notdir $@)$(RESET)\\n
-	$(SILENT)$(LINK_CMD) -o $@ $(OBJECTS) $(LIBFT_LIB) $(FT_PRINTF_LIB) $(LFLAGS) -lreadline
+	$(SILENT)$(LINK_CMD) -o $@ $(OBJECTS) $(LIBFT_LIB) $(FT_PRINTF_LIB) $(LFLAGS) -L$(HOME)/.brew/Cellar/readline/8.1.2/lib/ -lreadline
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(SILENT)mkdir -p $(@D)

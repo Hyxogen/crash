@@ -48,6 +48,9 @@ void
 	sh()->name = basename(tmp); // TODO: can't use basename
 	free(tmp);
 	sh_setenv("OPTIND", "1", 0);
+	sh_setenv("PS1", "$ ", 0);
+	sh_setenv("PS2", "> ", 0);
+	sh_setenv("PS4", "+ ", 0);
 }
 
 void

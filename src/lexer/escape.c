@@ -19,14 +19,10 @@ int
 	if (lex->src->bslash)
 		return (1);
 	if (lex->btick)
-	{
-		if (lex->src->cur != '\\' && lex->src->cur != '`')
-			return (1);
-		return (0);
-	}
+		return (lex->src->cur != '\\' && lex->src->cur != '`');
 	if (lex->quote == 1 && lex->src->cur != '\'')
 		return (1);
-	if (lex->quote == 2 || lex->end != NULL)
+	if (lex->quote == 2 || lex->end != NULL || lex->env_lexer)
 	{
 		if (lex->src->cur == '$' && !(lex->here_flags & flag_quote))
 			return (0);
@@ -34,7 +30,7 @@ int
 			return (0);
 		if (lex->src->cur == '\\' && !(lex->here_flags & flag_quote))
 			return (0);
-		if (lex->src->cur == '"' && lex->end == NULL)
+		if (lex->src->cur == '"' && lex->end == NULL && !lex->env_lexer)
 			return (0);
 		return (1);
 	}
@@ -44,13 +40,15 @@ int
 int
 	lex_bquoted(t_lexer *lex)
 {
-	if (lex->quote || lex->btick || lex->end != NULL)
+	if (lex->quote || lex->btick
+		|| lex->end != NULL || lex->env_lexer)
 	{
 		if (lex->src->nex == '$')
 			return (1);
 		if (lex->src->nex == '`')
 			return (1);
-		if (lex->src->nex == '"' && !lex->btick && lex->end == NULL)
+		if (lex->src->nex == '"' && !lex->btick
+			&& lex->end == NULL && !lex->env_lexer)
 			return (1);
 		if (lex->src->nex == '\\')
 			return (1);
