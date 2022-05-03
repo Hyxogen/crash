@@ -141,31 +141,29 @@ static int
 }
 
 static pid_t
-	execute_command_fork(const t_snode *command, const int io[SH_STDIO_SIZE])
-{
-	pid_t		command_pid;
-	pid_t		fork_pid;
-	t_command	command_func;
-
-	fork_pid = sh_fork();
-	if (fork_pid == 0)
-	{
-		command_func = get_command_function(command);
-		command_pid = command_func(command, io);
-		exit(wait_and_get_return_code(command_pid));
-	}
-	return (fork_pid);
-}
-
-static pid_t
 	execute_command_nofork(const t_snode *command, const int io[SH_STDIO_SIZE])
 {
 	pid_t		command_pid;
 	t_command	command_func;
 
-		command_func = get_command_function(command);
-		command_pid = command_func(command, io);
+	command_func = get_command_function(command);
+	command_pid = command_func(command, io);
 	return (command_pid);
+}
+
+static pid_t
+	execute_command_fork(const t_snode *command, const int io[SH_STDIO_SIZE])
+{
+	pid_t		fork_pid;
+	pid_t		command_pid;
+
+	fork_pid = sh_fork();
+	if (fork_pid == 0)
+	{
+		command_pid = execute_command_nofork(command, io);
+		exit(wait_and_get_return_code(command_pid));
+	}
+	return (fork_pid);
 }
 
 static int
