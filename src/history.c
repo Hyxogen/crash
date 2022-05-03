@@ -21,13 +21,13 @@ void
 }
 
 const char
-	*history_get_last(void)
+	*history_get_last_command(void)
 {
 	return (sh()->last_command);
 }
 
 void
-	history_clear(void)
+	history_new_command(void)
 {
 	free(sh()->last_command);
 	sh()->last_command = NULL;

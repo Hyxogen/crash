@@ -19,9 +19,11 @@ static const t_builtin builtins[] = {
 
 static const t_builtin utilities[] = {
 	{ "getopts", sh_getopts },
-	/* technically echo is not a builtin utility, but the minishell subject */
-	/* requires that it is implemented within the shell */
-	{ "echo", sh_echo }
+	/* technically these are not builtin utilities, but the minishell */
+	/* subject requires that it is implemented within the shell */
+	{ "echo", sh_echo },
+	{ "cd", sh_cd },
+	{ "pwd", sh_pwd }
 };
 
 void
@@ -30,9 +32,8 @@ void
 	char	*tmp;
 
 	sh_env_init(env);
-	tmp = getcwd(NULL, 0);
-	sh()->self = sh_join_path(tmp, argv[0]);
-	free(tmp);
+	sh()->pwd = sh_getcwd();
+	sh()->self = sh_join_path(sh()->pwd, argv[0]);
 	sh()->builtins = builtins;
 	sh()->builtins_size = sizeof(builtins) / sizeof(builtins[0]);
 	sh()->functions = NULL;
@@ -69,6 +70,7 @@ void
 	free(sh()->self);
 	free(sh()->functions);
 	free(sh()->name);
+	free(sh()->pwd);
 }
 
 static t_function

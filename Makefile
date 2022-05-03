@@ -33,10 +33,10 @@ ARITH_FILES		:= \
 	arith_assign.c
 BUILTINS_FILES	:= \
 	set.c echo.c dot.c colon.c exit.c break.c export.c continue.c shift.c \
-	getopts.c
+	getopts.c cd.c pwd.c
 UTIL_FILES		:= \
 	die.c memory.c op.c util.c wrap.c strlst.c err.c atol.c file.c ltoa.c \
-	wrap2.c
+	wrap2.c wrap3.c
 
 FILE_NAMES		:= \
 	$(BASE_FILES) \

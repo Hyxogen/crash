@@ -12,6 +12,7 @@
 
 #include "parser.h"
 
+#include "minishell.h"
 #include <stdio.h>
 #include <unistd.h>
 
@@ -21,7 +22,7 @@ int
 {
 	t_snode	*node;
 
-	if (pr->lexer->error)
+	if (pr->lexer->error || sh()->restart)
 		return (0);
 	node = snode(syn_id);
 	if (!pr_token_set(pr, node, tk_id))

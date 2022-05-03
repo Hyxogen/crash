@@ -12,6 +12,7 @@
 
 #include "commander.h"
 
+#include "minishell.h"
 #include "memory.h"
 #include <unistd.h>
 #include <stdlib.h>
@@ -19,8 +20,6 @@
 #include <errno.h>
 #include <stdio.h>
 #include <signal.h>
-
-
 
 static t_commandeer_proc
 	*get_command_table(void)
@@ -62,7 +61,12 @@ int
 int
 	commandeer(const t_snode *node, const int io[3])
 {
-	return (get_command_table()[node->type](node, io));
+	int	ret_code;
+
+	sh()->exec_count += 1;
+	ret_code = get_command_table()[node->type](node, io);
+	sh()->exec_count -= 1;
+	return (ret_code);
 }
 
 pid_t

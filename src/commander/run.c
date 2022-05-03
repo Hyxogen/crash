@@ -10,6 +10,7 @@
 
 extern int rl_catch_signals;
 extern void (*rl_event_hook)(void);
+extern void rl_clear_history(void);
 
 t_snode
 	*pr_parse(t_parser *pr)
@@ -28,6 +29,16 @@ t_snode
 	node->childs_size = 0;
 	node_destroy(node);
 	return (child);
+}
+
+void
+	sh_new_command(t_input *in, t_parser *pr)
+{
+	history_new_command();
+	sh()->restart = 0;
+	sh()->continuing = 0;
+	in->more = 0;
+	pr->lexer->error = 0;
 }
 
 int
@@ -50,23 +61,28 @@ int
 	std_io[SH_STDOUT_INDEX] = STDOUT_FILENO;
 	std_io[SH_STDERR_INDEX] = STDERR_FILENO;
 	sh()->last_command = NULL;
-	while (!pr.lexer->error)
+	rl_clear_history();
+	while (1)
 	{
-		in->more = 0;
-		pr.lexer->error = 0;
+		sh_new_command(in, &pr);
 		if (pr.current.id != tk_invalid)
 			token_destroy(&pr.current);
 		pr_next_token(&pr);
 		if (pr.current.id == tk_invalid || pr.current.id == tk_null)
 			break ;
 		node = pr_parse(&pr);
+		if (sh()->restart)
+		{
+			node_destroy(node);
+			continue;
+		}
 		if (node != NULL)
 			commandeer(node, std_io);
 		node_destroy(node);
 		if (pr.lexer->error)
 			sh_err1("syntax error");
-		add_history(history_get_last());
-		history_clear();
+		add_history(history_get_last_command());
+		history_new_command();
 	}
 	pr_destroy(&pr);
 	// TODO: errors?

@@ -10,7 +10,7 @@ eyes="oo"
 tongue="  "
 wrapcolumn=40
 progname="$(basename $0)"
-cowpath="${COWPATH:-cows}"
+cowpath="${COWPATH:-$(dirname $0)/cows}"
 
 wrap() {
 	width=$1

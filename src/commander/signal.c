@@ -21,6 +21,9 @@
 
 #include <stdio.h>
 
+extern int rl_done;
+extern void rl_replace_line(const char *text, int clear_undo);
+
 static void
 	try_reap_all_childs(void)
 {
@@ -42,11 +45,17 @@ static void
 static void
 	sigint_handler(int signal)
 {
-	// (void) signal;
-	ft_putchar_fd('\n', STDOUT_FILENO);
+	(void) signal;
 	rl_replace_line("", 1);
-	rl_on_new_line();
-	rl_redisplay();
+	sh()->restart = 1;
+	if (sh()->loop_depth)
+	{
+		sh()->breaking = sh()->loop_depth;
+		sh()->continuing = 1;
+	}
+	rl_done = 1;
+	if (sh()->exec_count)
+		ft_putchar_fd('\n', STDOUT_FILENO);
 }
 
 

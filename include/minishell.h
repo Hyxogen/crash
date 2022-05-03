@@ -80,15 +80,17 @@
 // MAYBE TODO:
 // break in pipe sequence
 // errors for unclosed stuff
+// ! in PS1
 
 /*
  * FOR SURE TODO:
- * fork in multi-command pipe sequence
  * 2.9.1; Command Search and Execution; 1.c (super extra special builtins)
  * handle all the shell variables
- * history
  * return value of lex_main is rarely checked
  * export should be able to set environment variables
+ * export with no arguments (it currently segfaults)
+ * path name expansion (~, *)
+ * history is broken
  */
 # define SH_ENV_EXPORT 1
 # define SH_ENV_READONLY 2
@@ -158,6 +160,7 @@ struct s_minishell
 	size_t				utilities_size;
 	char				*self;
 	char				**args;
+	char				*pwd;
 	int					interactive;
 	int					io[3];
 	int					breaking;
@@ -169,6 +172,8 @@ struct s_minishell
 	int					fd_flags[OPEN_MAX];
 	size_t				command_count;
 	char				*last_command;
+	int					exec_count;
+	int					restart;
 };
 
 char		*sh_join2(const char *lhs, char delim, const char *rhs);
@@ -202,6 +207,8 @@ int			sh_close(int fildes);
 int			sh_open(const char *path, int oflag, mode_t mode);
 int			sh_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
 ssize_t		sh_write(int fildes, const void *buf, size_t nbyte);
+int			sh_chdir(const char *path);
+char		*sh_getcwd(void);
 
 int			sh_exists(const char *filen);
 void		sh_strlst_clear(char **strs);
@@ -220,6 +227,8 @@ int			sh_continue(int argc, char **argv);
 int			sh_export(int argc, char **argv);
 int			sh_shift(int argc, char **argv);
 int			sh_getopts(int argc, char **argv);
+int			sh_cd(int argc, char **argv);
+int			sh_pwd(int argc, char **argv);
 
 void		sh_backtrace(int count);
 int			sh_atol(const char *str, long *v);
@@ -239,8 +248,8 @@ void		sh_fdctl(int fd, int flag, int on);
 void		sh_fd_before_exec(void);
 
 void		history_append(const char *line);
-const char	*history_get_last(void);
-void		history_clear(void);
+const char	*history_get_last_command(void);
+void		history_new_command(void);
 
 void		setup_default_signal_handlers(void);
 #endif

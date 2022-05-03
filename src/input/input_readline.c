@@ -48,6 +48,8 @@ ssize_t
 	t_token		token;
 	char		*prompt;
 
+	if (sh()->restart)
+		return (0);
 	if (in->more)
 		prompt = sh_getenv("PS2", "");
 	else
