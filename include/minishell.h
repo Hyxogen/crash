@@ -88,6 +88,7 @@
  * handle all the shell variables
  * history
  * return value of lex_main is rarely checked
+ * export should be able to set environment variables
  */
 # define SH_ENV_EXPORT 1
 # define SH_ENV_READONLY 2
