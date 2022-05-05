@@ -81,7 +81,7 @@ static int
 }
 
 int
-	command_restore_internal_redirects(const int io[SH_STDIO_SIZE])
+	command_restore_internal_redirects(const int io[SH_STDIO_SIZE], const int old_io[SH_STDIO_SIZE])
 {
 	int	*shell_io;
 
@@ -95,7 +95,7 @@ int
 	if (shell_io[SH_STDERR_INDEX] != io[SH_STDERR_INDEX]
 		&& shell_io[SH_STDERR_INDEX] != SH_CLOSED_FD)
 		close_nostd_fd(shell_io[SH_STDERR_INDEX]);
-	ft_memcpy(sh()->io, io, sizeof(sh()->io));
+	ft_memcpy(sh()->io, old_io, sizeof(sh()->io));
 	return (0);
 }
 
@@ -111,7 +111,7 @@ static int
 	if (command_setup_internal_redirects(command->childs[1], io, old_io))
 		return (SH_ERROR_INTERNAL_PID);
 	return_code = function->fn(argc, argv);
-	command_restore_internal_redirects(old_io);
+	command_restore_internal_redirects(io, old_io);
 	sh_env_clean();
 	return (return_code_to_internal_pid(return_code));
 }

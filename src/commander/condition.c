@@ -44,7 +44,7 @@ pid_t
 	else if (ifnode->childs_size >= 3)
 		body_ret = commandeer(ifnode->childs[2], sh()->io);
 	// cm_close_nstd_nred(io, sh()->io);
-	command_restore_internal_redirects(old_io);
+	command_restore_internal_redirects(io, old_io);
 	return (cm_convert_retcode(body_ret));
 }
 
@@ -102,6 +102,6 @@ pid_t
 		index++;
 	}
 	// cm_close_nstd_nred(io, case_io);
-	command_restore_internal_redirects(sh()->io);
+	command_restore_internal_redirects(io, old_io);
 	return (cm_convert_retcode(rc));
 }
