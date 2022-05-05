@@ -16,22 +16,22 @@ static void
 	node->next = NULL;
 }
 
-static void
-	_pattern_add_node(t_pattern_node **head, t_pattern_node *node)
-{
-	t_pattern_node	*temp;
+// static void
+// 	_pattern_add_node(t_pattern_node **head, t_pattern_node *node)
+// {
+// 	t_pattern_node	*temp;
 
-	temp = *head;
-	if (!*head)
-	{
-		*head = node;
-		return;
-	}
-	temp = *head;
-	while (temp->next)
-		temp = temp->next;
-	temp->next = node;
-}
+// 	temp = *head;
+// 	if (!*head)
+// 	{
+// 		*head = node;
+// 		return;
+// 	}
+// 	temp = *head;
+// 	while (temp->next)
+// 		temp = temp->next;
+// 	temp->next = node;
+// }
 
 static void
 	_pattern_enable_all(t_pattern_node *node)
@@ -43,7 +43,7 @@ static void
 	_pattern_generate_body(char **pattern, int **info, t_pattern_node *current)
 {
 	if (*(*info) & SH_PATTERN_ESCAPED)
-		current->chars[(size_t) *(*pattern)] = 0x1;
+		current->chars[(unsigned char) *(*pattern)] = 0x1;
 	else if (*(*pattern) == '[')
 	{
 		*info += _pattern_process_brackets(pattern, current, 0, 0);
@@ -61,7 +61,7 @@ static void
 		current->wildcard = 1;
 	}
 	else
-		current->chars[(size_t) *(*pattern)] = 0x1;
+		current->chars[(unsigned char) *(*pattern)] = 0x1;
 	*pattern += 1;
 	*info += 1;
 }
@@ -71,13 +71,16 @@ t_pattern_node
 {
 	t_pattern_node	*head;
 	t_pattern_node	*current;
+	t_pattern_node	**tail;
 
 	head = NULL;
+	tail = &head;
 	while (*pattern)
 	{
 		current = sh_safe_malloc(sizeof(*head));
 		_pattern_init_node(current);
-		_pattern_add_node(&head, current);
+		*tail = current;
+		tail = &current->next;
 		_pattern_generate_body(&pattern, &info, current);
 	}
 	return (head);

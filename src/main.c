@@ -53,7 +53,6 @@ int
 
 	sh_init(argv, envp);
 	enable_signal_child_reaper_handler();
-	run_start_scripts();
 	if (argc >= 2)
 	{
 		fd = open(argv[1], O_RDONLY);
@@ -64,7 +63,10 @@ int
 		input_new(&in, in_file, (void *)(unsigned long long) fd);
 	}
 	else
+	{
+		run_start_scripts();
 		input_new(&in, in_readline, NULL);
+	}
 	disable_kill_signals();
 	sh_cm_run(&in);
 	input_destroy(&in);

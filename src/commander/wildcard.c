@@ -58,7 +58,6 @@ void
 		i += 1;
 	slash = rest[i] == '/';
 	rest[i] = '\0';
-	pattern = pattern_compile(rest, info);
 	if (prefix[0] == '\0')
 		dir = opendir(".");
 	else
@@ -66,6 +65,7 @@ void
 	has_match = 0;
 	if (dir != NULL)
 	{
+		pattern = pattern_compile(rest, info);
 		while (1)
 		{
 			ent = readdir(dir);

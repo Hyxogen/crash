@@ -21,7 +21,6 @@
 int
 	_pattern_process_collating_class(char **pattern, t_pattern_node *node, char *ch)
 {
-
 	if (*(*pattern + 2)
 		&& *(*pattern + 3) == '.'
 		&& *(*pattern + 4) == ']')

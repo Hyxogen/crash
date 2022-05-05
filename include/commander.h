@@ -175,6 +175,8 @@ void			cm_close_nstd_nred(const int original[3], const int redirect[3]);
 
 pid_t			cm_convert_retcode(int rc);
 pid_t			cm_simple_cmd_command(const t_snode *cmd_node, const int io[3]);
+pid_t			commandeer_simple_command(const t_snode *command,
+					const int io[SH_STDIO_SIZE]);
 pid_t			cm_if_clause(const t_snode *ifnode, const int io[3]);
 pid_t			cm_for_clause(const t_snode *ifnode, const int io[3]);
 pid_t			cm_case_clause(const t_snode *ifnode, const int io[3]);
@@ -183,7 +185,6 @@ pid_t			cm_function(const t_snode *ifnode, const int io[3]);
 pid_t			cm_function_define(const t_snode *ifnode, const int io[3]);
 pid_t			cm_compound_list(const t_snode *node, const int io[SH_STDIO_SIZE]);
 
-pid_t			execute_simple_command(const t_snode *command, const int io[SH_STDIO_SIZE]);
 int				execute_pipe_seq(const t_snode *list_node, const int io[3]);
 int				cm_and_if(const t_snode *node, const int io[3]);
 int				cm_or_if(const t_snode *node, const int io[3]);

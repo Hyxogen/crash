@@ -22,7 +22,7 @@ PARSER_FILES	:= \
 COMMANDER_FILES	:= \
 	commander.c execvp.c pipe_sequence.c env.c redirect_process.c signal.c \
 	redirect_builtin.c run.c condition.c loop.c \
-	command.c expansion.c expand.c expand_param.c expand_command.c \
+	new_command.c expansion.c expand.c expand_param.c expand_command.c \
 	expand_arith.c new_pattern.c new_pattern_brackets.c new_pattern_class.c \
 	new_pattern_generate.c function.c init.c redirect_general.c and_or_if.c \
 	return_code.c assignment.c compound_command.c term.c wildcard.c
@@ -36,7 +36,7 @@ BUILTINS_FILES	:= \
 	getopts.c cd.c pwd.c unset.c env.c true.c false.c unimplemented.c
 UTIL_FILES		:= \
 	die.c memory.c op.c util.c wrap.c strlst.c err.c atol.c file.c ltoa.c \
-	wrap2.c wrap3.c termios.c
+	wrap2.c wrap3.c termios.c stringlst.c
 
 FILE_NAMES		:= \
 	$(BASE_FILES) \

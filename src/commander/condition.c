@@ -27,23 +27,24 @@ static pid_t
 pid_t
 	cm_if_clause(const t_snode *ifnode, const int io[3])
 {
-	int	if_io[3];
+	int	old_io[3];
 	int	statement_ret;
 	int	body_ret;
 
 	sh_assert(ifnode->type == sx_if_clause);
-	ft_memcpy(if_io, io, sizeof(int) * 3);
-	_cm_setup_builtin_redirects(ifnode->childs[ifnode->childs_size - 1], if_io);
-	statement_ret = commandeer(ifnode->childs[0], if_io);
+	command_setup_internal_redirects(ifnode->childs[ifnode->childs_size - 1], io, old_io);
+	// _cm_setup_builtin_redirects(ifnode->childs[ifnode->childs_size - 1], if_io);
+	statement_ret = commandeer(ifnode->childs[0], sh()->io);
 	body_ret = 0;
 	if (!statement_ret)
-		body_ret = commandeer(ifnode->childs[1], if_io);
+		body_ret = commandeer(ifnode->childs[1], sh()->io);
 	else if (ifnode->childs_size >= 3
 		&& ifnode->childs[2]->type == sx_if_clause)
-		body_ret = cm_elif_clause(ifnode->childs[2], if_io);
+		body_ret = cm_elif_clause(ifnode->childs[2], sh()->io);
 	else if (ifnode->childs_size >= 3)
-		body_ret = commandeer(ifnode->childs[2], if_io);
-	cm_close_nstd_nred(io, if_io);
+		body_ret = commandeer(ifnode->childs[2], sh()->io);
+	// cm_close_nstd_nred(io, sh()->io);
+	command_restore_internal_redirects(old_io);
 	return (cm_convert_retcode(body_ret));
 }
 
@@ -71,7 +72,7 @@ pid_t
 	size_t	clauses;
 	size_t	index;
 	char	*lhs;
-	int		case_io[3];
+	int		old_io[3];
 	int		cmp;
 	int		rc;
 
@@ -82,14 +83,15 @@ pid_t
 	if (!lhs)
 		return (cm_convert_retcode(1));
 	index = 0;
-	ft_memcpy(case_io, io, sizeof(int) * 3);
-	_cm_setup_builtin_redirects(node->childs[node->childs_size - 1], case_io);
+	// ft_memcpy(case_io, io, sizeof(int) * 3);
+	// _cm_setup_builtin_redirects(node->childs[node->childs_size - 1], case_io);
+	command_setup_internal_redirects(node->childs[node->childs_size - 1], io, old_io);
 	while (index < clauses)
 	{
 		cmp = _cm_strlst_cmp(lhs, &node->childs[index]->token);
 		if (!cmp)
 		{
-			rc = commandeer(node->childs[index], case_io);
+			rc = commandeer(node->childs[index], sh()->io);
 			break ;
 		}
 		else if (cmp < 0)
@@ -99,6 +101,7 @@ pid_t
 		}
 		index++;
 	}
-	cm_close_nstd_nred(io, case_io);
+	// cm_close_nstd_nred(io, case_io);
+	command_restore_internal_redirects(sh()->io);
 	return (cm_convert_retcode(rc));
 }

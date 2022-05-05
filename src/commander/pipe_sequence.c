@@ -121,7 +121,7 @@ static t_command
 	get_command_function(const t_snode *command)
 {
 	static t_command functions[] = {
-		cm_simple_cmd_command,
+		commandeer_simple_command,
 		cm_if_clause,
 		cm_function_define,
 		cm_case_clause,

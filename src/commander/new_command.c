@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+
+#include <stdio.h>
+
 static pid_t
 	execute_external_command(const t_snode *command,
 			char **argv, const int io[SH_STDIO_SIZE]);
@@ -68,6 +71,7 @@ static int
 	command_setup_external_redirects(const t_snode *redirect_list,
 			const int io[SH_STDIO_SIZE])
 {
+	sh_assert(redirect_list->type == sx_io_redirect_list);
 	close_or_dup2_fd(io[SH_STDIN_INDEX], STDIN_FILENO);
 	close_or_dup2_fd(io[SH_STDOUT_INDEX], STDOUT_FILENO);
 	close_or_dup2_fd(io[SH_STDERR_INDEX], STDERR_FILENO);
@@ -91,26 +95,12 @@ int
 	if (shell_io[SH_STDERR_INDEX] != io[SH_STDERR_INDEX]
 		&& shell_io[SH_STDERR_INDEX] != SH_CLOSED_FD)
 		close_nostd_fd(shell_io[SH_STDERR_INDEX]);
+	ft_memcpy(sh()->io, io, sizeof(sh()->io));
 	return (0);
 }
 
 static int
-	command_argv_valid(const t_snode *command, char **argv, int *return_code)
-{
-	if (argv == NULL || do_assignmetns(command->childs[2], !!argv[0]))
-	{
-		sh_strlst_clear(argv);
-		return (return_code_to_internal_pid(1));
-	}
-	else if (argv[0] == NULL)
-	{
-		sh_strlst_clear(argv);
-		return (return_code_to_internal_pid(1));
-	}
-}
-
-static int
-	execute_builtin(const t_snode *command, t_builtin *function
+	execute_builtin(const t_snode *command, const t_builtin *function,
 			char **argv, const int io[SH_STDIO_SIZE])
 {
 	int	return_code;
@@ -127,18 +117,21 @@ static int
 }
 
 static int
-	execute_function(const t_snode *command, t_function *function
+	execute_function(const t_snode *command, const t_function *function,
 			char **argv, const int io[SH_STDIO_SIZE])
 {
-	int	return_code;
-	int	argc;
-	int	old_io[SH_STDIO_SIZE];
+	int		return_code;
+	char	**old_args;
+	char	*old_arg0;
 
-	argc = get_argument_count(argv);
-	if (command_setup_internal_redirects(command->childs[1], io, old_io))
-		return (SH_ERROR_INTERNAL_PID);
-	return_code = function->fn(argc, argv);
-	command_restore_internal_redirects(old_io);
+	(void) command;
+	old_arg0 = argv[0];
+	argv[0] = sh()->args[0];
+	old_args = sh()->args;
+	sh()->args = argv;
+	return_code = cm_function(function->body, io);
+	argv[0] = old_arg0;
+	sh()->args = old_args;
 	sh_env_clean();
 	return (return_code_to_internal_pid(return_code));
 }
@@ -169,18 +162,18 @@ static int
 	find_and_execute_function(const t_snode *command,
 			char **argv, const int io[SH_STDIO_SIZE])
 {
-	size_t			index;
-	size_t			size;
-	const t_builtin	*builtin_func;
+	size_t		index;
+	size_t		size;
+	t_function	*function_func;
 
 	index = 0;
-	size = sh()->builtins_size;
+	size = sh()->functions_size;
 	while (index < size)
 	{
-		builtin_func = &sh()->builtins[index];
-		if (ft_strcmp(argv[0], builtin_func->key) == 0)
+		function_func = &sh()->functions[index];
+		if (ft_strcmp(argv[0], function_func->key) == 0)
 		{
-			return (execute_function(command, builtin_func, argv, io));
+			return (execute_function(command, function_func, argv, io));
 		}
 		index++;
 	}
@@ -226,7 +219,7 @@ static pid_t
 		return (command_pid);
 	return (SH_INVALID_INTERNAL_PID);
 }
-
+/*
 static pid_t
 	execute_simple_command(const t_snode *command,
 			char **argv, const int io[SH_STDIO_SIZE])
@@ -237,13 +230,13 @@ static pid_t
 	if (command_pid == SH_INVALID_INTERNAL_PID)
 		command_pid = execute_external_command(command, argv, io);
 	return (command_pid);
-}
+}*/
 
 static void
 	setup_and_try_execve_command(const t_snode *command,
 			char **argv, const int io[SH_STDIO_SIZE])
 {
-	if (command_setup_external_redirects(command, io))
+	if (command_setup_external_redirects(command->childs[1], io))
 		exit(EXIT_FAILURE);
 	sh_execvp(argv);
 }
@@ -258,7 +251,7 @@ static pid_t
 	if (command_pid == 0)
 	{
 		setup_and_try_execve_command(command, argv, io);
-		sh_assert(0);
+		perror("new command");
 	}
 	return (command_pid);
 }

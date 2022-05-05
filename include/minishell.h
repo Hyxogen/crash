@@ -107,6 +107,9 @@ typedef struct s_envvar			t_envvar;
 typedef struct s_builtin		t_builtin;
 typedef struct s_function		t_function;
 typedef struct s_mega_termios	t_mega_termios;
+typedef int						t_strinfo;
+typedef struct s_string			t_string;
+typedef struct s_stringlst		t_stringlst;
 /* return code should be: -return_code - 1 */
 typedef int						(*t_builtin_proc)(int argc, char **argv);
 
@@ -170,6 +173,17 @@ struct s_function
 
 struct s_mega_termios {
 	struct termios	term_attr[SH_STDIO_SIZE];
+};
+
+struct s_string {
+	char		*str;
+	t_strinfo	*info;
+	size_t		size;
+};
+
+struct s_stringlst {
+	t_string	*strings;
+	size_t		size;
 };
 
 struct s_minishell
@@ -239,6 +253,11 @@ char		*sh_strlst_join(char **strs, int delim);
 char		**sh_strlst_new(char *str);
 char		**sh_strlst_empty(void);
 char		**sh_strlst_dup(char **strs);
+
+void		sh_stringlst_begin(t_stringlst *lst);
+void		sh_stringlst_add_string(t_stringlst *lst);
+void		sh_stringlst_add_char(t_stringlst *lst, int ch, t_strinfo info);
+void		sh_stringlst_end(t_stringlst *lst, char ***string, t_strinfo ***info);
 
 int			sh_echo(int argc, char **argv);
 int			sh_exit(int argc, char **argv);
