@@ -14,7 +14,8 @@ static const t_builtin builtins[] = {
 	{ "break", sh_break },
 	{ "export", sh_export },
 	{ "continue", sh_continue },
-	{ "shift", sh_shift }
+	{ "shift", sh_shift },
+	{ "unset", sh_unset_builtin }
 };
 
 static const t_builtin utilities[] = {
@@ -23,7 +24,24 @@ static const t_builtin utilities[] = {
 	/* subject requires that it is implemented within the shell */
 	{ "echo", sh_echo },
 	{ "cd", sh_cd },
-	{ "pwd", sh_pwd }
+	{ "pwd", sh_pwd },
+	{ "env", sh_env_builtin },
+	{ "alias", sh_unimplemented },
+	{ "false", sh_false },
+	{ "jobs", sh_unimplemented, },
+	{ "false", sh_true },
+	{ "bg", sh_unimplemented, },
+	{ "fc", sh_unimplemented, },
+	{ "kill", sh_unimplemented, },
+	{ "umask", sh_unimplemented, },
+	{ "cd", sh_unimplemented, },
+	{ "fg", sh_unimplemented, },
+	{ "newgrp", sh_unimplemented, },
+	{ "unalias", sh_unimplemented, },
+	{ "command", sh_unimplemented, },
+	{ "getopts", sh_unimplemented, },
+	{ "read", sh_unimplemented, },
+	{ "wait", sh_unimplemented, },
 };
 
 void
@@ -40,7 +58,7 @@ void
 	sh()->functions_size = 0;
 	sh()->utilities = utilities;
 	sh()->utilities_size = sizeof(utilities) / sizeof(utilities[0]);
-	sh()->args = argv; // TODO: should this be on the heap?
+	sh()->args = sh_strlst_dup(argv);
 	sh()->interactive = 1; // TODO: check if interactive
 	sh()->io[SH_STDIN_INDEX] = STDIN_FILENO;
 	sh()->io[SH_STDOUT_INDEX] = STDOUT_FILENO;
@@ -71,6 +89,7 @@ void
 	free(sh()->functions);
 	free(sh()->name);
 	free(sh()->pwd);
+	sh_strlst_clear(sh()->args);
 }
 
 static t_function

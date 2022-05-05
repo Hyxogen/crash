@@ -52,18 +52,19 @@ int
 
 	sh_init(argv, envp);
 	enable_signal_child_reaper_handler();
-	setup_default_signal_handlers();
 	run_start_scripts();
 	if (argc >= 2)
 	{
 		fd = open(argv[1], O_RDONLY);
 		sh_fdctl(fd, SH_FD_FIOCLEX, 1);
-		sh()->args = argv + 1;
+		sh_strlst_clear(sh()->args);
+		sh()->args = sh_strlst_dup(argv + 1);
 		sh()->interactive = 0;
 		input_new(&in, in_file, (void *)(unsigned long long) fd);
 	}
 	else
 		input_new(&in, in_readline, NULL);
+	disable_kill_signals();
 	sh_cm_run(&in);
 	input_destroy(&in);
 	sh_destroy();

@@ -206,15 +206,16 @@ int
 int
 	expand_pattern(t_expand *exp, t_param_ctx *ctx, t_expand *tmp)
 {
-	int		*info;
-	char	*pattern;
-	int		long_mode;
-	size_t	i;
-	size_t	j;
-	size_t	best;
-	char	*str;
-	int		ch;
-	int		match;
+	int				*info;
+	char			*pattern;
+	int				long_mode;
+	size_t			i;
+	size_t			j;
+	size_t			best;
+	char			*str;
+	int				ch;
+	int				match;
+	t_pattern_node	*comp_pattern;
 
 	long_mode = ctx->token->str[ctx->i] == ctx->token->str[ctx->i + 1];
 	info = NULL;
@@ -228,6 +229,7 @@ int
 	}
 	expand_promote(exp, tmp);
 	i = 0;
+	comp_pattern = pattern_compile(pattern, info, 0);
 	while (exp->parts[exp->count - 1].str[i] != NULL)
 	{
 		j = 0;
@@ -237,7 +239,7 @@ int
 			best = ft_strlen(str);
 			while (str[j] != '\0')
 			{
-				match = pattern_match(str + j, pattern, info);
+				match = pattern_match(str + j, comp_pattern);
 				if (match)
 				{
 					best = j;
@@ -255,7 +257,7 @@ int
 			{
 				ch = str[j];
 				str[j] = '\0';
-				match = pattern_match(str, pattern, info);
+				match = pattern_match(str, comp_pattern);
 				str[j] = ch;
 				if (match)
 				{
@@ -270,6 +272,7 @@ int
 		}
 		i += 1;
 	}
+	pattern_destroy(comp_pattern);
 	return (0);
 }
 

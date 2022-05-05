@@ -9,33 +9,6 @@
 
 #include <stdio.h>
 
-static int
-	_do_assignments(const t_snode *ass_list, int is_tmp)
-{
-	size_t	i;
-	size_t	j;
-	char	*tmp;
-
-	i = 0;
-	while (i < ass_list->childs_size)
-	{
-		j = 0;
-		while (ass_list->childs[i]->token.str[j] != '=')
-			j += 1;
-		tmp = cm_expand_str(&ass_list->childs[i]->token, NULL, ' ');
-		if (tmp == NULL)
-		{
-			sh_env_clean();
-			return (-1);
-		}
-		tmp[j] = '\0';
-		sh_setenv(tmp, tmp + j + 1, is_tmp);
-		free(tmp);
-		i += 1;
-	}
-	return (0);
-}
-
 static void
 	_sh_execvp_error_handler(const char *name, int error)
 {
@@ -114,6 +87,7 @@ static pid_t
 		if (ctx->io[SH_STDERR_INDEX]
 			!= STDERR_FILENO && ctx->io[SH_STDERR_INDEX] >= 0)
 			sh_close(ctx->io[SH_STDERR_INDEX]);
+		setup_default_signal_handlers();
 		sh_execvp(ctx->args);
 		_sh_execvp_error_handler(ctx->args[0], errno);
 	}

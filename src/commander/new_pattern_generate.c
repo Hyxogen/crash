@@ -33,7 +33,15 @@ static void
 }
 
 static void
-	_pattern_generate_body(char **pattern, int **info, t_pattern_node *current)
+	_pattern_enable_all(t_pattern_node *node, int filename)
+{
+	ft_memset(&node->chars[0], 0xff, sizeof(node->chars) / sizeof(node->chars[0]));
+	if (filename)
+		node->chars[(int) '.'] = 0;
+}
+
+static void
+	_pattern_generate_body(char **pattern, int **info, t_pattern_node *current, int filename)
 {
 	if (*(*info) & SH_PATTERN_ESCAPED)
 		current->chars[(size_t) *(*pattern)] = 0x1;
@@ -44,11 +52,11 @@ static void
 	}
 	else if (*(*pattern) == '*')
 	{
-		ft_memset(&current->chars[0], 0xff, sizeof(current->chars) / sizeof(current->chars[0]));
+		_pattern_enable_all(current, filename);
 		current->infinite = 1;
 	}
 	else if (*(*pattern) == '?')
-		ft_memset(current->chars, 1, sizeof(current->chars) / sizeof(current->chars[0]));
+		_pattern_enable_all(current, filename);
 	else
 		current->chars[(size_t) *(*pattern)] = 0x1;
 	*pattern += 1;
@@ -56,7 +64,7 @@ static void
 }
 
 t_pattern_node
-	*_pattern_generate(char *pattern, int *info)
+	*pattern_compile(char *pattern, int *info, int filename)
 {
 	t_pattern_node	*head;
 	t_pattern_node	*current;
@@ -67,13 +75,13 @@ t_pattern_node
 		current = sh_safe_malloc(sizeof(*head));
 		_pattern_init_node(current);
 		_pattern_add_node(&head, current);
-		_pattern_generate_body(&pattern, &info, current);
+		_pattern_generate_body(&pattern, &info, current, filename);
 	}
 	return (head);
 }
 
 void
-	_pattern_destroy(t_pattern_node *node)
+	pattern_destroy(t_pattern_node *node)
 {
 	t_pattern_node	*next;
 

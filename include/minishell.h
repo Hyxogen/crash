@@ -19,6 +19,7 @@
 # include <sys/types.h>
 # include <signal.h>
 # include <limits.h>
+# include <termios.h>
 
 /* Constant Rage Again SHell */
 /* Can't Rest Again SHell */
@@ -87,10 +88,9 @@
  * 2.9.1; Command Search and Execution; 1.c (super extra special builtins)
  * handle all the shell variables
  * return value of lex_main is rarely checked
- * export should be able to set environment variables
- * export with no arguments (it currently segfaults)
  * path name expansion (~, *)
- * history is broken
+ * disable SIGINT and SIGQUIT ignoring for internal commands
+ * don't export invalid identifiers
  */
 # define SH_ENV_EXPORT 1
 # define SH_ENV_READONLY 2
@@ -102,12 +102,13 @@
 #  define sh_assert sh_assert_impl
 # endif
 
-typedef struct s_minishell	t_minishell;
-typedef struct s_envvar		t_envvar;
-typedef struct s_builtin	t_builtin;
-typedef struct s_function	t_function;
+typedef struct s_minishell		t_minishell;
+typedef struct s_envvar			t_envvar;
+typedef struct s_builtin		t_builtin;
+typedef struct s_function		t_function;
+typedef struct s_mega_termios	t_mega_termios;
 /* return code should be: -return_code - 1 */
-typedef int					(*t_builtin_proc)(int argc, char **argv);
+typedef int						(*t_builtin_proc)(int argc, char **argv);
 
 # ifndef OPEN_MAX
 #  define OPEN_MAX 1024
@@ -128,6 +129,25 @@ typedef int					(*t_builtin_proc)(int argc, char **argv);
 #  define SH_CLOSED_FD -1
 # endif
 
+# ifndef SH_STDIO_SIZE
+#  define SH_STDIO_SIZE 3
+# endif
+# ifndef SH_STDIN_INDEX
+#  define SH_STDIN_INDEX 0
+# elif SH_STDIN_INDEX >= SH_STDIO_SIZE
+#  error "SH_STDIO_SIZE must be at least one larger than SH_STDIN_INDEX"
+# endif
+# ifndef SH_STDOUT_INDEX
+#  define SH_STDOUT_INDEX 1
+# elif SH_STDOUT_INDEX >= SH_STDIO_SIZE
+#  error "SH_STDIO_SIZE must be at least one larger than SH_STDOUT_INDEX"
+# endif
+# ifndef SH_STDERR_INDEX
+#  define SH_STDERR_INDEX 2
+# elif SH_STDERR_INDEX >= SH_STDIO_SIZE
+#  error "SH_STDIO_SIZE must be at least one larger than SH_STDERR_INDEX"
+# endif
+
 struct s_envvar
 {
 	char	*key;
@@ -146,6 +166,10 @@ struct s_function
 {
 	char	*key;
 	t_snode	*body;
+};
+
+struct s_mega_termios {
+	struct termios	term_attr[SH_STDIO_SIZE];
 };
 
 struct s_minishell
@@ -170,7 +194,6 @@ struct s_minishell
 	char				*name;
 	int					return_code;
 	int					fd_flags[OPEN_MAX];
-	size_t				command_count;
 	char				*last_command;
 	int					exec_count;
 	int					restart;
@@ -229,6 +252,11 @@ int			sh_shift(int argc, char **argv);
 int			sh_getopts(int argc, char **argv);
 int			sh_cd(int argc, char **argv);
 int			sh_pwd(int argc, char **argv);
+int			sh_unimplemented(int argc, char **argv);
+int			sh_true(int argc, char **argv);
+int			sh_false(int argc, char **argv);
+int			sh_unset_builtin(int argc, char **argv);
+int			sh_env_builtin(int argc, char **argv);
 
 void		sh_backtrace(int count);
 int			sh_atol(const char *str, long *v);
@@ -252,4 +280,8 @@ const char	*history_get_last_command(void);
 void		history_new_command(void);
 
 void		setup_default_signal_handlers(void);
+void		disable_kill_signals(void);
+
+void		sh_get_term_attr(t_mega_termios *attr);
+void		sh_set_term_attr(t_mega_termios *attr);
 #endif

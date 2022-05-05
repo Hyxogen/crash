@@ -7,7 +7,7 @@ ifndef debug
 		main.c history.c
 else
 	BASE_FILES	+= \
-		debug.c
+		debug.c history.c
 endif
 
 LEXER_FILES		:= \
@@ -25,7 +25,7 @@ COMMANDER_FILES	:= \
 	command.c expansion.c expand.c expand_param.c expand_command.c \
 	expand_arith.c new_pattern.c new_pattern_brackets.c new_pattern_class.c \
 	new_pattern_generate.c function.c init.c redirect_general.c and_or_if.c \
-	return_code.c
+	return_code.c assignment.c compound_command.c
 ARITH_FILES		:= \
 	arith_plus.c arith_minus.c arith_modulo.c arith_divide.c arith_multiply.c \
 	arith_ternary.c arith_shift.c arith_inequality.c arith_equality.c \
@@ -33,10 +33,10 @@ ARITH_FILES		:= \
 	arith_assign.c
 BUILTINS_FILES	:= \
 	set.c echo.c dot.c colon.c exit.c break.c export.c continue.c shift.c \
-	getopts.c cd.c pwd.c
+	getopts.c cd.c pwd.c unset.c env.c true.c false.c unimplemented.c
 UTIL_FILES		:= \
 	die.c memory.c op.c util.c wrap.c strlst.c err.c atol.c file.c ltoa.c \
-	wrap2.c wrap3.c
+	wrap2.c wrap3.c termios.c
 
 FILE_NAMES		:= \
 	$(BASE_FILES) \
@@ -103,7 +103,7 @@ ifndef san
 endif 
 
 ifeq ($(config), debug)
-	CFLAGS		+= -DSH_DEBUG=1 -fno-inline -g3 -O0
+	CFLAGS		+= -DSH_DEBUG=1 -fno-inline -g3 -Og
 	LFLAGS		+= -DSH_DEBUG=1 -fno-inline
 	ifeq ($(san), address)
 		CFLAGS	+= -fsanitize=address,undefined

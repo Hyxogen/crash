@@ -109,7 +109,7 @@ static int
 	return (status_code_to_return_code(status_code));
 }
 
-static int
+int
 	wait_and_get_return_code(pid_t command_pid)
 {
 	if (command_is_internal(command_pid))
@@ -126,7 +126,8 @@ static t_command
 		cm_function_define,
 		cm_case_clause,
 		cm_for_clause,
-		cm_while_until_clause
+		cm_while_until_clause,
+		cm_compound_list,
 	};
 
 	return (functions[command->type - sx_simple_cmd]);
@@ -272,4 +273,3 @@ int
 	sh()->return_code = return_code;
 	return (return_code);
 }
-

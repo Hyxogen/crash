@@ -19,6 +19,7 @@
 #include <libft.h>
 #include <unistd.h>
 
+
 #include <stdio.h>
 
 extern int rl_done;
@@ -57,7 +58,6 @@ static void
 	if (sh()->exec_count)
 		ft_putchar_fd('\n', STDOUT_FILENO);
 }
-
 
 void
 	signal_try_reap_all_childs(int sig)
@@ -130,7 +130,19 @@ void
 	struct sigaction action;
 
 	sigemptyset(&action.sa_mask);
+	action.sa_handler = SIG_DFL;
+	sh_sigaction(SIGQUIT, &action, NULL);
+	sh_sigaction(SIGINT, &action, NULL);
+}
+
+void
+	disable_kill_signals(void)
+{
+	struct sigaction action;
+
+	sigemptyset(&action.sa_mask);
 	action.sa_handler = SIG_IGN;
+	action.sa_flags = SA_NODEFER | SA_RESTART;
 	sh_sigaction(SIGQUIT, &action, NULL);
 	action.sa_handler = sigint_handler;
 	action.sa_flags = SA_RESTART;

@@ -52,15 +52,18 @@ pid_t
 static int
 	_cm_strlst_cmp(char *lhs, t_token *tok)
 {
-	char	*rhs_str;
-	int		*escape_info;
-	int		match;
+	char			*rhs_str;
+	int				*escape_info;
+	int				match;
+	t_pattern_node	*pattern;
 
 	escape_info = NULL;
 	rhs_str = cm_expand_str(tok, &escape_info, ' ');
 	if (rhs_str == NULL)
 		return (-1);
-	match = pattern_match(lhs, rhs_str, escape_info);
+	pattern = pattern_compile(rhs_str, escape_info, 0);
+	match = pattern_match(lhs, pattern);
+	pattern_destroy(pattern);
 	return (!match);
 }
 

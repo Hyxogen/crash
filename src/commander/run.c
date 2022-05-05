@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <termios.h>
 #include <readline/readline.h>
 
 extern int rl_catch_signals;
@@ -44,11 +45,12 @@ void
 int
 	sh_cm_run(t_input *in)
 {
-	t_source	src;
-	t_lexer		lex;
-	t_parser	pr;
-	t_snode		*node;
-	int			std_io[3];
+	t_source		src;
+	t_lexer			lex;
+	t_parser		pr;
+	t_snode			*node;
+	int				std_io[3];
+	t_mega_termios	term_attr;
 
 	rl_catch_signals = 1;
 	rl_event_hook = sh_nop1;
@@ -76,8 +78,10 @@ int
 			node_destroy(node);
 			continue;
 		}
+		sh_get_term_attr(&term_attr);
 		if (node != NULL)
 			commandeer(node, std_io);
+		sh_set_term_attr(&term_attr);
 		node_destroy(node);
 		if (pr.lexer->error)
 			sh_err1("syntax error");

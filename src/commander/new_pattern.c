@@ -73,15 +73,10 @@ static int
 
 /* Returns 1 on match */
 int
-	pattern_match(const char *str, char *pattern, int *info)
+	pattern_match(const char *str, t_pattern_node *pattern)
 {
-	t_pattern_node	*head;
 	int				match;
 
-	head = _pattern_generate(pattern, info);
-	if (head == NULL)
-		return (0);
-	match = _pattern_match(str, head);
-	_pattern_destroy(head);
+	match = _pattern_match(str, pattern);
 	return (match);
 }

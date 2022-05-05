@@ -16,26 +16,8 @@
 
 # include "parser.h"
 # include "lexer.h"
+# include "minishell.h"
 # include <sys/wait.h>
-
-# ifndef SH_STDIO_SIZE
-#  define SH_STDIO_SIZE 3
-# endif
-# ifndef SH_STDIN_INDEX
-#  define SH_STDIN_INDEX 0
-# elif SH_STDIN_INDEX >= SH_STDIO_SIZE
-#  error "SH_STDIO_SIZE must be at least one larger than SH_STDIN_INDEX"
-# endif
-# ifndef SH_STDOUT_INDEX
-#  define SH_STDOUT_INDEX 1
-# elif SH_STDOUT_INDEX >= SH_STDIO_SIZE
-#  error "SH_STDIO_SIZE must be at least one larger than SH_STDOUT_INDEX"
-# endif
-# ifndef SH_STDERR_INDEX
-#  define SH_STDERR_INDEX 2
-# elif SH_STDERR_INDEX >= SH_STDIO_SIZE
-#  error "SH_STDIO_SIZE must be at least one larger than SH_STDERR_INDEX"
-# endif
 
 # ifndef SH_RETCODE_SIGNALLED_OFFSET
 #  define SH_RETCODE_SIGNALLED_OFFSET 128
@@ -198,6 +180,7 @@ pid_t			cm_case_clause(const t_snode *ifnode, const int io[3]);
 pid_t			cm_while_until_clause(const t_snode *ifnode, const int io[3]);
 pid_t			cm_function(const t_snode *ifnode, const int io[3]);
 pid_t			cm_function_define(const t_snode *ifnode, const int io[3]);
+pid_t			cm_compound_list(const t_snode *node, const int io[SH_STDIO_SIZE]);
 
 pid_t			execute_simple_command(const t_snode *command, const int io[SH_STDIO_SIZE]);
 int				execute_pipe_seq(const t_snode *list_node, const int io[3]);
@@ -205,6 +188,7 @@ int				cm_and_if(const t_snode *node, const int io[3]);
 int				cm_or_if(const t_snode *node, const int io[3]);
 int				commandeer_inner(const t_snode *node, const int io[3]);
 int				commandeer(const t_snode *node, const int io[3]);
+int				commandeer_compound_cmd(const t_snode *node, const int io[SH_STDIO_SIZE]);
 
 int				sh_execvp(char **argv);
 
@@ -234,7 +218,8 @@ void			enable_signal_child_reaper_handler(void);
 
 int				status_code_to_return_code(int status_code);
 int				internal_pid_to_return_code(pid_t command_pid);
-int				return_code_to_internal_pid(int return_code);
+pid_t			return_code_to_internal_pid(int return_code);
+int				wait_and_get_return_code(pid_t command_pid);
 
 int				sh_cm_run(t_input *in);
 int				match_pattern(const char *str, const char *pattern, const char *info);
@@ -248,11 +233,14 @@ int				_pattern_process_collating_class(char **pattern, t_pattern_node *node, ch
 int				_pattern_process_equivalence_class(char **pattern, t_pattern_node *node);
 int				_pattern_process_char_class(char **pattern, t_pattern_node *node);
 int				_pattern_process_brackets(char **pattern, t_pattern_node *node, int moved, int local_moved);
-t_pattern_node	*_pattern_generate(char *pattern, int *info);
-int				pattern_match(const char *str, char *pattern, int *info);
-void			_pattern_destroy(t_pattern_node *node);
+t_pattern_node	*pattern_compile(char *pattern, int *info, int filename);
+int				pattern_match(const char *str, t_pattern_node *pattern);
+void			pattern_destroy(t_pattern_node *node);
 void			pattern_debug_print_node(t_pattern_node *node);
 void			pattern_debug_print_chain(t_pattern_node *head);
+
+t_envvar		*_do_assignment(const char *ass, int is_tmp);
+int				_do_assignments(const t_snode *ass_list, int is_tmp);
 
 long			arith_plus(const char *str, long lhs, long rhs, long c);
 long			arith_plus_eq(const char *str, long rhs, long b, long c);

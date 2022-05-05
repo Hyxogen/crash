@@ -31,10 +31,32 @@ static t_commandeer_proc
 	procs[sx_command_list] = commandeer_inner;
 	procs[sx_compound_list] = commandeer_inner;
 	procs[sx_pipe_sequence] = execute_pipe_seq;
+	procs[sx_compound_cmd] = commandeer_compound_cmd;
 	procs[sx_and_if] = cm_and_if;
 	procs[sx_or_if] = cm_or_if;
 	// procs[sx_if_clause] = cm_if_clause;
 	return (procs);
+}
+
+static t_commandeer_proc
+	get_commandeer_proc(t_syntax_id id)
+{
+	static t_commandeer_proc procs[46];
+
+	procs[sx_list] = commandeer_inner;
+	procs[sx_term] = commandeer_inner;
+	procs[sx_command_list] = commandeer_inner;
+	procs[sx_compound_list] = commandeer_inner;
+	procs[sx_pipe_sequence] = execute_pipe_seq;
+	procs[sx_and_if] = cm_and_if;
+	procs[sx_or_if] = cm_or_if;
+
+	if (procs[id] == NULL)
+	{
+		fprintf(stderr, "Cannot get entry for %d\n", id);
+		abort();
+	}
+	return (procs[id]);
 }
 
 /* functions have the wrong return values */
@@ -50,8 +72,7 @@ int
 	index = 0;
 	while (index < size)
 	{
-		ret = get_command_table()[node->childs[index]->type]
-			(node->childs[index], io);
+		ret = get_commandeer_proc(node->childs[index]->type)(node->childs[index], io);			
 		index++;
 	}
 	return (!!ret);
@@ -64,7 +85,7 @@ int
 	int	ret_code;
 
 	sh()->exec_count += 1;
-	ret_code = get_command_table()[node->type](node, io);
+	ret_code = get_commandeer_proc(node->type)(node, io);
 	sh()->exec_count -= 1;
 	return (ret_code);
 }

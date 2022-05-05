@@ -32,6 +32,8 @@ static void
 	free(list);
 }
 
+/* TODO: maybe this shouldn't exec the .crashrc again? */
+
 static int
 	sh_exec(char *name, char **argv)
 {
