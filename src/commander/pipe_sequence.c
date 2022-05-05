@@ -59,7 +59,7 @@ char **cm_word_list_to_array(const t_snode *word_list)
 	i = 0;
 	while (i < word_list->childs_size)
 	{
-		tmp = cm_expand(&word_list->childs[i]->token);
+		tmp = cm_wildcard_expand(&word_list->childs[i]->token);
 		j = 0;
 		if (tmp == NULL)
 		{

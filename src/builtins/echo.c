@@ -10,7 +10,7 @@
 static int
 	_sh_putstr_fd(const char *str)
 {
-	if (ft_putstr_fd((char*) str, sh()->io[SH_STDOUT_INDEX]) < 0)
+	if (ft_putstr_fd((char *) str, sh()->io[SH_STDOUT_INDEX]) < 0)
 	{
 		sh_err2("echo", strerror(errno));
 		return (-1);

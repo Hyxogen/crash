@@ -21,7 +21,7 @@ INC=\
 	libft.h
 OBJ=$(SRC:.c=.o)
 OBJ_BONUS=$(SRC_BONUS:.c=.o)
-CFLAGS=-Wall -Wextra -Werror -DFT_SAFE=1 -ansi -pedantic
+CFLAGS=-Wall -Wextra -Werror -DFT_SAFE=1 -ansi -pedantic -Ofast
 NAME=libft.a
 
 BLACK					:="\033[0;30m"

@@ -41,7 +41,7 @@ int
 	ret = 1;
 	while (ret > 0)
 	{
-		str = sh_safe_realloc(str, size, size + 4096);
+		str = sh_safe_reallog(str, size, size + 4096);
 		ret = read(fd, str + size, 4096);
 		if (ret >= 0)
 			size += ret;

@@ -229,7 +229,7 @@ int
 	}
 	expand_promote(exp, tmp);
 	i = 0;
-	comp_pattern = pattern_compile(pattern, info, 0);
+	comp_pattern = pattern_compile(pattern, info);
 	while (exp->parts[exp->count - 1].str[i] != NULL)
 	{
 		j = 0;
@@ -239,7 +239,7 @@ int
 			best = ft_strlen(str);
 			while (str[j] != '\0')
 			{
-				match = pattern_match(str + j, comp_pattern);
+				match = pattern_match(str + j, comp_pattern, 0);
 				if (match)
 				{
 					best = j;
@@ -257,7 +257,7 @@ int
 			{
 				ch = str[j];
 				str[j] = '\0';
-				match = pattern_match(str, comp_pattern);
+				match = pattern_match(str, comp_pattern, 0);
 				str[j] = ch;
 				if (match)
 				{

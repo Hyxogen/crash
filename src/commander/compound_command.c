@@ -2,28 +2,9 @@
 
 #include <stdlib.h>
 
-/*
-sx_list
-  sx_term
-    sx_pipe_sequence
-      sx_compound_list ()
-        sx_term
-          sx_pipe_sequence
-            sx_simple_cmd
-              sx_wordlist
-                sx_word:
-                  tk_word: echo
-                    lx_normal: echo
-                sx_word:
-                  tk_word: Hallo
-                    lx_normal: Hallo
-              sx_io_redirect_list
-              sx_ass_list
-        sx_io_redirect_list
-*/
-
 static pid_t
-	cm_compound_list_no_subshell(const t_snode *node, const int io[SH_STDIO_SIZE])
+	cm_compound_list_no_subshell(const t_snode *node,
+			const int io[SH_STDIO_SIZE])
 {
 	size_t	index;
 	size_t	count;

@@ -10,7 +10,7 @@ int
 	sh_cd(int argc, char **argv)
 {
 	const char	*path;
-	
+
 	(void) argc;
 	path = argv[1];
 	if (path == NULL)

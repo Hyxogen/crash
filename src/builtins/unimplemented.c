@@ -7,7 +7,6 @@ int
 {
 	(void) argc;
 	(void) argv;
-
 	sh_err2(argv[0], "not implemented");
 	return (EXIT_FAILURE);
 }

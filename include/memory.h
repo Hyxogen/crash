@@ -17,5 +17,6 @@
 
 void	*sh_safe_malloc(size_t size);
 void	*sh_safe_realloc(void *ptr, size_t old_size, size_t new_size);
+void	*sh_safe_reallog(void *ptr, size_t old_size, size_t new_size);
 
 #endif

@@ -18,7 +18,8 @@
 #include <stdio.h>
 
 void
-	*sh_safe_malloc(size_t size) {
+	*sh_safe_malloc(size_t size)
+{
 	void	*ptr;
 
 	ptr = malloc(size);
@@ -27,7 +28,8 @@ void
 }
 
 void
-	*sh_safe_realloc(void *ptr, size_t old_size, size_t new_size) {
+	*sh_safe_realloc(void *ptr, size_t old_size, size_t new_size)
+{
 	size_t			size;
 	unsigned char	*ret;
 
@@ -43,4 +45,30 @@ void
 		free(ptr);
 	}
 	return (ret);
+}
+
+static size_t
+	sh_safe_reallog_p2(size_t size)
+{
+	if (size == 0)
+		return (1);
+	size -= 1;
+	size |= size >> 1;
+	size |= size >> 2;
+	size |= size >> 4;
+	size |= size >> 8;
+	size |= size >> 16;
+	size |= size >> 32;
+	size += 1;
+	return (size);
+}
+
+void
+	*sh_safe_reallog(void *ptr, size_t old_size, size_t new_size)
+{
+	old_size = sh_safe_reallog_p2(old_size);
+	new_size = sh_safe_reallog_p2(new_size);
+	if (old_size != new_size)
+		return (sh_safe_realloc(ptr, old_size, new_size));
+	return (ptr);
 }

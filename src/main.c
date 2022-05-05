@@ -41,6 +41,7 @@ void
 			input_destroy(&in);
 			close(fd);
 		}
+		free(rc);
 	}	
 }
 

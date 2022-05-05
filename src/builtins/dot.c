@@ -12,8 +12,8 @@ static int
 	return (0);
 }
 
-int
-	sh_dot(int argc, char **argv)
+static int
+	_dot_run(int argc, char **argv)
 {
 	t_input	in;
 	char	**old_args;
@@ -21,6 +21,30 @@ int
 	int		ret;
 	int		fd;
 
+	if (argc != 2)
+	{
+		old_argv_0 = argv[0];
+		old_args = sh()->args;
+		sh()->args = argv;
+		sh()->args[0] = old_args[0];
+	}
+	// TODO: should it be interactive?
+	fd = sh_open(argv[1], O_RDONLY, 0);
+	input_new(&in, in_file, (void *)(unsigned long long) fd);
+	ret = sh_cm_run(&in);
+	input_destroy(&in);
+	sh_close(fd);
+	if (argc != 2)
+	{
+		argv[0] = old_argv_0;
+		sh()->args = old_args;
+	}
+	return (ret);
+}
+
+int
+	sh_dot(int argc, char **argv)
+{
 	if (argc <= 1)
 	{
 		sh_err2(".", "filename argument required");
@@ -31,23 +55,5 @@ int
 		sh_err3(".", argv[1], "cannot execute binary file");
 		return (-1);
 	}
-	if (argc != 2)
-	{
-		old_argv_0 = argv[0];
-		old_args = sh()->args;
-		sh()->args = argv;
-		sh()->args[0] = old_args[0];
-	}
-	// TODO: should it be interactive?
-	fd = sh_open(argv[1], O_RDONLY, 0);
-	input_new(&in, in_file, (void*)(unsigned long long) fd);
-	ret = sh_cm_run(&in);
-	input_destroy(&in);
-	sh_close(fd);
-	if (argc != 2)
-	{
-		argv[0] = old_argv_0;
-		sh()->args = old_args;
-	}
-	return (ret);
+	return (_dot_run(argc, argv));
 }

@@ -12,6 +12,7 @@ static void
 	ft_memset(node->chars, 0, sizeof(node->chars)/sizeof(node->chars[0]));
 	node->infinite = 0;
 	node->invert = 0;
+	node->wildcard = 0;
 	node->next = NULL;
 }
 
@@ -33,15 +34,13 @@ static void
 }
 
 static void
-	_pattern_enable_all(t_pattern_node *node, int filename)
+	_pattern_enable_all(t_pattern_node *node)
 {
 	ft_memset(&node->chars[0], 0xff, sizeof(node->chars) / sizeof(node->chars[0]));
-	if (filename)
-		node->chars[(int) '.'] = 0;
 }
 
 static void
-	_pattern_generate_body(char **pattern, int **info, t_pattern_node *current, int filename)
+	_pattern_generate_body(char **pattern, int **info, t_pattern_node *current)
 {
 	if (*(*info) & SH_PATTERN_ESCAPED)
 		current->chars[(size_t) *(*pattern)] = 0x1;
@@ -52,11 +51,15 @@ static void
 	}
 	else if (*(*pattern) == '*')
 	{
-		_pattern_enable_all(current, filename);
+		_pattern_enable_all(current);
+		current->wildcard = 1;
 		current->infinite = 1;
 	}
 	else if (*(*pattern) == '?')
-		_pattern_enable_all(current, filename);
+	{
+		_pattern_enable_all(current);
+		current->wildcard = 1;
+	}
 	else
 		current->chars[(size_t) *(*pattern)] = 0x1;
 	*pattern += 1;
@@ -64,7 +67,7 @@ static void
 }
 
 t_pattern_node
-	*pattern_compile(char *pattern, int *info, int filename)
+	*pattern_compile(char *pattern, int *info)
 {
 	t_pattern_node	*head;
 	t_pattern_node	*current;
@@ -75,7 +78,7 @@ t_pattern_node
 		current = sh_safe_malloc(sizeof(*head));
 		_pattern_init_node(current);
 		_pattern_add_node(&head, current);
-		_pattern_generate_body(&pattern, &info, current, filename);
+		_pattern_generate_body(&pattern, &info, current);
 	}
 	return (head);
 }

@@ -34,7 +34,7 @@ void
 void
 	expansion_add_part(t_expand *exp, char **str, int quote)
 {
-	exp->parts = sh_safe_realloc(exp->parts,
+	exp->parts = sh_safe_reallog(exp->parts,
 		sizeof(*exp->parts) * exp->count,
 		sizeof(*exp->parts) * (exp->count + 1));
 	exp->parts[exp->count].str = str;
@@ -52,7 +52,7 @@ void
 	i = 0;
 	while (i < src->count)
 	{
-		dst->parts = sh_safe_realloc(dst->parts,
+		dst->parts = sh_safe_reallog(dst->parts,
 			sizeof(*dst->parts) * dst->count,
 			sizeof(*dst->parts) * (dst->count + 1));
 		dst->parts[dst->count].str = sh_strlst_dup(src->parts[i].str);

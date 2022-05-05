@@ -32,8 +32,11 @@ int
 	return (tmp);
 }
 
+// TODO: NOTE: if this has to be refactored for norminette then we might as well do it properly by storing the length instead of using reallog with ft_strlen
+// TODO: NOTE: also if maybe `int *quote` should be a char instead to save space for massive environment variables
+
 void
-	expand_add(char ***fields, int *new, int tmp)
+	expand_add(char ***fields, int ***quotes, int *new, int tmp, int quot)
 {
 	size_t	i;
 	size_t	len;
@@ -43,11 +46,18 @@ void
 		i += 1;
 	if (*new)
 	{
-		*fields = sh_safe_realloc(*fields,
+		*fields = sh_safe_reallog(*fields,
 			sizeof(**fields) * (i + 1),
 			sizeof(**fields) * (i + 2));
 		(*fields)[i] = sh_safe_malloc(1);
 		(*fields)[i][0] = '\0';
+		if (quotes != NULL)
+		{
+			*quotes = sh_safe_reallog(*quotes,
+				sizeof(**quotes) * (i + 0),
+				sizeof(**quotes) * (i + 1));
+			(*quotes)[i] = sh_safe_malloc(sizeof(*(*quotes)[i]));
+		}
 		i += 1;
 		(*fields)[i] = NULL;
 		*new = 0;
@@ -55,27 +65,34 @@ void
 	if (tmp != '\0')
 	{
 		len = ft_strlen((*fields)[i - 1]);
-		(*fields)[i - 1] = sh_safe_realloc((*fields)[i - 1], len + 1, len + 2);
+		(*fields)[i - 1] = sh_safe_reallog((*fields)[i - 1], len + 1, len + 2);
 		(*fields)[i - 1][len] = tmp;
 		(*fields)[i - 1][len + 1] = '\0';
+		if (quotes != NULL)
+		{
+			(*quotes)[i - 1] = sh_safe_reallog((*quotes)[i - 1],
+				sizeof(***quotes) * (len + 0),
+				sizeof(***quotes) * (len + 1));
+			(*quotes)[i - 1][len] = quot;
+		}
 	}
 }
 
 void
-	expand_add_str(char ***fields, int *new, char *str)
+	expand_add_str(char ***fields, int ***quotes, int *new, char *str, int quot)
 {
 	size_t	i;
 
 	i = 0;
 	while (str[i] != '\0')
 	{
-		expand_add(fields, new, str[i]);
+		expand_add(fields, quotes, new, str[i], quot);
 		i += 1;
 	}
 }
 
 void
-	expand_split(char ***fields, int *new, char *str, char *ifs)
+	expand_split(char ***fields, int ***quotes, int *new, char *str, char *ifs, int quot)
 {
 	size_t	i;
 
@@ -92,18 +109,18 @@ void
 			else
 			{
 				if (*new == 2)
-					expand_add(fields, new, '\0');
+					expand_add(fields, quotes, new, '\0', quot);
 				*new = 2;
 			}
 		}
 		else
-			expand_add(fields, new, str[i]);
+			expand_add(fields, quotes, new, str[i], quot);
 		i += 1;
 	}
 }
 
 void
-	expand_collate(t_expand *exp, char ***fields)
+	expand_collate(t_expand *exp, char ***fields, int ***quotes)
 {
 	char	*ifs;
 	int		new;
@@ -121,11 +138,11 @@ void
 			if (j > 0)
 				new = 2;
 			if (exp->parts[i].quote)
-				expand_add(fields, &new, '\0');
+				expand_add(fields, quotes, &new, '\0', exp->parts[i].quote);
 			if (exp->parts[i].quote || exp->parts[i].normal)
-				expand_add_str(fields, &new, exp->parts[i].str[j]);
+				expand_add_str(fields, quotes, &new, exp->parts[i].str[j], exp->parts[i].quote);
 			else
-				expand_split(fields, &new, exp->parts[i].str[j], ifs);
+				expand_split(fields, quotes, &new, exp->parts[i].str[j], ifs, exp->parts[i].quote);
 			j += 1;
 		}
 		i += 1;
@@ -140,12 +157,12 @@ void
 	i = 0;
 	while ((*str)[i] != '\0')
 		i += 1;
-	*str = sh_safe_realloc(*str, i + 1, i + 2);
+	*str = sh_safe_reallog(*str, i + 1, i + 2);
 	(*str)[i] = ch;
 	(*str)[i + 1] = '\0';
 	if (quote != NULL)
 	{
-		*quote = sh_safe_realloc(*quote,
+		*quote = sh_safe_reallog(*quote,
 			sizeof(**quote) * i,
 			sizeof(**quote) * (i + 1));
 		(*quote)[i] = quot;
@@ -218,7 +235,7 @@ char
 // TODO: check null when called
 // TODO: tilde expansion and wildcards
 char
-	**cm_expand(const t_token *token)
+	**cm_expand(const t_token *token, int ***quotes)
 {
 	t_expand	exp;
 	char		**fields;
@@ -226,7 +243,12 @@ char
 	if (cm_expand_list(&exp, token) < 0)
 		return (NULL);
 	fields = sh_strlst_empty();
-	expand_collate(&exp, &fields);
+	if (quotes != NULL)
+	{
+		*quotes = sh_safe_malloc(sizeof(**quotes));
+		(*quotes)[0] = NULL;
+	}
+	expand_collate(&exp, &fields, quotes);
 	expansion_destroy(&exp);
 	return (fields);
 }

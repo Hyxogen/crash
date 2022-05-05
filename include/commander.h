@@ -126,6 +126,7 @@ struct s_pattern_node {
 	char			chars[256];
 	int				invert;
 	int				infinite;
+	int				wildcard;
 	t_pattern_node	*next;
 };
 
@@ -188,7 +189,7 @@ int				cm_and_if(const t_snode *node, const int io[3]);
 int				cm_or_if(const t_snode *node, const int io[3]);
 int				commandeer_inner(const t_snode *node, const int io[3]);
 int				commandeer(const t_snode *node, const int io[3]);
-int				commandeer_compound_cmd(const t_snode *node, const int io[SH_STDIO_SIZE]);
+int				commandeer_term(const t_snode *node, const int io[SH_STDIO_SIZE]);
 
 int				sh_execvp(char **argv);
 
@@ -200,7 +201,7 @@ int				_cm_create_and_write_here(const char *str, int skip_leading_tabs);
 int				_cm_setup_process_redirects(const t_snode *redi_list);
 int				_cm_setup_builtin_redirects(const t_snode *redi_list, int io[3]);
 int				cm_expand_list(t_expand *exp, const t_token *token);
-char			**cm_expand(const t_token *token);
+char			**cm_expand(const t_token *token, int ***quote);
 char			*cm_expand_str(const t_token *token, int **quote, int ch);
 int				expand_param(t_expand *exp, t_token *token);
 int				expand_command(t_expand *exp, t_snode *node);
@@ -233,8 +234,8 @@ int				_pattern_process_collating_class(char **pattern, t_pattern_node *node, ch
 int				_pattern_process_equivalence_class(char **pattern, t_pattern_node *node);
 int				_pattern_process_char_class(char **pattern, t_pattern_node *node);
 int				_pattern_process_brackets(char **pattern, t_pattern_node *node, int moved, int local_moved);
-t_pattern_node	*pattern_compile(char *pattern, int *info, int filename);
-int				pattern_match(const char *str, t_pattern_node *pattern);
+t_pattern_node	*pattern_compile(char *pattern, int *info);
+int				pattern_match(const char *str, t_pattern_node *pattern, int filename);
 void			pattern_destroy(t_pattern_node *node);
 void			pattern_debug_print_node(t_pattern_node *node);
 void			pattern_debug_print_chain(t_pattern_node *head);
@@ -278,4 +279,7 @@ long			arith_negate(const char *str, long lhs, long b, long c);
 long			arith_logical_not(const char *str, long lhs, long b, long c);
 long			arith_bitwise_not(const char *str, long lhs, long b, long c);
 long			arith_assign(const char *str, long old_value, long value, long c);
+
+void			cm_wildcard(const char *path, int *info, char ***out);
+char			**cm_wildcard_expand(const t_token *token);
 #endif

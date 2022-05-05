@@ -6,9 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-#include <stdio.h>
-
 static void
 	_sh_execvp_error_handler(const char *name, int error)
 {
@@ -226,9 +223,7 @@ void
 		_cm_close_nostd(redirect[SH_STDERR_INDEX]);
 }
 
-/* NOTE: Ik was bezig met het refactoren van deze file, maar het nieuwe systeem werkt nog niet helemaal
- * for the time being heb ik even het oude systeem nog aan laten staan */
-
+/*
 static int
 	command_should_execute(const t_snode *command)
 {
@@ -469,3 +464,4 @@ pid_t
 	sh_strlst_clear(args);
 	return (command_pid);
 }
+*/

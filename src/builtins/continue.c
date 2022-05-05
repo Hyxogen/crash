@@ -9,8 +9,8 @@ int
 
 	if (!sh()->loop_depth)
 	{
-		sh_err2("continue", "only meaningful in a `for', `while', or `until' loop");
-		return (0);	
+		return (sh_err2("continue",
+				"only meaningful in a `for', `while', or `until' loop"), 0);
 	}
 	if (argc <= 1)
 		count = 1;

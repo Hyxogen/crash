@@ -9,8 +9,10 @@
 #include <stdio.h>
 
 static int
-	_is_match(char ch, t_pattern_node *const node)
+	_is_match(char ch, t_pattern_node *const node, int first)
 {
+	if (first && node->wildcard && ch == '.')
+		return (0);
 	if (node->invert)
 		return (!node->chars[(size_t) ch]);
 	return (!!node->chars[(size_t) ch]);
@@ -45,18 +47,18 @@ void
 }
 
 static int
-	_pattern_match(const char *str, t_pattern_node *node)
+	_pattern_match(const char *str, t_pattern_node *node, int first)
 {
 	if (*str && node) {
-		if (_is_match(*str, node))
+		if (_is_match(*str, node, first))
 		{
-			if (node->infinite && _pattern_match(str + 1, node))
+			if (node->infinite && _pattern_match(str + 1, node, 0))
 				return (1);
-			if (_pattern_match(str + 1, node->next))
+			if (_pattern_match(str + 1, node->next, 0))
 				return (1);
 		}
 		if (node->infinite)
-			return (_pattern_match(str, node->next));
+			return (_pattern_match(str, node->next, 0));
 	}
 	if (*str)
 		return (0);
@@ -73,10 +75,10 @@ static int
 
 /* Returns 1 on match */
 int
-	pattern_match(const char *str, t_pattern_node *pattern)
+	pattern_match(const char *str, t_pattern_node *pattern, int filename)
 {
 	int				match;
 
-	match = _pattern_match(str, pattern);
+	match = _pattern_match(str, pattern, filename);
 	return (match);
 }

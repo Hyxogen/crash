@@ -5,6 +5,5 @@ int
 {
 	(void) argc;
 	(void) argv;
-
 	return (EXIT_FAILURE);
 }
