@@ -1,9 +1,7 @@
 #include "commander.h"
 
 #include <stdlib.h>
-#include <unistd.h>
 #include <errno.h>
-#include <string.h>
 
 static pid_t
 	execute_external_command(const t_snode *command,
