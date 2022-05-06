@@ -170,13 +170,10 @@ int
 	else
 	{
 		tok->size = arith_lex_const(lex->str);
-		if (tok->size != 0)
-			tok->id = ar_tk_const;
+		tok->id = ar_tk_const * (tok->size != 0) + tok->id * (tok->size == 0);
 	}
 	lex->str += tok->size;
-	if (tok->id != ar_tk_null)
-		return (1);
-	return (-1);
+	return ((tok->id != ar_tk_null) * 2 - 1);
 }
 
 const t_arith_operator
