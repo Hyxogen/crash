@@ -1,4 +1,5 @@
 #include "commander.h"
+
 #include "minishell.h"
 #include "memory.h"
 #include "parser.h"
@@ -23,7 +24,8 @@ size_t
 			j += 1;
 		}
 		else
-			sh_err3("warning", "command substitution", "ignored null byte in input");
+			sh_err3("warning", "command substitution",
+				"ignored null byte in input");
 		i += 1;
 	}
 	return (j);
