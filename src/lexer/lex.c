@@ -81,9 +81,11 @@ int
 	}
 	if (lex->src->cur == -1)
 	{
-		token_destroy(tok);
 		if (lex->id == lx_command)
+		{
+			token_destroy(tok);
 			return (-1);
+		}
 		return (0);
 	}
 	return (lex_lex_int(lex, tok));

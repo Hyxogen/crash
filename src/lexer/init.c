@@ -49,6 +49,6 @@ void
 	tok->id = tk_invalid;
 	tok->parts = NULL;
 	tok->count = 0;
-	tok->str = NULL;
+	tok->str = ft_strdup("");
 	tok->len = 0;
 }

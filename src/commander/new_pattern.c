@@ -11,8 +11,8 @@ static int
 	if (first && node->wildcard && ch == '.')
 		return (0);
 	if (node->invert)
-		return (!node->chars[(size_t) ch]);
-	return (!!node->chars[(size_t) ch]);
+		return (!node->chars[(unsigned char) ch]);
+	return (!!node->chars[(unsigned char) ch]);
 }
 
 /* TODO rename node->infinite to something more appropriate */

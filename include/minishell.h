@@ -87,12 +87,11 @@
  * FOR SURE TODO:
  * handle all the shell variables
  * return value of lex_main is rarely checked
- * path name expansion (~, *)
  * disable SIGINT and SIGQUIT ignoring for internal commands
  * don't export invalid identifiers
  * shell flags (set -)
  * remove globals according to the subject/norminette
- * fix segfault for `echo "` keyboard interrupt in unclosed string literal
+ * fix readline segfault
  */
 # define SH_ENV_EXPORT 1
 # define SH_ENV_READONLY 2

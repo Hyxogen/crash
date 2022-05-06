@@ -59,6 +59,7 @@ int
 	if (token == NULL || token->id != tk_word)
 		return (0);
 	len = ft_strlen(pr_get_keywords()[id - kw_if]);
+	sh_assert(token->str != NULL);
 	if (ft_memcmp(pr_get_keywords()[id - kw_if], token->str, len + 1) == 0)
 	{
 		token->id = id;

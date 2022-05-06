@@ -73,7 +73,7 @@ ssize_t
 			read_size = tmp - &fh->buf[fh->beg];
 			*lp = ft_strndup(&fh->buf[fh->beg], read_size);
 			fh->beg += (tmp - &fh->buf[fh->beg]) + 1;
-			return (read_size);
+			return (ft_strlen(*lp));
 		}
 		read_size = read(fh->fd, &buffer[0], BUFFER_SIZE);
 		if (read_size < 0 || (read_size == 0 && fh->beg == fh->end))
@@ -84,7 +84,7 @@ ssize_t
 			read_size = fh->end - fh->beg;
 			*lp = ft_strndup(&fh->buf[fh->beg], read_size);
 			fh->beg = fh->end;
-			return (read_size);
+			return (ft_strlen(*lp));
 		}
 	}
 }

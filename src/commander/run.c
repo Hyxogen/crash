@@ -11,7 +11,6 @@
 
 extern int rl_catch_signals;
 extern void (*rl_event_hook)(void);
-extern void rl_clear_history(void);
 
 t_snode
 	*pr_parse(t_parser *pr)
@@ -63,7 +62,6 @@ int
 	std_io[SH_STDOUT_INDEX] = STDOUT_FILENO;
 	std_io[SH_STDERR_INDEX] = STDERR_FILENO;
 	sh()->last_command = NULL;
-	rl_clear_history();
 	arith_init();
 	while (1)
 	{
@@ -84,10 +82,10 @@ int
 			node_destroy(node);
 			continue ;
 		}
+		add_history(history_get_last_command());
+		history_new_command();
 		if (pr.lexer->error || lex.quote != 0 || lex.btick != 0)
 		{
-			add_history(history_get_last_command());
-			history_new_command();
 			sh_err1("syntax error");
 			continue ;
 		}
@@ -96,8 +94,6 @@ int
 			commandeer(node, std_io);
 		sh_set_term_attr(&term_attr);
 		node_destroy(node);
-		add_history(history_get_last_command());
-		history_new_command();
 	}
 	pr_destroy(&pr);
 	// TODO: errors?

@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <libgen.h>
 
+extern void rl_clear_history(void);
+
 void
 	run_start_scripts(void)
 {
@@ -69,6 +71,7 @@ int
 	else
 	{
 		run_start_scripts();
+		rl_clear_history();
 		input_new(&in, in_readline, NULL);
 	}
 	disable_kill_signals();

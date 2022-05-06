@@ -43,7 +43,7 @@ int
 		ret = open(path, oflag, mode);
 	else
 		ret = open(path, oflag);
-	sh_check(ret >= 0, "open");
+	sh_check(ret >= 0, path);
 	return (ret);
 }
 

@@ -38,7 +38,6 @@ void
 {
 	if (error == ENOENT)
 	{
-		sh_backtrace(64);
 		sh_err2(name, "command not found");
 		exit(127);
 	}
