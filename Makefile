@@ -27,7 +27,7 @@ COMMANDER_FILES	:= \
 	new_pattern_generate.c function.c init.c redirect_general.c and_or_if.c \
 	return_code.c assignment.c compound_command.c term.c wildcard.c \
 	command_util.c command_internal_exec.c command_redirect.c env_int.c \
-	env_util.c
+	env_util.c expand_special1.c expand_special2.c
 ARITH_FILES		:= \
 	arith_plus.c arith_minus.c arith_modulo.c arith_divide.c arith_multiply.c \
 	arith_ternary.c arith_shift.c arith_inequality.c arith_equality.c \

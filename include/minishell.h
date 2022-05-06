@@ -212,6 +212,7 @@ struct s_minishell
 	char				*last_command;
 	int					exec_count;
 	int					restart;
+	pid_t				last_bg_proc;
 };
 
 char		*sh_join2(const char *lhs, char delim, const char *rhs);

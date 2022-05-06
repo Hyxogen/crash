@@ -208,6 +208,14 @@ int				expand_param(t_expand *exp, t_token *token);
 int				expand_command(t_expand *exp, t_snode *node);
 int				expand_backtick(t_expand *exp, char *str);
 int				expand_arith(t_expand *exp, t_token *token);
+int				expand_special_asterisk(t_expand *exp, char *key);
+int				expand_special_at(t_expand *exp, char *key);
+int				expand_special_sharp(t_expand *exp, char *key, long i);
+int				expand_special_qmark(t_expand *exp, char *key);
+int				expand_special_minus(t_expand *exp, char *key);
+int				expand_special_dollar(t_expand *exp, char *key);
+int				expand_special_bang(t_expand *exp, char *key);
+int				expand_special_digit(t_expand *exp, char *key, long i);
 
 pid_t			cm_unimplemented_cmd_command(const t_snode *node, const int io[3]);
 

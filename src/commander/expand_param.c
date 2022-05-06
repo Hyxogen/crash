@@ -62,65 +62,21 @@ int
 	expand_special(t_expand *exp, char *key)
 {
 	char	*str;
-	long	idx;
 	long	i;
 
 	// TODO: special parameters
 	i = 0;
 	while (sh()->args[i] != NULL)
 		i += 1;
-	if (key[0] == '*')
-	{
-		str = sh_getenv("IFS", NULL);
-		if (str == NULL)
-			str = sh_strlst_join(sh()->args + 1, ' ');
-		else
-			str = sh_strlst_join(sh()->args + 1, str[0]);
-		expansion_add_part(exp, sh_strlst_new(str), 0);
+	if (expand_special_asterisk(exp, key)
+		|| expand_special_at(exp, key)
+		|| expand_special_sharp(exp, key, i)
+		|| expand_special_qmark(exp, key)
+		|| expand_special_minus(exp, key)
+		|| expand_special_dollar(exp, key)
+		|| expand_special_bang(exp, key)
+		|| expand_special_digit(exp, key, i))
 		return (0);
-	}
-	if (key[0] == '@')
-	{
-		expansion_add_part(exp, sh_strlst_dup(sh()->args + 1), 0);
-		exp->parts[exp->count - 1].array = 1;
-		return (0);
-	}
-	if (key[0] == '#')
-	{
-		expansion_add_part(exp, sh_strlst_new(ft_itoa(i - 1)), 0);
-		return (0);
-	}
-	if (key[0] == '?')
-	{
-		expansion_add_part(exp, sh_strlst_new(ft_itoa(sh()->return_code)), 0);
-		return (0);
-	}
-	if (key[0] == '-')
-	{
-		// TODO: option flags
-		expansion_add_part(exp, sh_strlst_new(ft_strdup("")), 0);
-		return (0);
-	}
-	if (key[0] == '$')
-	{
-		expansion_add_part(exp, sh_strlst_new(ft_itoa(getpid())), 0);
-		return (0);
-	}
-	if (key[0] == '!')
-	{
-		// TODO: background commands
-		expansion_add_part(exp, sh_strlst_new(ft_itoa(0)), 0);
-		return (0);
-	}
-	if (ft_isdigit(key[0]))
-	{
-		idx = ft_atol(key);
-		if (idx < 0 || idx >= i)
-			expansion_add_part(exp, sh_strlst_new(ft_strdup("")), 0);
-		else
-			expansion_add_part(exp, sh_strlst_new(ft_strdup(sh()->args[idx])), 0);
-		return (0);
-	}
 	str = sh_getenv(key, NULL);
 	if (str == NULL)
 		return (-1);
@@ -137,9 +93,9 @@ int
 		sh_err2(ctx->key, "parameter not set");
 	else
 	{
-		ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + i;
+		ctx->token->parts[0].data = (char *) ctx->token->parts[0].data + i;
 		str = cm_expand_str(ctx->token, NULL, ' ');
-		ctx->token->parts[0].data = (char*) ctx->token->parts[0].data - i;
+		ctx->token->parts[0].data = (char *) ctx->token->parts[0].data - i;
 		if (str != NULL)
 			return (-1);
 		sh_err2(ctx->key, str);
@@ -167,9 +123,9 @@ int
 		sh_err2(ctx->key, "cannot assign in this way");
 		return (-1);
 	}
-	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + i;
+	ctx->token->parts[0].data = (char *) ctx->token->parts[0].data + i;
 	str = cm_expand_str(ctx->token, NULL, ' ');
-	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data - i;
+	ctx->token->parts[0].data = (char *) ctx->token->parts[0].data - i;
 	if (str == NULL)
 		return (-1);
 	sh_setenv(ctx->key, str, 0);
@@ -183,9 +139,9 @@ int
 	t_expand	tmp;
 	int			result;
 
-	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + i;
+	ctx->token->parts[0].data = (char *) ctx->token->parts[0].data + i;
 	result = cm_expand_list(&tmp, ctx->token);
-	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data - i;
+	ctx->token->parts[0].data = (char *) ctx->token->parts[0].data - i;
 	expansion_copy_parts(exp, &tmp);
 	expansion_destroy(&tmp);
 	return (result);
