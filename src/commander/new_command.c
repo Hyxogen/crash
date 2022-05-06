@@ -252,6 +252,7 @@ static pid_t
 	{
 		setup_and_try_execve_command(command, argv, io);
 		perror("new command");
+		exit(-1);
 	}
 	return (command_pid);
 }

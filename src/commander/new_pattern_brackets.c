@@ -35,7 +35,7 @@ static int
 	if (*(*pattern) == '[')
 	{
 		// if (*(*pattern + 1) == '.')
-			// return (_pattern_process_collating_class(pattern, node));
+		// 	return (_pattern_process_collating_class(pattern, node));
 		if (*(*pattern + 1) == '=')
 			return (_pattern_process_equivalence_class(pattern, node));
 		else if (*(*pattern + 1) == ':')
