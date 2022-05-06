@@ -12,43 +12,9 @@
 
 #include "minishell.h"
 #include "commander.h"
-#include "libft.h"
 #include "memory.h"
+#include <libft.h>
 #include <stdlib.h>
-
-t_envvar
-	*sh_setenv_int(const char *key)
-{
-	t_envvar	*var;
-
-	sh()->vars = sh_safe_realloc(sh()->vars,
-		sizeof(*sh()->vars) * sh()->vars_size,
-		sizeof(*sh()->vars) * (sh()->vars_size + 1));
-	var = &sh()->vars[sh()->vars_size];
-	sh()->vars_size += 1;
-	var->key = ft_strdup(key);
-	var->attr = 0;
-	var->value = NULL;
-	var->tmp_value = NULL;
-	return (var);
-}
-
-t_envvar
-	*sh_getenv_int(const char *key, int create)
-{
-	size_t	i;
-
-	i = 0;
-	while (i < sh()->vars_size)
-	{
-		if (ft_strcmp(sh()->vars[i].key, key) == 0)
-			return (&sh()->vars[i]);
-		i += 1;
-	}
-	if (create)
-		return (sh_setenv_int(key));
-	return (NULL);
-}
 
 char
 	*sh_getenv(const char *key, const char *def)
@@ -57,11 +23,11 @@ char
 
 	var = sh_getenv_int(key, 0);
 	if (var == NULL)
-		return ((char*) def);
+		return ((char *) def);
 	if (var->tmp_value != NULL)
 		return (var->tmp_value);
 	if (var->value == NULL)
-		return ((char*) def);
+		return ((char *) def);
 	return (var->value);
 }
 
@@ -124,8 +90,10 @@ char
 	while (i < sh()->vars_size)
 	{
 		if (sh()->vars[i].tmp_value != NULL)
-			out[j++] = sh_join2(sh()->vars[i].key, '=', sh()->vars[i].tmp_value);
-		else if ((sh()->vars[i].attr & SH_ENV_EXPORT) && sh()->vars[i].value != NULL)
+			out[j++] = sh_join2(sh()->vars[i].key,
+					'=', sh()->vars[i].tmp_value);
+		else if ((sh()->vars[i].attr & SH_ENV_EXPORT)
+			&& sh()->vars[i].value != NULL)
 			out[j++] = sh_join2(sh()->vars[i].key, '=', sh()->vars[i].value);
 		i += 1;
 	}
@@ -145,42 +113,4 @@ void
 		sh()->vars[i].tmp_value = NULL;
 		i += 1;
 	}
-}
-
-void
-	sh_env_init(char **env)
-{
-	char		*key;
-	char		*value;
-	size_t		i;
-	t_envvar	*var;
-
-	i = 0;
-	sh()->vars = NULL;
-	sh()->vars_size = 0;
-	while (env[i] != NULL)
-	{
-		sh_split2(env[i], '=', &key, &value);
-		var = sh_setenv(key, value, 0);
-		var->attr |= SH_ENV_EXPORT;
-		free(key);
-		free(value);
-		i += 1;
-	}
-}
-
-void
-	sh_env_destroy(void)
-{
-	size_t	i;
-
-	i = 0;
-	while (i < sh()->vars_size)
-	{
-		free(sh()->vars[i].value);
-		free(sh()->vars[i].tmp_value);
-		free(sh()->vars[i].key);
-		i += 1;
-	}
-	free(sh()->vars);
 }

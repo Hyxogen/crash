@@ -91,6 +91,7 @@
  * disable SIGINT and SIGQUIT ignoring for internal commands
  * don't export invalid identifiers
  * shell flags (set -)
+ * remove globals according to the subject/norminette
  */
 # define SH_ENV_EXPORT 1
 # define SH_ENV_READONLY 2
