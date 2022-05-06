@@ -2,9 +2,8 @@
 
 #include <stdlib.h>
 #include <unistd.h>
-
-
-#include <stdio.h>
+#include <errno.h>
+#include <string.h>
 
 static pid_t
 	execute_external_command(const t_snode *command,
@@ -45,6 +44,26 @@ static int
 	if (fd != STDIN_FILENO && fd != STDOUT_FILENO && fd != STDERR_FILENO)
 		return (sh_close(fd));
 	return (0);
+}
+
+static void
+	handle_execvp_error(const char *name, int error)
+{
+	if (error == ENOENT)
+	{
+		sh_err2(name, "command not found");
+		exit(127);
+	}
+	else if (error == EACCES)
+	{
+		sh_err2(name, "permission denied");
+		exit(126);
+	}
+	else
+	{
+		sh_err3(name, "unknown error", strerror(errno));
+		sh_abort();
+	}
 }
 
 int
@@ -219,18 +238,6 @@ static pid_t
 		return (command_pid);
 	return (SH_INVALID_INTERNAL_PID);
 }
-/*
-static pid_t
-	execute_simple_command(const t_snode *command,
-			char **argv, const int io[SH_STDIO_SIZE])
-{
-	pid_t	command_pid;
-
-	command_pid = execute_internal_command(command, argv, io);
-	if (command_pid == SH_INVALID_INTERNAL_PID)
-		command_pid = execute_external_command(command, argv, io);
-	return (command_pid);
-}*/
 
 static void
 	setup_and_try_execve_command(const t_snode *command,
@@ -251,8 +258,7 @@ static pid_t
 	if (command_pid == 0)
 	{
 		setup_and_try_execve_command(command, argv, io);
-		perror("new command");
-		exit(-1);
+		handle_execvp_error(argv[0], errno);
 	}
 	return (command_pid);
 }
