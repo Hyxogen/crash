@@ -4,6 +4,9 @@
 #include <libft.h>
 #include <stdlib.h>
 
+
+#include <stdio.h>
+
 pid_t
 	cm_function_define(const t_snode *node, const int io[3])
 {
