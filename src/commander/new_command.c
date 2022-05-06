@@ -99,7 +99,7 @@ int
 	return (0);
 }
 
-static int
+static pid_t
 	execute_builtin(const t_snode *command, const t_builtin *function,
 			char **argv, const int io[SH_STDIO_SIZE])
 {
@@ -116,11 +116,11 @@ static int
 	return (return_code_to_internal_pid(return_code));
 }
 
-static int
+static pid_t
 	execute_function(const t_snode *command, const t_function *function,
 			char **argv, const int io[SH_STDIO_SIZE])
 {
-	int		return_code;
+	pid_t	internal_pid;
 	char	**old_args;
 	char	*old_arg0;
 
@@ -129,14 +129,14 @@ static int
 	argv[0] = sh()->args[0];
 	old_args = sh()->args;
 	sh()->args = argv;
-	return_code = cm_function(function->body, io);
+	internal_pid = cm_function(function->body, io);
 	argv[0] = old_arg0;
 	sh()->args = old_args;
 	sh_env_clean();
-	return (return_code_to_internal_pid(return_code));
+	return (internal_pid);
 }
 
-static int
+static pid_t
 	find_and_execute_builtin(const t_snode *command,
 			char **argv, const int io[SH_STDIO_SIZE])
 {
@@ -158,7 +158,7 @@ static int
 	return (SH_INVALID_INTERNAL_PID);
 }
 
-static int
+static pid_t
 	find_and_execute_function(const t_snode *command,
 			char **argv, const int io[SH_STDIO_SIZE])
 {
