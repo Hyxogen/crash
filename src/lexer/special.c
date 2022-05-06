@@ -26,7 +26,8 @@ int
 		lex_nom_and_skip(lex);
 		part = token_add_part(lex, lx_arithmetic, lex->quote);
 		lex_arithmetic(lex, part);
-		lex_update(lex, 1);
+		if (lex->src->cur != -1)
+			lex_update(lex, 1);
 	}
 	else
 	{
@@ -34,7 +35,8 @@ int
 		part = token_add_part(lex, lx_command, lex->quote);
 		lex_command(lex, part);
 	}
-	lex_update(lex, 1);
+	if (lex->src->cur != -1)
+		lex_update(lex, 1);
 	lex->new_part = 1;
 	return (1);
 }
@@ -113,7 +115,8 @@ int
 		lex_nom_and_skip(lex);
 		part = token_add_part(lex, lx_parameter, lex->quote);
 		lex_parameter(lex, part);
-		lex_update(lex, 1);
+		if (lex->src->cur != -1)
+			lex_update(lex, 1);
 		lex->new_part = 1;
 		return (1);
 	}

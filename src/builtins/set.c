@@ -3,9 +3,6 @@
 
 #include <stdlib.h>
 
-// TODO: better set implementation
-// TODO: properly set argv[0]
-
 int
 	sh_set(int argc, char **argv)
 {
@@ -18,7 +15,7 @@ int
 	{
 		if ((*current)[0] == '-')
 		{
-			sh_err3(sh()->name, argv[0],
+			sh_err2(argv[0],
 				"warning options are ignored for this command");
 			break ;
 		}

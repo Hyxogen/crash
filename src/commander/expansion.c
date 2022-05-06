@@ -1,4 +1,5 @@
 #include "commander.h"
+
 #include "memory.h"
 #include "minishell.h"
 #include <stdlib.h>
@@ -35,12 +36,13 @@ void
 	expansion_add_part(t_expand *exp, char **str, int quote)
 {
 	exp->parts = sh_safe_reallog(exp->parts,
-		sizeof(*exp->parts) * exp->count,
-		sizeof(*exp->parts) * (exp->count + 1));
+			sizeof(*exp->parts) * exp->count,
+			sizeof(*exp->parts) * (exp->count + 1));
 	exp->parts[exp->count].str = str;
 	exp->parts[exp->count].quote = quote;
 	exp->parts[exp->count].normal = 0;
 	exp->parts[exp->count].array = 0;
+	exp->parts[exp->count].tilde_expanded = 0;
 	exp->count += 1;
 }
 
@@ -53,8 +55,8 @@ void
 	while (i < src->count)
 	{
 		dst->parts = sh_safe_reallog(dst->parts,
-			sizeof(*dst->parts) * dst->count,
-			sizeof(*dst->parts) * (dst->count + 1));
+				sizeof(*dst->parts) * dst->count,
+				sizeof(*dst->parts) * (dst->count + 1));
 		dst->parts[dst->count].str = sh_strlst_dup(src->parts[i].str);
 		dst->parts[dst->count].quote = src->parts[i].quote;
 		dst->parts[dst->count].normal = src->parts[i].normal;

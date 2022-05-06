@@ -5,9 +5,6 @@
 #include <ft_printf.h>
 #include <unistd.h>
 
-
-#include <stdio.h>
-
 static int
 	_is_match(char ch, t_pattern_node *const node, int first)
 {
@@ -26,7 +23,7 @@ void
 
 	index = 1;
 	ft_fprintf(STDERR_FILENO, "[");
-	while (index < sizeof(node->chars)/sizeof(node->chars[0]))
+	while (index < sizeof(node->chars) / sizeof(node->chars[0]))
 	{
 		if (node->chars[index])
 			ft_fprintf(STDERR_FILENO, "%c", index);
@@ -49,7 +46,8 @@ void
 static int
 	_pattern_match(const char *str, t_pattern_node *node, int first)
 {
-	if (*str && node) {
+	if (*str && node)
+	{
 		if (_is_match(*str, node, first))
 		{
 			if (node->infinite && _pattern_match(str + 1, node, 0))
@@ -79,6 +77,8 @@ int
 {
 	int				match;
 
+	if (pattern == NULL)
+		return (0);
 	match = _pattern_match(str, pattern, filename);
 	return (match);
 }

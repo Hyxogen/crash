@@ -113,7 +113,7 @@ char
 	size_t	i;
 	char	**out;
 
-	list = cm_expand(token, &info);
+	list = cm_expand(token, &info, 1);
 	if (list == NULL)
 		return (NULL);
 	out = sh_safe_malloc(sizeof(*out));

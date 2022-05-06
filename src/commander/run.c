@@ -64,27 +64,38 @@ int
 	std_io[SH_STDERR_INDEX] = STDERR_FILENO;
 	sh()->last_command = NULL;
 	rl_clear_history();
+	arith_init();
 	while (1)
 	{
+		src_init(&src, in);
+		lex_init(&lex);
+		pr_init(&pr);
 		sh_new_command(in, &pr);
 		if (pr.current.id != tk_invalid)
 			token_destroy(&pr.current);
 		pr_next_token(&pr);
+		if (pr.current.id == tk_null && sh()->interactive)
+			ft_putstr_fd("exit\n", STDERR_FILENO);
 		if (pr.current.id == tk_invalid || pr.current.id == tk_null)
 			break ;
 		node = pr_parse(&pr);
-		if (sh()->restart)
+		if (sh()->restart != 0)
 		{
 			node_destroy(node);
-			continue;
+			continue ;
+		}
+		if (pr.lexer->error || lex.quote != 0 || lex.btick != 0)
+		{
+			add_history(history_get_last_command());
+			history_new_command();
+			sh_err1("syntax error");
+			continue ;
 		}
 		sh_get_term_attr(&term_attr);
 		if (node != NULL)
 			commandeer(node, std_io);
 		sh_set_term_attr(&term_attr);
 		node_destroy(node);
-		if (pr.lexer->error)
-			sh_err1("syntax error");
 		add_history(history_get_last_command());
 		history_new_command();
 	}

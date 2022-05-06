@@ -5,109 +5,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-size_t
-	expand_key_length(const char *param)
-{
-	size_t	i;
-
-	if (param[0] == '*'
-		|| param[0] == '@'
-		|| param[0] == '#'
-		|| param[0] == '?'
-		|| param[0] == '-'
-		|| param[0] == '$'
-		|| param[0] == '!')
-		return (1);
-	i = 0;
-	if (ft_isdigit(param[0]))
-		while (ft_isdigit(param[i]))
-			i += 1;
-	else
-		while (ft_isalnum(param[i]) || param[i] == '_')
-			i += 1;
-	return (i);
-}
-
 int
-	expand_empty(t_expand *exp, int empty_is_null)
-{
-	if (exp->count == 0 || exp->parts[0].str[0] == NULL)
-		return (1);
-	if (exp->parts[0].str[0][0] == '\0'
-		&& exp->parts[0].str[1] == NULL
-		&& empty_is_null)
-		return (1);
-	return (0);
-}
-
-size_t
-	expand_length(t_expand *exp)
-{
-	size_t	i;
-
-	if (exp->count == 0)
-		return (0);
-	i = 0;
-	if (exp->parts[0].array)
-		while (exp->parts[0].str[i] != NULL)
-			i += 1;
-	else
-		while (exp->parts[0].str[0][i] != '\0')
-			i += 1;
-	return (i);
-}
-
-/* this function is waaaaaaaaAAAAAAYYYY too long */
-int
-	expand_special(t_expand *exp, char *key)
-{
-	char	*str;
-	long	i;
-
-	// TODO: special parameters
-	i = 0;
-	while (sh()->args[i] != NULL)
-		i += 1;
-	if (expand_special_asterisk(exp, key)
-		|| expand_special_at(exp, key)
-		|| expand_special_sharp(exp, key, i)
-		|| expand_special_qmark(exp, key)
-		|| expand_special_minus(exp, key)
-		|| expand_special_dollar(exp, key)
-		|| expand_special_bang(exp, key)
-		|| expand_special_digit(exp, key, i))
-		return (0);
-	str = sh_getenv(key, NULL);
-	if (str == NULL)
-		return (-1);
-	expansion_add_part(exp, sh_strlst_new(ft_strdup(str)), 0);
-	return (0);
-}
-
-int
-	expand_error(t_param_ctx *ctx, size_t i)
-{
-	char	*str;
-
-	if (((char *) ctx->token->parts[0].data)[i] == '\0')
-		sh_err2(ctx->key, "parameter not set");
-	else
-	{
-		ctx->token->parts[0].data = (char *) ctx->token->parts[0].data + i;
-		str = cm_expand_str(ctx->token, NULL, ' ');
-		ctx->token->parts[0].data = (char *) ctx->token->parts[0].data - i;
-		if (str != NULL)
-			return (-1);
-		sh_err2(ctx->key, str);
-		free(str);
-	}
-	if (!sh()->interactive)
-		exit(EXIT_FAILURE);
-	return (-1);
-}
-
-int
-	expand_assign(t_expand *exp, t_param_ctx *ctx, size_t i)
+	expand_assign(t_expand *exp, t_param_ctx *ctx, size_t i, int mode)
 {
 	char	*str;
 
@@ -124,7 +23,7 @@ int
 		return (-1);
 	}
 	ctx->token->parts[0].data = (char *) ctx->token->parts[0].data + i;
-	str = cm_expand_str(ctx->token, NULL, ' ');
+	str = cm_expand_str(ctx->token, NULL, ' ', mode);
 	ctx->token->parts[0].data = (char *) ctx->token->parts[0].data - i;
 	if (str == NULL)
 		return (-1);
@@ -134,17 +33,19 @@ int
 }
 
 int
-	expand_right(t_expand *exp, t_param_ctx *ctx, size_t i)
+	expand_right(t_expand *exp, t_param_ctx *ctx, size_t i, int mode)
 {
 	t_expand	tmp;
 	int			result;
 
 	ctx->token->parts[0].data = (char *) ctx->token->parts[0].data + i;
-	result = cm_expand_list(&tmp, ctx->token);
+	result = cm_expand_list(&tmp, ctx->token, mode);
 	ctx->token->parts[0].data = (char *) ctx->token->parts[0].data - i;
+	if (result < 0)
+		return (-1);
 	expansion_copy_parts(exp, &tmp);
 	expansion_destroy(&tmp);
-	return (result);
+	return (0);
 }
 
 int
@@ -175,9 +76,9 @@ int
 
 	long_mode = ctx->token->str[ctx->i] == ctx->token->str[ctx->i + 1];
 	info = NULL;
-	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data + ctx->i + long_mode + 1;
-	pattern = cm_expand_str(ctx->token, &info, ' ');
-	ctx->token->parts[0].data = (char*) ctx->token->parts[0].data - ctx->i - long_mode - 1;
+	ctx->token->parts[0].data = (char *) ctx->token->parts[0].data + ctx->i + long_mode + 1;
+	pattern = cm_expand_str(ctx->token, &info, ' ', 1);
+	ctx->token->parts[0].data = (char *) ctx->token->parts[0].data - ctx->i - long_mode - 1;
 	if (pattern == NULL)
 	{
 		expansion_destroy(tmp);
@@ -232,8 +133,16 @@ int
 	return (0);
 }
 
+/* This function literally only calls expansion_destroy.
+	this is meant for norminette*/
+static void
+	ed(t_expand *exp)
+{
+	expansion_destroy(exp);
+}
+
 int
-	expand_subst(t_expand *exp, t_param_ctx *ctx)
+	expand_subst(t_expand *exp, t_param_ctx *ctx, int mode)
 {
 	t_expand	tmp;
 	int			empty;
@@ -248,24 +157,22 @@ int
 	ctx->i += ctx->token->str[ctx->i] == ':';
 	if (ctx->token->str[ctx->i] == '+' && empty
 		&& tmp.count == 1 && tmp.parts[0].array)
-		return (expansion_destroy(&tmp), expansion_add_part(exp, sh_strlst_empty(), 0), 0);
+		return (ed(&tmp), expansion_add_part(exp, sh_strlst_empty(), 0), 0);
 	if ((ctx->token->str[ctx->i] == '-' && !empty)
 		|| (ctx->token->str[ctx->i] == '+' && empty))
 		return (expand_promote(exp, &tmp));
 	expansion_destroy(&tmp);
 	if (ctx->token->str[ctx->i] == '+' || ctx->token->str[ctx->i] == '-')
-		return (expand_right(exp, ctx, ctx->i + 1));
+		return (expand_right(exp, ctx, ctx->i + 1, mode));
 	if (ctx->token->str[ctx->i] == '?')
 		return (expand_error(ctx, ctx->i + 1));
 	if (ctx->token->str[ctx->i] == '=')
-		return (expand_assign(exp, ctx, ctx->i + 1));
+		return (expand_assign(exp, ctx, ctx->i + 1, mode));
 	return (-1);
 }
 
-// TODO: error for invalid pattern
-
 int
-	expand_param(t_expand *exp, t_token *token)
+	expand_param(t_expand *exp, t_token *token, int mode)
 {
 	t_expand	tmp;
 	t_param_ctx	ctx;
@@ -273,7 +180,7 @@ int
 
 	ctx.token = token;
 	if (token->str[0] == '#' && (token->str[1] != '#'
-		|| token->str[2] == '\0'))
+			|| token->str[2] == '\0'))
 	{
 		ctx.i = expand_key_length(token->str + 1) + 1;
 		if (token->str[ctx.i] != '\0')
@@ -288,7 +195,7 @@ int
 	ctx.i = expand_key_length(token->str);
 	ctx.key = ft_strdup(token->str);
 	ctx.key[ctx.i] = '\0';
-	result = expand_subst(exp, &ctx);
+	result = expand_subst(exp, &ctx, mode);
 	free(ctx.key);
 	return (result);
 }

@@ -44,7 +44,6 @@ static t_commandeer_proc
 	return (procs[id]);
 }
 
-/* functions have the wrong return values */
 int
 	commandeer_inner(const t_snode *node, const int io[3])
 {
@@ -64,7 +63,6 @@ int
 	return (!!ret);
 }
 
-/* TODO fork the entire term when it runs in the background */
 int
 	commandeer(const t_snode *node, const int io[3])
 {

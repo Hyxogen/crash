@@ -32,7 +32,7 @@ static void
 	free(list);
 }
 
-/* TODO: maybe this shouldn't exec the .crashrc again? */
+/* ODOT: maybe this shouldn't exec the .crashrc again? */
 
 static int
 	sh_exec(char *name, char **argv)
@@ -72,11 +72,10 @@ int
 	char	*strings[2];
 	int		ret;
 
-	/* TODO: some of this needs to move before builtin check */
 	strings[0] = sh_getenv("PATH", NULL);
 	if (ft_strchr(argv[0], '/') != NULL || strings[0] == NULL)
 		return (sh_exec(argv[0], argv));
-	/* TODO: check if splitting by : is correct */
+	/* ODOT: check if splitting by : is correct */
 	path = ft_split(strings[0], ':');
 	i = 0;
 	while (path[i] != NULL)

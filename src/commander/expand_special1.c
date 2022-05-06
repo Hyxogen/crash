@@ -53,13 +53,26 @@ int
 }
 
 int
-	expand_special_minus(t_expand *exp, char *key)
+	expand_special(t_expand *exp, char *key)
 {
-	if (key[0] == '-')
-	{
-		// ODOT: option flags
-		expansion_add_part(exp, sh_strlst_new(ft_strdup("")), 0);
-		return (1);
-	}
+	char	*str;
+	long	i;
+
+	i = 0;
+	while (sh()->args[i] != NULL)
+		i += 1;
+	if (expand_special_asterisk(exp, key)
+		|| expand_special_at(exp, key)
+		|| expand_special_sharp(exp, key, i)
+		|| expand_special_qmark(exp, key)
+		|| expand_special_minus(exp, key)
+		|| expand_special_dollar(exp, key)
+		|| expand_special_bang(exp, key)
+		|| expand_special_digit(exp, key, i))
+		return (0);
+	str = sh_getenv(key, NULL);
+	if (str == NULL)
+		return (-1);
+	expansion_add_part(exp, sh_strlst_new(ft_strdup(str)), 0);
 	return (0);
 }

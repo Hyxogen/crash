@@ -6,43 +6,67 @@
 #include <libgen.h>
 #include <stdlib.h>
 
-static const t_builtin builtins[] = {
-	{ "exit", sh_exit },
-	{ ".", sh_dot },
-	{ ":", sh_colon },
-	{ "set", sh_set },
-	{ "break", sh_break },
-	{ "export", sh_export },
-	{ "continue", sh_continue },
-	{ "shift", sh_shift },
-	{ "unset", sh_unset_builtin }
-};
+/* technically these are not all builtin utilities, but the minishell */
+/* subject requires that it is implemented within the shell */
+static const t_builtin
+	*get_utilities(void)
+{
+	static const t_builtin utilities[] = {
+		{ "getopts", sh_getopts },
+		{ "echo", sh_echo },
+		{ "cd", sh_cd },
+		{ "pwd", sh_pwd },
+		{ "env", sh_env_builtin },
+		{ "alias", sh_unimplemented },
+		{ "false", sh_false },
+		{ "jobs", sh_unimplemented, },
+		{ "false", sh_true },
+		{ "bg", sh_unimplemented, },
+		{ "fc", sh_unimplemented, },
+		{ "kill", sh_unimplemented, },
+		{ "umask", sh_unimplemented, },
+		{ "cd", sh_unimplemented, },
+		{ "fg", sh_unimplemented, },
+		{ "newgrp", sh_unimplemented, },
+		{ "unalias", sh_unimplemented, },
+		{ "command", sh_unimplemented, },
+		{ "getopts", sh_unimplemented, },
+		{ "read", sh_unimplemented, },
+		{ "wait", sh_unimplemented, },
+	};
 
-static const t_builtin utilities[] = {
-	{ "getopts", sh_getopts },
-	/* technically these are not builtin utilities, but the minishell */
-	/* subject requires that it is implemented within the shell */
-	{ "echo", sh_echo },
-	{ "cd", sh_cd },
-	{ "pwd", sh_pwd },
-	{ "env", sh_env_builtin },
-	{ "alias", sh_unimplemented },
-	{ "false", sh_false },
-	{ "jobs", sh_unimplemented, },
-	{ "false", sh_true },
-	{ "bg", sh_unimplemented, },
-	{ "fc", sh_unimplemented, },
-	{ "kill", sh_unimplemented, },
-	{ "umask", sh_unimplemented, },
-	{ "cd", sh_unimplemented, },
-	{ "fg", sh_unimplemented, },
-	{ "newgrp", sh_unimplemented, },
-	{ "unalias", sh_unimplemented, },
-	{ "command", sh_unimplemented, },
-	{ "getopts", sh_unimplemented, },
-	{ "read", sh_unimplemented, },
-	{ "wait", sh_unimplemented, },
-};
+	return (utilities);
+}
+
+static size_t
+	get_utilities_count(void)
+{
+	return (21);
+}
+
+static const t_builtin
+	*get_builtins(void)
+{
+	const static t_builtin	builtins[] = {
+		{ "exit", sh_exit },
+		{ ".", sh_dot },
+		{ ":", sh_colon },
+		{ "set", sh_set },
+		{ "break", sh_break },
+		{ "export", sh_export },
+		{ "continue", sh_continue },
+		{ "shift", sh_shift },
+		{ "unset", sh_unset_builtin }
+	};
+
+	return (builtins);
+}
+
+static size_t
+	get_builtins_count(void)
+{
+	return (9);
+}
 
 void
 	sh_init(char **argv, char **env)
@@ -52,12 +76,12 @@ void
 	sh_env_init(env);
 	sh()->pwd = sh_getcwd();
 	sh()->self = sh_join_path(sh()->pwd, argv[0]);
-	sh()->builtins = builtins;
-	sh()->builtins_size = sizeof(builtins) / sizeof(builtins[0]);
+	sh()->builtins = get_builtins();
+	sh()->builtins_size = get_builtins_count();
 	sh()->functions = NULL;
 	sh()->functions_size = 0;
-	sh()->utilities = utilities;
-	sh()->utilities_size = sizeof(utilities) / sizeof(utilities[0]);
+	sh()->utilities = get_utilities();
+	sh()->utilities_size = get_utilities_count();
 	sh()->args = sh_strlst_dup(argv);
 	sh()->interactive = 1; // TODO: check if interactive
 	sh()->io[SH_STDIN_INDEX] = STDIN_FILENO;
@@ -65,7 +89,7 @@ void
 	sh()->io[SH_STDERR_INDEX] = STDERR_FILENO;
 	sh()->last_bg_proc = -1;
 	tmp = ft_strdup(argv[0]);
-	sh()->name = basename(tmp); // TODO: can't use basename
+	sh()->name = sh_basename(tmp); // TODO: can't use basename
 	free(tmp);
 	sh_setenv("OPTIND", "1", 0);
 	sh_setenv("PS1", "$ ", 0);

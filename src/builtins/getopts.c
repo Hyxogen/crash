@@ -1,10 +1,10 @@
 #include "minishell.h"
 #include "commander.h"
+#include "memory.h"
 
 #include <stdlib.h>
 
-// TODO: this implementation is incomplete
-// TODO: this implementation does not work
+// ODOT: this implementation is incomplete
 
 static int
 	sh_getopt(char *str, char *key, long *ind, char **args)
@@ -29,7 +29,13 @@ static int
 			*ind += 1;
 			if (*str != ':')
 				return (0);
-			// TODO: too few arguments
+			if (args[*ind] == NULL)
+			{
+				sh_setenv(key, "?", 0);
+				sh_unset("OPTARG");
+				sh_err2("usage", "option requires an argument");
+				return (0);
+			}
 			sh_setenv("OPTARG", args[*ind], 0);
 			str += 1;
 			*ind += 1;
@@ -37,7 +43,9 @@ static int
 		}
 		str += 1;
 	}
-	// TODO: invalid parameter
+	sh_setenv(key, "?", 0);
+	sh_unset("OPTARG");
+	sh_err2("usage", "illegal option");
 	return (0);
 }
 
@@ -45,8 +53,10 @@ int
 	sh_getopts(int argc, char **argv)
 {
 	char	*optind_str;
+	char	**opt_argv;
 	long	optind;
 	int		result;
+	long	i;
 
 	if (argc < 3)
 	{
@@ -54,14 +64,17 @@ int
 		return (2);
 	}
 	optind_str = sh_getenv("OPTIND", "1");
-	if (sh_atol(optind_str, &optind) < 0)
-		optind = 1;
-	// TODO: check optind range
+	if (sh_atol(optind_str, &i) < 0)
+		i = 1;
+	opt_argv = argv + 2;
 	if (argc == 3)
-		result = sh_getopt(argv[1], argv[2], &optind, sh()->args);
-	else
-		result = sh_getopt(argv[1], argv[2], &optind, argv + 2);
-	optind_str = ft_itoa(optind); // TODO: long?
+		opt_argv = sh()->args;
+	optind = 0;
+	while (optind < i && opt_argv[i] != NULL)
+		optind += 1;
+	result = sh_getopt(argv[1], argv[2], &optind, opt_argv);
+	optind_str = sh_safe_malloc(21);
+	sh_ltoa(optind, optind_str, 21);
 	sh_setenv("OPTIND", optind_str, 0);
 	free(optind_str);
 	return (result);

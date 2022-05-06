@@ -21,7 +21,6 @@ void
 {
 	pr->current.id = tk_invalid;
 	pr->next.id = tk_invalid;
-	pr->lexer = NULL;
 	pr->here_docs = NULL;
 }
 

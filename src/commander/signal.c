@@ -19,11 +19,8 @@
 #include <libft.h>
 #include <unistd.h>
 
-
-#include <stdio.h>
-
-extern int rl_done;
-extern void rl_replace_line(const char *text, int clear_undo);
+extern int	rl_done;
+extern void	rl_replace_line(const char *text, int clear_undo);
 
 static void
 	try_reap_all_childs(void)
@@ -145,6 +142,5 @@ void
 	action.sa_flags = SA_NODEFER | SA_RESTART;
 	sh_sigaction(SIGQUIT, &action, NULL);
 	action.sa_handler = sigint_handler;
-	action.sa_flags = SA_RESTART;
 	sh_sigaction(SIGINT, &action, NULL);
 }

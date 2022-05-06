@@ -110,7 +110,7 @@ int
 			moved += local_moved;
 			continue ;
 		}
-		node->chars[(size_t) *(*pattern)] = 0x1;
+		node->chars[(unsigned char) *(*pattern)] = 0x1;
 		*pattern += 1;
 		moved += 1;
 	}

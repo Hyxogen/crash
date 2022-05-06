@@ -92,7 +92,7 @@ static int
 {
 	char	*str;
 
-	str = cm_expand_str(&redi_node->childs[0]->here_content, NULL, ' ');
+	str = cm_expand_str(&redi_node->childs[0]->here_content, NULL, ' ', 0);
 	if (str == NULL)
 		return (-1);
 	sh_dup2(_cm_create_and_write_here(str, redi_node->childs[0]->flags & flag_trim), STDIN_FILENO);

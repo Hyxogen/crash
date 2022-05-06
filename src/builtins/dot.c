@@ -20,6 +20,7 @@ static int
 	char	*old_argv_0;
 	int		ret;
 	int		fd;
+	int		old_interactive;
 
 	if (argc != 2)
 	{
@@ -28,10 +29,12 @@ static int
 		sh()->args = argv;
 		sh()->args[0] = old_args[0];
 	}
-	// TODO: should it be interactive?
 	fd = sh_open(argv[1], O_RDONLY, 0);
 	input_new(&in, in_file, (void *)(unsigned long long) fd);
+	old_interactive = sh()->interactive;
+	sh()->interactive = 0;
 	ret = sh_cm_run(&in);
+	sh()->interactive = old_interactive;
 	input_destroy(&in);
 	sh_close(fd);
 	if (argc != 2)

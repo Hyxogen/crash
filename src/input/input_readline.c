@@ -60,8 +60,10 @@ ssize_t
 		return (-1);
 	}
 	child_reaper_lock();
-	prompt = cm_expand_str(&token, NULL, ' ');
+	prompt = cm_expand_str(&token, NULL, ' ', 0);
 	child_reaper_unlock();
+	if (prompt == NULL)
+		prompt = ft_strdup("$ ");
 	*lp = readline(prompt);
 	free(prompt);
 	if (!*lp)

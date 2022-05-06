@@ -86,7 +86,7 @@ static int
 	char	*str;
 	int		here_read;
 
-	str = cm_expand_str(&redi_node->childs[0]->here_content, NULL, ' ');
+	str = cm_expand_str(&redi_node->childs[0]->here_content, NULL, ' ', 0);
 	if (str == NULL)
 		return (-1);
 	here_read = _cm_create_and_write_here(str, redi_node->childs[0]->flags & flag_trim);

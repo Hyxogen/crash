@@ -27,7 +27,9 @@ COMMANDER_FILES	:= \
 	new_pattern_generate.c function.c init.c redirect_general.c and_or_if.c \
 	return_code.c assignment.c compound_command.c term.c wildcard.c \
 	command_util.c command_internal_exec.c command_redirect.c env_int.c \
-	env_util.c expand_special1.c expand_special2.c
+	env_util.c expand_special1.c expand_special2.c expand_param_util.c \
+	expand_arith_tok.c expand_arith_bin_init1.c expand_arith_bin_init2.c \
+	expand_arith_optok_init.c expand_arith_unary.c
 ARITH_FILES		:= \
 	arith_plus.c arith_minus.c arith_modulo.c arith_divide.c arith_multiply.c \
 	arith_ternary.c arith_shift.c arith_inequality.c arith_equality.c \
@@ -38,7 +40,7 @@ BUILTINS_FILES	:= \
 	getopts.c cd.c pwd.c unset.c env.c true.c false.c unimplemented.c
 UTIL_FILES		:= \
 	die.c memory.c op.c util.c wrap.c strlst.c err.c atol.c file.c ltoa.c \
-	wrap2.c wrap3.c termios.c stringlst.c
+	wrap2.c wrap3.c termios.c stringlst.c basename.c
 
 FILE_NAMES		:= \
 	$(BASE_FILES) \

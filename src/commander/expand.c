@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 int
-	expand_part(t_expand *exp, const t_tpart *part)
+	expand_part(t_expand *exp, const t_tpart *part, int mode)
 {
 	size_t	i;
 	int		tmp;
@@ -20,7 +20,7 @@ int
 	else if (part->id == lx_backtick)
 		tmp = expand_backtick(exp, part->data);
 	else if (part->id == lx_parameter)
-		tmp = expand_param(exp, part->data);
+		tmp = expand_param(exp, part->data, mode);
 	else
 		tmp = expand_arith(exp, part->data);
 	while (tmp == 0 && i < exp->count)
@@ -32,8 +32,7 @@ int
 	return (tmp);
 }
 
-// TODO: NOTE: if this has to be refactored for norminette then we might as well do it properly by storing the length instead of using reallog with ft_strlen
-// TODO: NOTE: also if maybe `int *quote` should be a char instead to save space for massive environment variables
+// ODOT: maybe `int *quote` should be a char instead to save space for massive environment variables
 
 void
 	expand_add(t_stringlst *lst, int *new, int tmp, int quot)
@@ -139,29 +138,96 @@ void
 	}
 }
 
-// TODO: check -1 when called
+void
+	expand_tilde(t_epart *part, int first, int last, int ass)
+{
+	char		*str;
+	char		*tmp;
+	t_stringlst	lst;
+	const char	*home;
+
+	if (!part->normal || part->quote || part->tilde_expanded)
+		return ;
+	part->tilde_expanded = 1;
+	sh_stringlst_begin(&lst);
+	sh_stringlst_add_string(&lst);
+	str = *part->str;
+	while (*str != '\0')
+	{
+		if (*str == '~' && first)
+		{
+			tmp = str;
+			while (*tmp != '\0' && *tmp != '/' && (*tmp != ':' || !ass))
+				tmp += 1;
+			if ((*tmp == '\0' && !last) || tmp != str + 1)
+			{
+				while (str < tmp)
+				{
+					sh_stringlst_add_char(&lst, *str, 0);
+					str += 1;
+				}
+			}
+			else
+			{
+				home = sh_getenv("HOME", "~");
+				while (*home != '\0')
+				{
+					sh_stringlst_add_char(&lst, *home, 0);
+					home += 1;
+				}
+				str = tmp;
+			}
+		}
+		while ((*str != ':' || !ass) && *str != '\0')
+		{
+			sh_stringlst_add_char(&lst, *str, 0);
+			str += 1;
+		}
+		if (*str == ':' && ass)
+		{
+			sh_stringlst_add_char(&lst, *str, 0);
+			str += 1;
+		}
+		first = 1;
+	}
+	sh_strlst_clear(part->str);
+	sh_stringlst_end(&lst, &part->str, NULL);
+}
+
 int
-	cm_expand_list(t_expand *exp, const t_token *token)
+	cm_expand_list(t_expand *exp, const t_token *token, int mode)
 {
 	size_t	i;
+	int		tmp;
 
 	expansion_init(exp);
 	i = 0;
 	while (i < token->count)
 	{
-		if (expand_part(exp, &token->parts[i]) < 0)
+		tmp = mode;
+		if (token->parts[i].quote)
+			tmp = 0;
+		if (expand_part(exp, &token->parts[i], tmp) < 0)
 		{
 			expansion_destroy(exp);
 			return (-1);
 		}
 		i += 1;
 	}
+	if (mode)
+	{
+		i = 0;
+		while (i < exp->count)
+		{
+			expand_tilde(&exp->parts[i], i == 0, i == exp->count - 1, mode == 2);
+			i += 1;
+		}
+	}
 	return (0);
 }
 
-// TODO: check null when called
 char
-	*cm_expand_str(const t_token *token, int **quote, int ch)
+	*cm_expand_str(const t_token *token, int **quote, int ch, int mode)
 {
 	t_expand	exp;
 	t_stringlst	lst;
@@ -170,7 +236,7 @@ char
 	int			**info;
 	char		*result0;
 
-	if (cm_expand_list(&exp, token) < 0)
+	if (cm_expand_list(&exp, token, mode) < 0)
 		return (NULL);
 	sh_stringlst_begin(&lst);
 	sh_stringlst_add_string(&lst);
@@ -192,16 +258,14 @@ char
 	return (result0);
 }
 
-// TODO: check null when called
-// TODO: tilde expansion and wildcards
 char
-	**cm_expand(const t_token *token, int ***quotes)
+	**cm_expand(const t_token *token, int ***quotes, int mode)
 {
 	t_expand	exp;
 	char		**fields;
 	t_stringlst	lst;
 
-	if (cm_expand_list(&exp, token) < 0)
+	if (cm_expand_list(&exp, token, mode) < 0)
 		return (NULL);
 	sh_stringlst_begin(&lst);
 	expand_collate(&exp, &lst);

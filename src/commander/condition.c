@@ -56,7 +56,7 @@ static int
 	t_pattern_node	*pattern;
 
 	escape_info = NULL;
-	rhs_str = cm_expand_str(tok, &escape_info, ' ');
+	rhs_str = cm_expand_str(tok, &escape_info, ' ', 1);
 	if (rhs_str == NULL)
 		return (-1);
 	pattern = pattern_compile(rhs_str, escape_info);
@@ -102,7 +102,7 @@ pid_t
 
 	sh_assert(node->type == sx_case_clause);
 	clauses = node->childs_size - 1;
-	lhs = cm_expand_str(&node->token, NULL, ' ');
+	lhs = cm_expand_str(&node->token, NULL, ' ', 1);
 	if (!lhs)
 		return (cm_convert_retcode(1));
 	command_setup_internal_redirects(node->childs[node->childs_size - 1],

@@ -23,6 +23,10 @@
 #  define SH_RETCODE_SIGNALLED_OFFSET 128
 # endif
 
+#define SH_BINARY_OP_COUNT 30
+#define SH_UNARY_OP_COUNT 4
+#define SH_OP_TOK_COUNT 35
+
 enum e_associativity {
 	ass_left,
 	ass_right
@@ -88,7 +92,7 @@ typedef struct s_pattern_node	t_pattern_node;
 typedef struct s_arith_token	t_arith_token;
 typedef struct s_arith_lexer	t_arith_lexer;
 typedef struct s_arith_parser	t_arith_parser;
-typedef struct s_arith_operator	t_arith_operator;
+typedef struct s_arith_operator	t_arith_op;
 typedef struct s_arith_optok	t_arith_optok;
 typedef struct s_arith_value	t_arith_value;
 
@@ -109,6 +113,7 @@ struct s_epart {
 	int		quote;
 	int		normal;
 	int		array;
+	int		tilde_expanded;
 };
 
 struct s_expand {
@@ -146,6 +151,7 @@ struct s_arith_parser {
 	t_arith_token	next;
 	int				error;
 	int				is_fake;
+	int				recursion_level;
 };
 
 struct s_arith_operator {
@@ -201,10 +207,10 @@ int				_cm_get_redi_flags(t_syntax_id type);
 int				_cm_create_and_write_here(const char *str, int skip_leading_tabs);
 int				_cm_setup_process_redirects(const t_snode *redi_list);
 int				_cm_setup_builtin_redirects(const t_snode *redi_list, int io[3]);
-int				cm_expand_list(t_expand *exp, const t_token *token);
-char			**cm_expand(const t_token *token, int ***quote);
-char			*cm_expand_str(const t_token *token, int **quote, int ch);
-int				expand_param(t_expand *exp, t_token *token);
+int				cm_expand_list(t_expand *exp, const t_token *token, int mode);
+char			**cm_expand(const t_token *token, int ***quote, int mode);
+char			*cm_expand_str(const t_token *token, int **quote, int ch, int mode);
+int				expand_param(t_expand *exp, t_token *token, int mode);
 int				expand_command(t_expand *exp, t_snode *node);
 int				expand_backtick(t_expand *exp, char *str);
 int				expand_arith(t_expand *exp, t_token *token);
@@ -216,6 +222,11 @@ int				expand_special_minus(t_expand *exp, char *key);
 int				expand_special_dollar(t_expand *exp, char *key);
 int				expand_special_bang(t_expand *exp, char *key);
 int				expand_special_digit(t_expand *exp, char *key, long i);
+size_t			expand_key_length(const char *param);
+int				expand_empty(t_expand *exp, int empty_is_null);
+size_t			expand_length(t_expand *exp);
+int				expand_error(t_param_ctx *ctx, size_t i);
+int				expand_special(t_expand *exp, char *key);
 
 pid_t			cm_unimplemented_cmd_command(const t_snode *node, const int io[3]);
 
@@ -278,42 +289,97 @@ pid_t			find_and_execute_function(const t_snode *command,
 pid_t			find_and_execute_utility(const t_snode *command,
 					char **argv, const int io[SH_STDIO_SIZE]);
 
-long			arith_plus(const char *str, long lhs, long rhs, long c);
-long			arith_plus_eq(const char *str, long rhs, long b, long c);
-long			arith_minus(const char *str, long lhs, long rhs, long c);
-long			arith_minus_eq(const char *str, long lhs, long rhs, long c);
-long			arith_decrement(const char *str, long a, long b, long c);
-long			arith_modulo(const char *str, long dividend, long divisor, long c);
-long			arith_modulo_eq(const char *str, long lhs, long rhs, long c);
-long			arith_multiple_eq(const char *str, long lhs, long rhs, long c);
-long			arith_multiply(const char *str, long lhs, long rhs, long c);
-long			arith_multiple_eq(const char *str, long lhs, long rhs, long c);
-long			arith_divide(const char *str, long dividend, long divisor, long c);
-long			arith_divide_eq(const char *str, long lhs, long rhs, long c);
-long			arith_ternary(const char *str, long lhs, long rhs, long super_rhs);
-long			arith_shift_left(const char *ptr, long lhs, long rhs, long c);
-long			arith_shift_left_eq(const char *str, long lhs, long rhs, long c);
-long			arith_shift_right(const char *ptr, long lhs, long rhs, long c);
-long			arith_shift_right_eq(const char *str, long lhs, long rhs, long c);
-long			arith_less_than(const char *str, long lhs, long rhs, long c);
-long			arith_less_than_or_eq(const char *str, long lhs, long rhs, long c);
-long			arith_greater_than(const char *str, long lhs, long rhs, long c);
-long			arith_greater_than_or_eq(const char *str, long lhs, long rhs, long c);
-long			arith_equal(const char *str, long lhs, long rhs, long c);
-long			arith_not_equal(const char *str, long lhs, long rhs, long c);
-long			arith_bitwise_or(const char *ptr, long lhs, long rhs, long c);
-long			arith_bitwise_and(const char *ptr, long lhs, long rhs, long c);
-long			arith_bitwise_xor(const char *ptr, long lhs, long rhs, long c);
-long			arith_bitwise_or_eq(const char *str, long lhs, long rhs, long c);
-long			arith_bitwise_and_eq(const char *str, long lhs, long rhs, long c);
-long			arith_bitwise_xor_eq(const char *str, long lhs, long rhs, long c);
-long			arith_logical_and(const char *str, long lhs, long rhs, long c);
-long			arith_logical_or(const char *str, long lhs, long rhs, long c);
-long			arith_identity(const char *str, long lhs, long b, long c);
-long			arith_negate(const char *str, long lhs, long b, long c);
-long			arith_logical_not(const char *str, long lhs, long b, long c);
-long			arith_bitwise_not(const char *str, long lhs, long b, long c);
-long			arith_assign(const char *str, long old_value, long value, long c);
+t_arith_op		*get_binary_operators(void);
+t_arith_optok	*get_operator_tokens(void);
+t_arith_op		*get_unary_operators(void);
+void			arith_binary_init1(void);
+void			arith_binary_init2(void);
+void			arith_binary_init3(void);
+void			arith_binary_init4(void);
+void			arith_binary_init5(void);
+void			arith_binary_init6(void);
+void			arith_binary_init(void);
+void			arith_optok_init(void);
+void			arith_init(void);
+t_arith_op		*arith_get_unary_op(t_arith_token_id id);
+long			arith_plus(const char *str,
+					long lhs, long rhs, long c);
+long			arith_plus_eq(const char *str,
+					long rhs, long b, long c);
+long			arith_minus(const char *str,
+					long lhs, long rhs, long c);
+long			arith_minus_eq(const char *str,
+					long lhs, long rhs, long c);
+long			arith_decrement(const char *str,
+					long a, long b, long c);
+long			arith_modulo(const char *str,
+					long dividend, long divisor, long c);
+long			arith_modulo_eq(const char *str,
+					long lhs, long rhs, long c);
+long			arith_multiple_eq(const char *str,
+					long lhs, long rhs, long c);
+long			arith_multiply(const char *str,
+					long lhs, long rhs, long c);
+long			arith_multiple_eq(const char *str,
+					long lhs, long rhs, long c);
+long			arith_divide(const char *str,
+					long dividend, long divisor, long c);
+long			arith_divide_eq(const char *str,
+					long lhs, long rhs, long c);
+long			arith_ternary(const char *str,
+					long lhs, long rhs, long super_rhs);
+long			arith_shift_left(const char *ptr,
+					long lhs, long rhs, long c);
+long			arith_shift_left_eq(const char *str,
+					long lhs, long rhs, long c);
+long			arith_shift_right(const char *ptr,
+					long lhs, long rhs, long c);
+long			arith_shift_right_eq(const char *str,
+					long lhs, long rhs, long c);
+long			arith_less_than(const char *str,
+					long lhs, long rhs, long c);
+long			arith_less_than_or_eq(const char *str,
+					long lhs, long rhs, long c);
+long			arith_greater_than(const char *str,
+					long lhs, long rhs, long c);
+long			arith_greater_than_or_eq(const char *str,
+					long lhs, long rhs, long c);
+long			arith_equal(const char *str,
+					long lhs, long rhs, long c);
+long			arith_not_equal(const char *str,
+					long lhs, long rhs, long c);
+long			arith_bitwise_or(const char *ptr,
+					long lhs, long rhs, long c);
+long			arith_bitwise_and(const char *ptr,
+					long lhs, long rhs, long c);
+long			arith_bitwise_xor(const char *ptr,
+					long lhs, long rhs, long c);
+long			arith_bitwise_or_eq(const char *str,
+					long lhs, long rhs, long c);
+long			arith_bitwise_and_eq(const char *str,
+					long lhs, long rhs, long c);
+long			arith_bitwise_xor_eq(const char *str,
+					long lhs, long rhs, long c);
+long			arith_logical_and(const char *str,
+					long lhs, long rhs, long c);
+long			arith_logical_or(const char *str,
+					long lhs, long rhs, long c);
+long			arith_identity(const char *str,
+					long lhs, long b, long c);
+long			arith_negate(const char *str,
+					long lhs, long b, long c);
+long			arith_logical_not(const char *str,
+					long lhs, long b, long c);
+long			arith_bitwise_not(const char *str,
+					long lhs, long b, long c);
+long			arith_assign(const char *str,
+					long old_value, long value, long c);
+t_arith_value	arith_parse_binary(t_arith_parser *pr,
+					t_arith_value lhs, int min_prec);
+t_arith_value	arith_parse_unary(t_arith_parser *pr);
+int				arith_lex(t_arith_lexer *lex, t_arith_token *tok);
+long			expand_arith_str(const char *str,
+					int *error, int recursion_level);
 
 void			cm_wildcard(const char *path, int *info, char ***out);
 char			**cm_wildcard_expand(const t_token *token);

@@ -3,8 +3,8 @@
 #include <string.h>
 #include <errno.h>
 
-/* TODO: CDPATH environment variable */
-/* TODO: maybe PWD and OLDPWD environment variables */
+/* ODOT: CDPATH environment variable */
+/* ODOT: maybe PWD and OLDPWD environment variables */
 
 int
 	sh_cd(int argc, char **argv)

@@ -28,6 +28,7 @@ void
 	int			fd;
 	const char	*home;
 	char		*rc;
+	int			old_interactive;
 
 	home = sh_getenv("HOME", NULL);
 	if (home != NULL)
@@ -37,7 +38,10 @@ void
 		if (fd >= 0)
 		{
 			input_new(&in, in_file, (void*)(unsigned long long) fd);
+			old_interactive = sh()->interactive;
+			sh()->interactive = 0;
 			sh_cm_run(&in);
+			sh()->interactive = old_interactive;
 			input_destroy(&in);
 			close(fd);
 		}

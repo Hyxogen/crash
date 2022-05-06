@@ -29,7 +29,7 @@ int
 	i = 0;
 	while (i < ass_list->childs_size)
 	{
-		tmp = cm_expand_str(&ass_list->childs[i]->token, NULL, ' ');
+		tmp = cm_expand_str(&ass_list->childs[i]->token, NULL, ' ', 2);
 		if (tmp == NULL)
 		{
 			sh_env_clean();

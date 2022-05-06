@@ -31,7 +31,6 @@ void
 {
 	lex->prev = NULL;
 	lex->id = lx_normal;
-	lex->src = NULL;
 	lex->tok = NULL;
 	lex->btick = 0;
 	lex->quote = 0;

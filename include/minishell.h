@@ -92,6 +92,7 @@
  * don't export invalid identifiers
  * shell flags (set -)
  * remove globals according to the subject/norminette
+ * fix segfault for `echo "` keyboard interrupt in unclosed string literal
  */
 # define SH_ENV_EXPORT 1
 # define SH_ENV_READONLY 2
@@ -235,6 +236,8 @@ void		sh_check(int test, const char *s);
 void		sh_abort(void);
 void		sh_nop(void *ptr);
 void		sh_nop1(void);
+
+char		*sh_basename(char *str);
 
 pid_t		sh_fork(void);
 int			sh_execve(const char *path, char *const argv[], char *const envp[]);
