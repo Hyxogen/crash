@@ -61,8 +61,7 @@ static int
 		ret = execve(sh()->self, argv2, envp);
 		sh_free_list(argv2);
 	}
-	sh_free_list(envp);
-	return (ret);
+	return (sh_free_list(envp), ret);
 }
 
 int
