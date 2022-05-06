@@ -25,7 +25,7 @@
 static t_commandeer_proc
 	get_commandeer_proc(t_syntax_id id)
 {
-	static t_commandeer_proc procs[46];
+	static t_commandeer_proc	procs[46];
 
 	procs[sx_list] = commandeer_inner;
 	procs[sx_term] = commandeer_inner;
