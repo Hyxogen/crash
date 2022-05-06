@@ -22,10 +22,11 @@ PARSER_FILES	:= \
 COMMANDER_FILES	:= \
 	commander.c execvp.c pipe_sequence.c env.c redirect_process.c signal.c \
 	redirect_builtin.c run.c condition.c loop.c \
-	new_command.c expansion.c expand.c expand_param.c expand_command.c \
+	command.c expansion.c expand.c expand_param.c expand_command.c \
 	expand_arith.c new_pattern.c new_pattern_brackets.c new_pattern_class.c \
 	new_pattern_generate.c function.c init.c redirect_general.c and_or_if.c \
-	return_code.c assignment.c compound_command.c term.c wildcard.c
+	return_code.c assignment.c compound_command.c term.c wildcard.c \
+	command_util.c command_internal_exec.c command_redirect.c
 ARITH_FILES		:= \
 	arith_plus.c arith_minus.c arith_modulo.c arith_divide.c arith_multiply.c \
 	arith_ternary.c arith_shift.c arith_inequality.c arith_equality.c \

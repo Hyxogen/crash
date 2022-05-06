@@ -244,6 +244,32 @@ void			pattern_debug_print_chain(t_pattern_node *head);
 t_envvar		*_do_assignment(const char *ass, int is_tmp);
 int				_do_assignments(const t_snode *ass_list, int is_tmp);
 
+void			handle_execvp_error(const char *name, int error);
+char			**command_get_arguments(const t_snode *command);
+void			handle_execvp_error(const char *name, int error);
+int				command_should_execute(const t_snode *command);
+int				get_argument_count(char *const *argv);
+int				close_nostd_fd(int fd);
+void			close_or_dup2_fd(int fromfd, int tofd);
+int				command_setup_internal_redirects(const t_snode *redirect_list,
+					const int io[SH_STDIO_SIZE], int old_io[SH_STDIO_SIZE]);
+int				command_setup_external_redirects(const t_snode *redirect_list,
+					const int io[SH_STDIO_SIZE]);
+int				command_restore_internal_redirects(const int io[SH_STDIO_SIZE],
+					const int old_io[SH_STDIO_SIZE]);
+pid_t			execute_builtin(const t_snode *command,
+					const t_builtin *function, char **argv,
+					const int io[SH_STDIO_SIZE]);
+pid_t			execute_function(const t_snode *command,
+					const t_function *function, char **argv,
+					const int io[SH_STDIO_SIZE]);
+pid_t			find_and_execute_builtin(const t_snode *command,
+					char **argv, const int io[SH_STDIO_SIZE]);
+pid_t			find_and_execute_function(const t_snode *command,
+					char **argv, const int io[SH_STDIO_SIZE]);
+pid_t			find_and_execute_utility(const t_snode *command,
+					char **argv, const int io[SH_STDIO_SIZE]);
+
 long			arith_plus(const char *str, long lhs, long rhs, long c);
 long			arith_plus_eq(const char *str, long rhs, long b, long c);
 long			arith_minus(const char *str, long lhs, long rhs, long c);
