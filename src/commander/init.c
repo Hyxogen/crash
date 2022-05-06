@@ -63,6 +63,7 @@ void
 	sh()->io[SH_STDIN_INDEX] = STDIN_FILENO;
 	sh()->io[SH_STDOUT_INDEX] = STDOUT_FILENO;
 	sh()->io[SH_STDERR_INDEX] = STDERR_FILENO;
+	sh()->last_bg_proc = -1;
 	tmp = ft_strdup(argv[0]);
 	sh()->name = basename(tmp); // TODO: can't use basename
 	free(tmp);
