@@ -92,6 +92,7 @@
  * shell flags (set -)
  * remove globals according to the subject/norminette
  * "" permission denied
+ * first argument of shell scripts
  */
 # define SH_ENV_EXPORT 1
 # define SH_ENV_READONLY 2

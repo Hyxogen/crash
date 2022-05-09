@@ -15,7 +15,7 @@ long
 	long	difference;
 
 	(void) c;
-	difference = lhs + rhs;
+	difference = lhs - rhs;
 	sh_ltoa(difference, difference_str, 32);
 	sh_setenv(str, difference_str, 0);
 	return (difference);
