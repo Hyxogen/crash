@@ -70,6 +70,7 @@ int
 	}
 	else if (sh_has_term(STDIN_FILENO) == 1)
 	{
+		disable_kill_signals();
 		run_start_scripts();
 		rl_clear_history();
 		input_new(&in, in_readline, NULL);
@@ -77,7 +78,6 @@ int
 		sh()->interactive = 0;
 		input_new(&in, in_file, (void *) (unsigned long long) STDIN_FILENO);
 	}
-	disable_kill_signals();
 	sh_cm_run(&in);
 	input_destroy(&in);
 	sh_destroy();
