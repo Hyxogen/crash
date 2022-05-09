@@ -61,3 +61,10 @@ int
 		return (O_RDWR | O_TRUNC | O_CREAT);
 	return (0);
 }
+
+/* This functions only exists for norminette */
+/* It just calls _cm_get_redi_flags */
+int fl(t_syntax_id type)
+{
+	return (_cm_get_redi_flags(type));
+}

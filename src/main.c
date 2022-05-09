@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <libgen.h>
 
-extern void rl_clear_history(void);
+extern void	rl_clear_history(void);
 
 void
 	run_start_scripts(void)
@@ -39,7 +39,7 @@ void
 		fd = open(rc, O_RDONLY);
 		if (fd >= 0)
 		{
-			input_new(&in, in_file, (void*)(unsigned long long) fd);
+			input_new(&in, in_file, (void *)(unsigned long long) fd);
 			old_interactive = sh()->interactive;
 			sh()->interactive = 0;
 			sh_cm_run(&in);
@@ -73,11 +73,10 @@ int
 		run_start_scripts();
 		rl_clear_history();
 		input_new(&in, in_readline, NULL);
-	} else {
-		input_new(&in, in_file, (void *) (unsigned long long) STDIN_FILENO);
 	}
+	else
+		input_new(&in, in_file, (void *)(unsigned long long) STDIN_FILENO);
 	sh_cm_run(&in);
 	input_destroy(&in);
-	sh_destroy();
-	return (EXIT_SUCCESS);
+	return (sh_destroy(), EXIT_SUCCESS);
 }

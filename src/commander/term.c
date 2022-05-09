@@ -14,10 +14,11 @@ int
 		pid = sh_fork();
 		if (pid == 0)
 		{
-			ft_fprintf(sh()->io[SH_STDOUT_INDEX], "%s: %d\n", sh()->name, getpid());
+			ft_fprintf(sh()->io[SH_STDOUT_INDEX],
+				"%s: %d\n", sh()->name, getpid());
 			exit(commandeer_inner(node, io));
 		}
-	  sh()->last_bg_proc = pid;
+		sh()->last_bg_proc = pid;
 		return (EXIT_SUCCESS);
 	}
 	return (commandeer_inner(node, io));

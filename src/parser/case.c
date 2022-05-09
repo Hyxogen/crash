@@ -12,11 +12,11 @@
 
 #include "parser.h"
 
+/* should_array may be any value, it is only meant for norminette */
 int
-	pr_case_item(t_parser *pr, t_snode *parent)
+	pr_case_item(t_parser *pr, t_snode *parent, int should_error)
 {
 	t_token	token;
-	int		should_error;
 
 	token_init(&token);
 	should_error = pr_token(pr, NULL, sx_none, op_lparen);
@@ -34,15 +34,13 @@ int
 		{
 			while (pr_token(pr, NULL, sx_none, tk_newline))
 				continue ;
-			token_destroy(&token);
-			return (1);
+			return (token_destroy(&token), 1);
 		}
 		should_error = 1;
 	}
 	if (should_error)
 		pr->lexer->error = SH_PR_UNEXTOKEN;
-	token_destroy(&token);
-	return (0);
+	return (token_destroy(&token), 0);
 }
 
 int
@@ -62,7 +60,7 @@ int
 		{
 			while (pr_token(pr, NULL, sx_none, tk_newline))
 				continue ;
-			while (pr_case_item(pr, node))
+			while (pr_case_item(pr, node, 0))
 				continue ;
 			if (pr_error_token(pr, NULL, sx_none, kw_esac))
 			{

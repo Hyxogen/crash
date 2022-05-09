@@ -41,6 +41,18 @@ int
 	return (lex.error || lex.src->cur != -1);
 }
 
+static char
+	*get_prompt(t_input *in)
+{
+	char		*prompt;
+
+	if (in->more)
+		prompt = sh_getenv("PS2", "");
+	else
+		prompt = sh_getenv("PS1", "");
+	return (prompt);
+}
+
 ssize_t
 	_input_readline_line_proc(t_input *in, char **lp)
 {
@@ -49,10 +61,7 @@ ssize_t
 
 	if (sh()->restart)
 		return (0);
-	if (in->more)
-		prompt = sh_getenv("PS2", "");
-	else
-		prompt = sh_getenv("PS1", "");
+	prompt = get_prompt(in);
 	if (_input_readline_lex(prompt, &token))
 	{
 		*lp = NULL;

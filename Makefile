@@ -20,8 +20,8 @@ PARSER_FILES	:= \
 	function.c general.c io.c list.c loop.c node_int.c node.c other.c \
 	pipe.c redirect.c separator.c subshell.c die.c error.c global.c
 COMMANDER_FILES	:= \
-	commander.c execvp.c pipe_sequence.c env.c redirect_process.c signal.c \
-	redirect_builtin.c run.c condition.c loop.c \
+	commander.c execvp.c pipe_sequence.c env.c redirect_process1.c signal.c \
+	redirect_builtin1.c redirect_builtin2.c run.c condition.c loop.c \
 	command.c expansion.c expand.c expand_param.c expand_command.c \
 	expand_arith.c new_pattern.c new_pattern_brackets.c new_pattern_class.c \
 	new_pattern_generate.c function.c init.c redirect_general.c and_or_if.c \
@@ -31,7 +31,7 @@ COMMANDER_FILES	:= \
 	expand_arith_tok.c expand_arith_bin_init1.c expand_arith_bin_init2.c \
 	expand_arith_optok_init.c expand_arith_unary.c expand_arith_bin1.c \
 	expand_arith_lex.c builtins.c pipe_sequence_rec.c pipe_sequence_command.c \
-	wait.c word_list.c expand_arith_bin2.c
+	wait.c word_list.c expand_arith_bin2.c redirect_process2.c
 ARITH_FILES		:= \
 	arith_plus.c arith_minus.c arith_modulo.c arith_divide.c arith_multiply.c \
 	arith_ternary.c arith_shift.c arith_inequality.c arith_equality.c \

@@ -3,8 +3,6 @@
 #include "memory.h"
 #include <libft.h>
 
-
-#include <stdio.h>
 /**
  * Processes something called a collating symbols, which is (as far as I
  * understand) something to be handled as one character even though it

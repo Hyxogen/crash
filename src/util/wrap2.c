@@ -5,9 +5,6 @@
 #include <sys/wait.h>
 #include <ft_printf.h>
 
-
-#include <stdio.h>
-
 int
 	sh_waitpid(pid_t pid, int *stat_loc, int options)
 {
@@ -24,10 +21,6 @@ int
 	int	ret;
 
 	ret = close(fildes);
-	if (ret < 0)
-	{
-		fprintf(stderr, "failed to close fd %d\n", fildes);
-	}
 	sh_check(ret >= 0, "close");
 	sh_fdctl(fildes, SH_FD_FIOCLEX, 0);
 	return (ret);

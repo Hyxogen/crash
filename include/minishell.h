@@ -78,14 +78,13 @@
  * Substitution failure is not an error
  */
 
-/* ODOT:
+/* MAYBE ODOT:
  * break in pipe sequence
  * errors for unclosed stuff
  * ! in PS1
  */
 
-/*
- * FOR SURE TODO:
+/* FOR SURE TODO:
  * handle all the shell variables
  * return value of lex_main is rarely checked
  * disable SIGINT and SIGQUIT ignoring for internal commands
@@ -216,6 +215,7 @@ struct s_minishell
 	int					restart;
 	pid_t				last_bg_proc;
 	int					is_subshell;
+	int					clobber;
 };
 
 char				*sh_join2(const char *lhs, char delim, const char *rhs);

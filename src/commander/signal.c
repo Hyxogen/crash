@@ -60,7 +60,7 @@ static void
 void
 	setup_default_signal_handlers(void)
 {
-	struct sigaction action;
+	struct sigaction	action;
 
 	sigemptyset(&action.sa_mask);
 	action.sa_handler = SIG_DFL;
@@ -71,7 +71,7 @@ void
 void
 	disable_kill_signals(void)
 {
-	struct sigaction action;
+	struct sigaction	action;
 
 	sigemptyset(&action.sa_mask);
 	action.sa_handler = SIG_IGN;

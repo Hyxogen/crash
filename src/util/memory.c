@@ -14,9 +14,6 @@
 #include <libft.h>
 #include <stdlib.h>
 
-
-#include <stdio.h>
-
 void
 	*sh_safe_malloc(size_t size)
 {

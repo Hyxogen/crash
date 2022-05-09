@@ -4,7 +4,8 @@
 #include <stdio.h>
 
 static int
-	execute_for_body(const t_snode *fornode, char *name, char **list, const int io[SH_STDIO_SIZE])
+	execute_for_body(const t_snode *fornode,
+		char *name, char **list, const int io[SH_STDIO_SIZE])
 {
 	t_snode	*do_node;
 	int		rc;
@@ -38,7 +39,8 @@ pid_t
 	rc = 0;
 	name = fornode->token.str;
 	list = cm_word_list_to_array(fornode->childs[0]);
-	command_setup_internal_redirects(fornode->childs[fornode->childs_size - 1], io, old_io);
+	command_setup_internal_redirects(fornode->childs[fornode->childs_size - 1],
+		io, old_io);
 	rc = execute_for_body(fornode, name, list, sh()->io);
 	sh()->loop_depth -= 1;
 	sh_strlst_clear(list);
@@ -55,7 +57,8 @@ pid_t
 	sh()->loop_depth += 1;
 	rc = -1;
 	sh_assert(node->childs_size >= 3);
-	command_setup_internal_redirects(node->childs[node->childs_size - 1], io, old_io);
+	command_setup_internal_redirects(node->childs[node->childs_size - 1],
+		io, old_io);
 	while (!commandeer(node->childs[0], sh()->io) == !(node->flags & flag_until)
 		&& !sh()->breaking)
 	{

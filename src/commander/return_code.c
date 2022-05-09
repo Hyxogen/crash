@@ -22,4 +22,3 @@ int
 {
 	return (-(return_code + 1));
 }
-

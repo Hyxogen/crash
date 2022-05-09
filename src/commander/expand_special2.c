@@ -2,12 +2,12 @@
 
 #include <unistd.h>
 
+// ODOT: option flags
 int
 	expand_special_minus(t_expand *exp, char *key)
 {
 	if (key[0] == '-')
 	{
-		// ODOT: option flags
 		expansion_add_part(exp, sh_strlst_new(ft_strdup("")), 0);
 		return (1);
 	}

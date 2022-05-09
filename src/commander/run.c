@@ -117,6 +117,5 @@ int
 	try_reap_all_childs();
 	src_destroy(&src);
 	pr_destroy(&pr);
-	// TODO: errors?
 	return (0);
 }

@@ -269,7 +269,7 @@ static t_snode
 	return (child);
 }
 
-// TODO: remove or normalize
+/* TODO: remove or normalize */
 int
 	main(int argc, char **argv, char **envp)
 {

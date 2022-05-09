@@ -148,8 +148,7 @@ int
 		if (!lex->btick)
 			token_add_part(lex, lx_backtick, lex->quote);
 		lex->new_part = lex->btick;
-		lex->btick = !lex->btick;
-		return (1);
+		return (lex->btick = !lex->btick, 1);
 	}
 	return (0);
 }

@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-/* NOTE implement if we ever wish to do so. We decided we couldn't really be bothered */
+/* NOTE implement if we ever wish to do so. */
+/* We decided we couldn't really be bothered */
 static int
 	_is_binary(const char *filen)
 {
@@ -12,15 +13,17 @@ static int
 	return (0);
 }
 
+/* Norm array contents */
+/* 0: ret */
+/* 1: fd */
+/* 2: old_interactive */
 static int
 	_dot_run(int argc, char **argv)
 {
 	t_input	in;
 	char	**old_args;
 	char	*old_argv_0;
-	int		ret;
-	int		fd;
-	int		old_interactive;
+	int		norm[3];
 
 	if (argc != 2)
 	{
@@ -29,20 +32,19 @@ static int
 		sh()->args = argv;
 		sh()->args[0] = old_args[0];
 	}
-	fd = sh_open(argv[1], O_RDONLY, 0);
-	input_new(&in, in_file, (void *)(unsigned long long) fd);
-	old_interactive = sh()->interactive;
+	norm[1] = sh_open(argv[1], O_RDONLY, 0);
+	input_new(&in, in_file, (void *)(unsigned long long) norm[1]);
+	norm[2] = sh()->interactive;
 	sh()->interactive = 0;
-	ret = sh_cm_run(&in);
-	sh()->interactive = old_interactive;
+	norm[0] = sh_cm_run(&in);
+	sh()->interactive = norm[2];
 	input_destroy(&in);
-	sh_close(fd);
+	sh_close(norm[1]);
 	if (argc != 2)
-	{
 		argv[0] = old_argv_0;
+	if (argc != 2)
 		sh()->args = old_args;
-	}
-	return (ret);
+	return (norm[0]);
 }
 
 int

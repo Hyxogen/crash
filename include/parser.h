@@ -129,7 +129,7 @@ int			pr_error_token(t_parser *pr, t_snode *parent, t_syntax_id syn_id,
 				t_token_id tk_id);
 
 int			pr_and_or(t_parser *pr, t_snode *parent);
-int			pr_case_item(t_parser *pr, t_snode *parent);
+int			pr_case_item(t_parser *pr, t_snode *parent, int should_error);
 void		pr_case_list(t_parser *pr, t_snode *parent);
 int			pr_case_clause(t_parser *pr, t_snode *parent);
 int			pr_cmd_prefix(t_parser *pr, t_snode *red, t_snode *ass,

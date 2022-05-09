@@ -225,6 +225,16 @@ int				command_setup_internal_redirects(const t_snode *redirect_list,
 					const int io[SH_STDIO_SIZE], int old_io[SH_STDIO_SIZE]);
 
 int				_cm_get_redi_flags(t_syntax_id type);
+int				_cm_redi_get_from_index(const t_snode *redi_node);
+int				_cm_redi_get_from(const t_snode *redi_node);
+int				_cm_setup_builtin_redirects(const t_snode *redi_list,
+					int io[3]);
+int				_cm_handle_builtin_redi_node_noerr(const t_snode *node,
+					char *filen, int io[3]);
+int				_cm_handle_process_node_noerr(const t_snode *node, char *filen);
+/* This functions only exists for norminette */
+/* It just calls _cm_get_redi_flags */
+int				fl(t_syntax_id type);
 int				_cm_create_and_write_here(const char *str,
 					int skip_leading_tabs);
 int				_cm_setup_process_redirects(const t_snode *redi_list);

@@ -31,6 +31,7 @@ int
 	return (1);
 }
 
+/* NOTE: Line 42 (token_init) Can prob be removed */
 int
 	pr_io_redirect(t_parser *pr, t_snode *parent)
 {
@@ -38,7 +39,7 @@ int
 
 	if (pr->current.id == tk_invalid)
 		return (0);
-	token_init(&token); /* NOTE: Can prob be removed */
+	token_init(&token);
 	if (pr->current.id == tk_ionumber)
 	{
 		token_move(&token, &pr->current);

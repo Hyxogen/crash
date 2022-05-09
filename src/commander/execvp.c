@@ -64,6 +64,7 @@ static int
 	return (sh_free_list(envp), ret);
 }
 
+/* ODOT: check if splitting by : is correct */
 int
 	sh_execvp(char **argv)
 {
@@ -75,7 +76,6 @@ int
 	strings[0] = sh_getenv("PATH", NULL);
 	if (ft_strchr(argv[0], '/') != NULL || strings[0] == NULL)
 		return (sh_exec(argv[0], argv));
-	/* ODOT: check if splitting by : is correct */
 	path = ft_split(strings[0], ':');
 	i = 0;
 	while (path[i] != NULL)

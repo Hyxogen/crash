@@ -19,14 +19,12 @@ int
 	else if (argc >= 3)
 	{
 		sh_err2("continue", "too many arguments");
-		sh()->breaking = sh()->loop_depth;
-		return (1);
+		return (sh()->breaking = sh()->loop_depth, 1);
 	}
 	else if (sh_atol(argv[1], &count) < 0)
 	{
 		sh_err2("continue", "numeric argument required");
-		sh()->breaking = INT_MAX;
-		return (1);
+		return (sh()->breaking = INT_MAX, 1);
 	}
 	if (count > sh()->loop_depth)
 		count = sh()->loop_depth;

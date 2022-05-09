@@ -3,10 +3,6 @@
 #include <sys/ioctl.h>
 #include <errno.h>
 
-
-#include <stdio.h>
-#include <string.h>
-
 void
 	sh_get_term_attr(t_mega_termios *attr)
 {

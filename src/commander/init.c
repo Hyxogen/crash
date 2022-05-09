@@ -28,6 +28,7 @@ void
 	sh()->io[SH_STDERR_INDEX] = STDERR_FILENO;
 	sh()->last_bg_proc = -1;
 	sh()->is_subshell = 0;
+	sh()->clobber = 0;
 	tmp = ft_strdup(argv[0]);
 	sh()->name = sh_basename(tmp);
 	free(tmp);
