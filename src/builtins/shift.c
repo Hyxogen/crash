@@ -1,12 +1,15 @@
 #include "commander.h"
 #include "minishell.h"
 
+#include <stdlib.h>
+
 static void
 	sh_shift_once(void)
 {
 	long	i;
 
 	i = 1;
+	free(sh()->args[i]);
 	while (sh()->args[i] != NULL)
 	{
 		sh()->args[i] = sh()->args[i + 1];

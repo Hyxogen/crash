@@ -40,9 +40,13 @@ void
 {
 	if (!node)
 		return ;
-	if (node->type != sx_invalid)
-		node_destroy_childs(node);
-	token_destroy(&node->token);
-	token_destroy(&node->here_content);
-	free(node);
+	node->refcount -= 1;
+	if (node->refcount == 0)
+	{
+		if (node->type != sx_invalid)
+			node_destroy_childs(node);
+		token_destroy(&node->token);
+		token_destroy(&node->here_content);
+		free(node);
+	}
 }

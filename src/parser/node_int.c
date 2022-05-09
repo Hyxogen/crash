@@ -31,6 +31,7 @@ t_snode
 	node->childs_capacity = 0;
 	node->childs_size = 0;
 	node->flags = 0;
+	node->refcount = 1;
 	token_init(&node->token);
 	token_init(&node->here_content);
 	return (node);

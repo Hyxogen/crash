@@ -13,9 +13,6 @@
 #include "parser.h"
 #include <stdlib.h>
 
-
-#include <stdio.h>
-
 int
 	pr_convert_io_number(t_parser *pr, t_token *token)
 {

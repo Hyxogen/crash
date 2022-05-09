@@ -14,6 +14,7 @@ static int
 	int	result_fd;
 
 	result_fd = sh_open(filen, flags, mode);
+	sh_fdctl(result_fd, SH_FD_FIOCLEX, 1);
 	return (result_fd);
 }
 
@@ -73,7 +74,7 @@ static int
 		return (io[io_index] = -1, 0);
 	target_fd = ft_atol(word);
 	if (target_fd < 0 || target_fd >= INT_MAX)
-		return (sh_err1("invalid file descriptor")), -1;
+		return ((sh_err1("invalid file descriptor")), -1);
 	if (target_fd >= SH_STDERR_INDEX)
 		return (0);
 	io[io_index] = target_fd;

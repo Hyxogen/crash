@@ -90,8 +90,8 @@ void
 		entry->body = NULL;
 		sh()->functions_size += 1;
 	}
-	/* TODO free previous entry */
+	free(entry->key);
 	entry->key = ft_strdup(key);
-	entry->body = sh_safe_malloc(sizeof(*body));
-	node_move(entry->body, body);
+	entry->body = body;
+	body->refcount += 1;
 }

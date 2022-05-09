@@ -58,9 +58,7 @@ ssize_t
 		*lp = NULL;
 		return (-1);
 	}
-	child_reaper_lock();
 	prompt = cm_expand_str(&token, NULL, ' ', 0);
-	child_reaper_unlock();
 	token_destroy(&token);
 	if (prompt == NULL)
 		prompt = ft_strdup("$ ");

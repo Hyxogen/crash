@@ -51,8 +51,8 @@ static int
  * Moved and ch only exist because of norminette, it doesn't matter
  * what the value is
  */
-/* TODO check a pattern like [0-9 (yes no closing bracket) */
-/* ODOT Error when something goes wrong (return 0) */
+/* ODOT: check a pattern like [0-9 (yes no closing bracket) */
+/* ODOT: Error when something goes wrong (return 0) */
 static int
 	_pattern_process_collating_range(char **ptn, t_pattern_node *n,
 		int moved, char ch)
@@ -84,7 +84,7 @@ static int
 	return (0);
 }
 
-/* TODO make all pattern functions return size_t instead of int */
+/* ODOT: make all pattern functions return size_t instead of int */
 /**
  * Moved and local_moved only exist because of norminette, it doesn't matter
  * what the value is

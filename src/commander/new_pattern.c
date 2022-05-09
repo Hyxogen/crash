@@ -15,7 +15,7 @@ static int
 	return (!!node->chars[(t_byte) ch]);
 }
 
-/* TODO rename node->infinite to something more appropriate */
+/* ODOT: rename node->infinite to something more appropriate */
 void
 	pattern_debug_print_node(t_pattern_node *node)
 {

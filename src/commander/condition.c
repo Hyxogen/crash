@@ -4,6 +4,7 @@
 #include "memory.h"
 #include <libft.h>
 #include <string.h>
+#include <stdlib.h>
 
 static pid_t
 	cm_elif_clause(const t_snode *node, const int io[3])

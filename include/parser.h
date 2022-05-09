@@ -103,6 +103,7 @@ struct s_snode
 	t_token			token;
 	t_token			here_content;
 	int				flags;
+	size_t			refcount;
 };
 
 const char	**pr_get_keywords(void);

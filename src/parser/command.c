@@ -13,9 +13,6 @@
 #include "parser.h"
 #include <stdlib.h>
 
-
-#include <stdio.h>
-
 int
 	pr_compound_cmd(t_parser *pr, t_snode *parent)
 {
@@ -56,7 +53,8 @@ int
 		return (0);
 	if (pr_list(pr, parent))
 	{
-		if (pr->next.id == tk_invalid) {
+		if (pr->next.id == tk_invalid)
+		{
 			return (1);
 		}
 	}

@@ -41,17 +41,26 @@ size_t
 	expand_length(t_expand *exp)
 {
 	size_t	i;
+	int		c;
+	size_t	n;
 
 	if (exp->count == 0)
 		return (0);
 	i = 0;
+	n = 0;
 	if (exp->parts[0].array)
-		while (exp->parts[0].str[i] != NULL)
-			i += 1;
+		while (exp->parts[0].str[n] != NULL)
+			n += 1;
 	else
+	{
 		while (exp->parts[0].str[0][i] != '\0')
+		{
+			c = exp->parts[0].str[0][i];
+			n += ((c & 0x80) == 0 || (c & 0xC0) == 0xC0);
 			i += 1;
-	return (i);
+		}
+	}
+	return (n);
 }
 
 int

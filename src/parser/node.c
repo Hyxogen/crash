@@ -42,7 +42,5 @@ void
 	if (dest == src)
 		return ;
 	ft_memcpy(dest, src, sizeof(*src));
-	token_init(&src->token);
-	token_init(&src->here_content);
-	src->type = sx_invalid;
+	node_init(src, sx_invalid);
 }

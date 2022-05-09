@@ -78,10 +78,11 @@
  * Substitution failure is not an error
  */
 
-// MAYBE TODO:
-// break in pipe sequence
-// errors for unclosed stuff
-// ! in PS1
+/* ODOT:
+ * break in pipe sequence
+ * errors for unclosed stuff
+ * ! in PS1
+ */
 
 /*
  * FOR SURE TODO:
@@ -91,6 +92,7 @@
  * don't export invalid identifiers
  * shell flags (set -)
  * remove globals according to the subject/norminette
+ * "" permission denied
  */
 # define SH_ENV_EXPORT 1
 # define SH_ENV_READONLY 2

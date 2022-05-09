@@ -76,12 +76,10 @@ int
 
 	if (!pipe_seq_should_execute(pipe_seq))
 		return (0);
-	child_reaper_lock();
 	if (pipe_seq->childs_size == 1)
 		return_code = execute_single_command_pipe_seq(pipe_seq, io);
 	else
 		return_code = execute_multi_command_pipe_seq(pipe_seq, io);
-	child_reaper_unlock();
 	sh()->return_code = return_code;
 	return (return_code);
 }

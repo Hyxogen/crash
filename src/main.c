@@ -58,7 +58,6 @@ int
 	int			fd;
 
 	sh_init(argv, envp);
-	enable_signal_child_reaper_handler();
 	if (argc >= 2)
 	{
 		fd = open(argv[1], O_RDONLY);

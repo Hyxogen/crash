@@ -257,11 +257,7 @@ pid_t			cm_unimplemented_cmd_command(const t_snode *node,
 
 char			**cm_word_list_to_array(const t_snode *word_list);
 
-int				child_reaper_lock(void);
-int				child_reaper_unlock(void);
 void			try_reap_all_childs(void);
-void			disable_signal_child_reaper_handler(void);
-void			enable_signal_child_reaper_handler(void);
 
 int				status_code_to_return_code(int status_code);
 int				internal_pid_to_return_code(pid_t command_pid);

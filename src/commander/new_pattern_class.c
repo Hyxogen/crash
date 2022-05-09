@@ -55,7 +55,7 @@ int
 	return (0);
 }
 
-/* TODO rename */
+/* ODOT: rename */
 static void
 	_enable_chars(t_pattern_node *node, int (*isfunc)(int))
 {
