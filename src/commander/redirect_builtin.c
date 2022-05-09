@@ -138,6 +138,7 @@ static int
 	_cm_handle_redi_node(const t_snode *redi_node, int io[3])
 {
 	char	**filen;
+	int		return_code;
 
 	if (redi_node->childs_size == 0)
 		return (sh_err1("no file specified"), -1);
@@ -146,8 +147,13 @@ static int
 	if (!filen)
 		return (-1);
 	if (!*filen || *(filen + 1))
+	{
+		sh_strlst_clear(filen);
 		return (sh_err1("ambigious redirect"), -1);
-	return (_cm_handle_redi_node_noerr(redi_node, *filen, io));
+	}
+	return_code = _cm_handle_redi_node_noerr(redi_node, *filen, io);
+	sh_strlst_clear(filen);
+	return (return_code);
 }
 
 int
