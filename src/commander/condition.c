@@ -112,5 +112,6 @@ pid_t
 		io, old_io);
 	rc = execute_case_clause(node, lhs, clauses);
 	command_restore_internal_redirects(io, old_io);
+	free(lhs);
 	return (cm_convert_retcode(rc));
 }

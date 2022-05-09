@@ -144,7 +144,7 @@ case "abc" in
 
 
 case "abc" in
-	[?[b-z][A-Z]?]) TODO Make this kind of test!
+	[?[b-z][A-Z]?]) #TODO Make this kind of test!
 		echo Spy around here
 		;;
 	[[:graph:]][a-z][?*c]*)
