@@ -16,8 +16,8 @@ void
 	t_string	*last;
 
 	lst->strings = sh_safe_reallog(lst->strings,
-		sizeof(*lst->strings) * (lst->size + 0),
-		sizeof(*lst->strings) * (lst->size + 1));
+			sizeof(*lst->strings) * (lst->size + 0),
+			sizeof(*lst->strings) * (lst->size + 1));
 	last = &lst->strings[lst->size];
 	last->str = sh_safe_malloc(1);
 	last->str[0] = '\0';
@@ -34,11 +34,11 @@ void
 
 	last = &lst->strings[lst->size - 1];
 	last->str = sh_safe_reallog(last->str,
-		last->size + 1,
-		last->size + 2);
+			last->size + 1,
+			last->size + 2);
 	last->info = sh_safe_reallog(last->info,
-		sizeof(*last->info) * (last->size + 1),
-		sizeof(*last->info) * (last->size + 2));
+			sizeof(*last->info) * (last->size + 1),
+			sizeof(*last->info) * (last->size + 2));
 	last->str[last->size] = ch;
 	last->info[last->size] = info;
 	last->size += 1;

@@ -87,30 +87,32 @@ void
 	}
 }
 
+/* I'm sorry for the variable names but norminette */
+/* didn't like the readable version of this function */
 void
-	expand_collate(t_expand *exp, t_stringlst *lst)
+	expand_collate(t_expand *e, t_stringlst *l)
 {
-	char	*ifs;
-	int		new;
+	char	*f;
+	int		n;
 	size_t	i;
 	size_t	j;
 
-	ifs = sh_getenv("IFS", " \t\n");
-	new = 2;
+	f = sh_getenv("IFS", " \t\n");
+	n = 2;
 	i = 0;
-	while (i < exp->count)
+	while (i < e->count)
 	{
 		j = 0;
-		while (exp->parts[i].str[j] != NULL)
+		while (e->parts[i].str[j] != NULL)
 		{
 			if (j > 0)
-				new = 2;
-			if (exp->parts[i].quote)
-				expand_add(lst, &new, '\0', exp->parts[i].quote);
-			if (exp->parts[i].quote || exp->parts[i].normal)
-				expand_add_str(lst, &new, exp->parts[i].str[j], exp->parts[i].quote);
+				n = 2;
+			if (e->parts[i].quote)
+				expand_add(l, &n, '\0', e->parts[i].quote);
+			if (e->parts[i].quote || e->parts[i].normal)
+				expand_add_str(l, &n, e->parts[i].str[j], e->parts[i].quote);
 			else
-				expand_split(lst, &new, exp->parts[i].str[j], ifs, exp->parts[i].quote);
+				expand_split(l, &n, e->parts[i].str[j], f, e->parts[i].quote);
 			j += 1;
 		}
 		i += 1;

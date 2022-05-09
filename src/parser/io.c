@@ -32,8 +32,8 @@ void
 }
 
 int
-	pr_check_here(t_parser *pr)
 {
+	pr_check_here(t_parser *pr)
 	if (pr->current.id == tk_newline
 		&& ft_lstsize(pr->here_docs))
 	{
@@ -54,7 +54,6 @@ int
 		|| pr_token(pr, parent, sx_lessgreat, op_lessgreat)
 		|| pr_token(pr, parent, sx_clobber, op_clobber))
 	{
-		token_destroy(&parent->childs[parent->childs_size - 1]->token);
 		parent->childs[parent->childs_size - 1]->token.id = tk_invalid;
 		if (pr_error_token(pr, parent->childs[parent->childs_size - 1],
 				sx_filename, tk_word))

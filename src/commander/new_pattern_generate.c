@@ -36,14 +36,16 @@ static void
 static void
 	_pattern_enable_all(t_pattern_node *node)
 {
-	ft_memset(&node->chars[0], 0xff, sizeof(node->chars) / sizeof(node->chars[0]));
+	ft_memset(&node->chars[0],
+		0xff,
+		sizeof(node->chars) / sizeof(node->chars[0]));
 }
 
 static void
 	_pattern_generate_body(char **pattern, int **info, t_pattern_node *current)
 {
 	if (*(*info) & SH_PATTERN_ESCAPED)
-		current->chars[(unsigned char) *(*pattern)] = 0x1;
+		current->chars[(t_byte) *(*pattern)] = 0x1;
 	else if (*(*pattern) == '[')
 	{
 		*info += _pattern_process_brackets(pattern, current, 0, 0);
@@ -61,7 +63,7 @@ static void
 		current->wildcard = 1;
 	}
 	else
-		current->chars[(unsigned char) *(*pattern)] = 0x1;
+		current->chars[(t_byte) *(*pattern)] = 0x1;
 	*pattern += 1;
 	*info += 1;
 }

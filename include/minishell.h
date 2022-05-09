@@ -112,6 +112,7 @@ typedef struct s_string			t_string;
 typedef struct s_stringlst		t_stringlst;
 /* return code should be: -return_code - 1 */
 typedef int						(*t_builtin_proc)(int argc, char **argv);
+typedef unsigned char			t_byte;
 
 # ifndef OPEN_MAX
 #  define OPEN_MAX 1024
@@ -215,97 +216,106 @@ struct s_minishell
 	int					is_subshell;
 };
 
-char		*sh_join2(const char *lhs, char delim, const char *rhs);
-void		sh_split2(char *str, char delim, char **lhs, char **rhs);
-char		*sh_join_path(char *lhs, char *rhs);
+char				*sh_join2(const char *lhs, char delim, const char *rhs);
+void				sh_split2(char *str, char delim, char **lhs, char **rhs);
+char				*sh_join_path(char *lhs, char *rhs);
 
-t_envvar	*sh_setenv_int(const char *key);
-t_envvar	*sh_getenv_int(const char *key, int create);
-char		*sh_getenv(const char *key, const char *def);
-t_envvar	*sh_setenv(const char *key, const char *value, int tmp);
-void		sh_unset(const char *key);
-char		**sh_env(void);
-void		sh_env_clean(void);
-void		sh_env_init(char **env);
-void		sh_env_destroy(void);
+t_envvar			*sh_setenv_int(const char *key);
+t_envvar			*sh_getenv_int(const char *key, int create);
+char				*sh_getenv(const char *key, const char *def);
+t_envvar			*sh_setenv(const char *key, const char *value, int tmp);
+void				sh_unset(const char *key);
+char				**sh_env(void);
+void				sh_env_clean(void);
+void				sh_env_init(char **env);
+void				sh_env_destroy(void);
 
-void		pr_debug(void);
-void		sh_assert_impl(int test);
-void		sh_check(int test, const char *s);
-void		sh_abort(void);
-void		sh_nop(void *ptr);
-void		sh_nop1(void);
+void				pr_debug(void);
+void				sh_assert_impl(int test);
+void				sh_check(int test, const char *s);
+void				sh_abort(void);
+void				sh_nop(void *ptr);
+void				sh_nop1(void);
 
-char		*sh_basename(char *str);
+char				*sh_basename(char *str);
 
-pid_t		sh_fork(void);
-int			sh_execve(const char *path, char *const argv[], char *const envp[]);
-int			sh_waitpid(pid_t pid, int *stat_loc, int options);
-int			sh_pipe(int fildes[2]);
-int			sh_dup2(int fildes, int fildes2);
-int			sh_dup(int fildes);
-int			sh_close(int fildes);
-int			sh_open(const char *path, int oflag, mode_t mode);
-int			sh_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
-ssize_t		sh_write(int fildes, const void *buf, size_t nbyte);
-int			sh_chdir(const char *path);
-char		*sh_getcwd(void);
+pid_t				sh_fork(void);
+int					sh_execve(const char *path,
+						char *const argv[], char *const envp[]);
+int					sh_waitpid(pid_t pid, int *stat_loc, int options);
+int					sh_pipe(int fildes[2]);
+int					sh_dup2(int fildes, int fildes2);
+int					sh_dup(int fildes);
+int					sh_close(int fildes);
+int					sh_open(const char *path, int oflag, mode_t mode);
+int					sh_sigaction(int sig, const struct sigaction *act,
+						struct sigaction *oact);
+ssize_t				sh_write(int fildes, const void *buf, size_t nbyte);
+int					sh_chdir(const char *path);
+char				*sh_getcwd(void);
 
-int			sh_exists(const char *filen);
-void		sh_strlst_clear(char **strs);
-char		*sh_strlst_join(char **strs, int delim);
-char		**sh_strlst_new(char *str);
-char		**sh_strlst_empty(void);
-char		**sh_strlst_dup(char **strs);
+int					sh_exists(const char *filen);
+void				sh_strlst_clear(char **strs);
+char				*sh_strlst_join(char **strs, int delim);
+char				**sh_strlst_new(char *str);
+char				**sh_strlst_empty(void);
+char				**sh_strlst_dup(char **strs);
 
-void		sh_stringlst_begin(t_stringlst *lst);
-void		sh_stringlst_add_string(t_stringlst *lst);
-void		sh_stringlst_add_char(t_stringlst *lst, int ch, t_strinfo info);
-void		sh_stringlst_end(t_stringlst *lst, char ***string, t_strinfo ***info);
+void				sh_stringlst_begin(t_stringlst *lst);
+void				sh_stringlst_add_string(t_stringlst *lst);
+void				sh_stringlst_add_char(t_stringlst *lst,
+						int ch, t_strinfo info);
+void				sh_stringlst_end(t_stringlst *lst,
+						char ***string, t_strinfo ***info);
 
-int			sh_echo(int argc, char **argv);
-int			sh_exit(int argc, char **argv);
-int			sh_dot(int argc, char **argv);
-int			sh_colon(int argc, char **argv);
-int			sh_set(int argc, char **argv);
-int			sh_break(int argc, char **argv);
-int			sh_continue(int argc, char **argv);
-int			sh_export(int argc, char **argv);
-int			sh_shift(int argc, char **argv);
-int			sh_getopts(int argc, char **argv);
-int			sh_cd(int argc, char **argv);
-int			sh_pwd(int argc, char **argv);
-int			sh_unimplemented(int argc, char **argv);
-int			sh_true(int argc, char **argv);
-int			sh_false(int argc, char **argv);
-int			sh_unset_builtin(int argc, char **argv);
-int			sh_env_builtin(int argc, char **argv);
+const t_builtin		*get_utilities(void);
+size_t				get_utilities_count(void);
+const t_builtin		*get_builtins(void);
+size_t				get_builtins_count(void);
 
-void		sh_backtrace(int count);
-int			sh_atol(const char *str, long *v);
-int			sh_arith_atol(const char *str, long *v);
-void		sh_ltoa(long value, char *str, size_t len);
+int					sh_echo(int argc, char **argv);
+int					sh_exit(int argc, char **argv);
+int					sh_dot(int argc, char **argv);
+int					sh_colon(int argc, char **argv);
+int					sh_set(int argc, char **argv);
+int					sh_break(int argc, char **argv);
+int					sh_continue(int argc, char **argv);
+int					sh_export(int argc, char **argv);
+int					sh_shift(int argc, char **argv);
+int					sh_getopts(int argc, char **argv);
+int					sh_cd(int argc, char **argv);
+int					sh_pwd(int argc, char **argv);
+int					sh_unimplemented(int argc, char **argv);
+int					sh_true(int argc, char **argv);
+int					sh_false(int argc, char **argv);
+int					sh_unset_builtin(int argc, char **argv);
+int					sh_env_builtin(int argc, char **argv);
 
-t_minishell	*sh(void);
-void		sh_err1(const char *s1);
-void		sh_err2(const char *s1, const char *s2);
-void		sh_err3(const char *s1, const char *s2, const char *s3);
+void				sh_backtrace(int count);
+int					sh_atol(const char *str, long *v);
+int					sh_arith_atol(const char *str, long *v);
+void				sh_ltoa(long value, char *str, size_t len);
 
-void		sh_init(char **argv, char **env);
-void		sh_destroy(void);
-void		sh_add_function(const char *key, t_snode *body);
+t_minishell			*sh(void);
+void				sh_err1(const char *s1);
+void				sh_err2(const char *s1, const char *s2);
+void				sh_err3(const char *s1, const char *s2, const char *s3);
 
-void		sh_fdctl(int fd, int flag, int on);
-void		sh_fd_before_exec(void);
+void				sh_init(char **argv, char **env);
+void				sh_destroy(void);
+void				sh_add_function(const char *key, t_snode *body);
 
-void		history_append(const char *line);
-const char	*history_get_last_command(void);
-void		history_new_command(void);
+void				sh_fdctl(int fd, int flag, int on);
+void				sh_fd_before_exec(void);
 
-void		setup_default_signal_handlers(void);
-void		disable_kill_signals(void);
+void				history_append(const char *line);
+const char			*history_get_last_command(void);
+void				history_new_command(void);
 
-void		sh_get_term_attr(t_mega_termios *attr);
-void		sh_set_term_attr(t_mega_termios *attr);
-int			sh_has_term(int fd);
+void				setup_default_signal_handlers(void);
+void				disable_kill_signals(void);
+
+void				sh_get_term_attr(t_mega_termios *attr);
+void				sh_set_term_attr(t_mega_termios *attr);
+int					sh_has_term(int fd);
 #endif

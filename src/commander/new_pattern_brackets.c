@@ -22,20 +22,20 @@ static int
 	}
 	if (*(*pattern) == '-')
 	{
-		node->chars[(unsigned char) *(*pattern)] = 0x1;
+		node->chars[(t_byte) *(*pattern)] = 0x1;
 		*pattern += 1;
 		moved += 1;
 	}
 	return (moved);
 }
 
+/* if (*(*pattern + 1) == '.') */
+/* 	return (_pattern_process_collating_class(pattern, node)); */
 static int
 	_pattern_process_class(char **pattern, t_pattern_node *node)
 {
 	if (*(*pattern) == '[')
 	{
-		// if (*(*pattern + 1) == '.')
-		// 	return (_pattern_process_collating_class(pattern, node));
 		if (*(*pattern + 1) == '=')
 			return (_pattern_process_equivalence_class(pattern, node));
 		else if (*(*pattern + 1) == ':')
@@ -52,30 +52,32 @@ static int
  * what the value is
  */
 /* TODO check a pattern like [0-9 (yes no closing bracket) */
+/* ODOT Error when something goes wrong (return 0) */
 static int
-	_pattern_process_collating_range(char **pattern, t_pattern_node *node, int moved, char ch)
+	_pattern_process_collating_range(char **ptn, t_pattern_node *n,
+		int moved, char ch)
 {
-	moved = _pattern_process_collating_class(pattern, node, &ch);
+	moved = _pattern_process_collating_class(ptn, n, &ch);
 	if (moved)
 	{
-		if (*(*pattern) == '-' && *(*pattern + 1) && *(*pattern) != ']')
+		if (*(*ptn) == '-' && *(*ptn + 1) && *(*ptn) != ']')
 		{
-			if (ch > *(*pattern + 1)) /* TODO error or something */
+			if (ch > *(*ptn + 1))
 				return (0);
-			ft_memset(&node->chars[(unsigned char) ch], 0x1, *(*pattern + 1) - ch);
+			ft_memset(&n->chars[(t_byte) ch], 0x1, *(*ptn + 1) - ch);
 			moved += 2;
-			*pattern += 2;
+			*ptn += 2;
 		}
 		return (moved);
 	}
-	if (*(*pattern) && *(*pattern + 1) == '-' && *(*pattern + 2))
+	if (*(*ptn) && *(*ptn + 1) == '-' && *(*ptn + 2))
 	{
-		if (*(*pattern + 2) != ']')
+		if (*(*ptn + 2) != ']')
 		{
-			if (*(*pattern) > *(*pattern + 2)) /* TODO error or something */
+			if (*(*ptn) > *(*ptn + 2))
 				return (0);
-			ft_memset(&node->chars[(unsigned char) *(*pattern)], 0x1, *(*pattern + 2) - *(*pattern));
-			*pattern += 3;
+			ft_memset(&n->chars[(t_byte) *(*ptn)], 0x1, *(*ptn + 2) - *(*ptn));
+			*ptn += 3;
 			return (moved + 3);
 		}
 	}
@@ -88,7 +90,8 @@ static int
  * what the value is
  */
 int
-	_pattern_process_brackets(char **pattern, t_pattern_node *node, int moved, int local_moved)
+	_pattern_process_brackets(char **pattern, t_pattern_node *node,
+		int moved, int local_moved)
 {
 	moved = _pattern_process_brackets_start(pattern, node);
 	while (*(*pattern))
@@ -110,7 +113,7 @@ int
 			moved += local_moved;
 			continue ;
 		}
-		node->chars[(unsigned char) *(*pattern)] = 0x1;
+		node->chars[(t_byte) *(*pattern)] = 0x1;
 		*pattern += 1;
 		moved += 1;
 	}

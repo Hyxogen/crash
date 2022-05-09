@@ -17,10 +17,8 @@
 void
 	pr_destroy(t_parser *pr)
 {
-	if (pr->current.id != tk_invalid)
-		token_destroy(&pr->current);
-	if (pr->next.id != tk_invalid)
-		token_destroy(&pr->next);
+	token_destroy(&pr->current);
+	token_destroy(&pr->next);
 }
 
 void
@@ -44,9 +42,7 @@ void
 		return ;
 	if (node->type != sx_invalid)
 		node_destroy_childs(node);
-	if (node->type != sx_invalid && node->token.id != tk_invalid)
-		token_destroy(&node->token);
-	if (node->type != sx_invalid && node->here_content.id != tk_invalid)
-		token_destroy(&node->here_content);
+	token_destroy(&node->token);
+	token_destroy(&node->here_content);
 	free(node);
 }

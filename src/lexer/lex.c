@@ -72,7 +72,6 @@ int
 	lex->new_part = 1;
 	lex_skip(lex);
 	lex->tok = tok;
-	token_init(tok);
 	if (lex->src->cur == '\n')
 	{
 		tok->id = tk_newline;
@@ -82,10 +81,7 @@ int
 	if (lex->src->cur == -1)
 	{
 		if (lex->id == lx_command)
-		{
-			token_destroy(tok);
 			return (-1);
-		}
 		return (0);
 	}
 	return (lex_lex_int(lex, tok));

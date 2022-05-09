@@ -12,6 +12,7 @@
 
 #include "lexer.h"
 #include "parser.h"
+#include "minishell.h"
 #include <stdlib.h>
 
 void
@@ -50,10 +51,14 @@ void
 void
 	token_move(t_token *dst, t_token *src)
 {
+	token_destroy(dst);
 	*dst = *src;
-	src->id = tk_invalid;
-	src->parts = NULL;
-	src->count = 0;
-	src->str = NULL;
-	src->len = 0;
+	token_init(src);
+}
+
+void
+	src_destroy(t_source *src)
+{
+	free(src->str);
+	ft_lstclear(&src->lst, sh_nop);
 }

@@ -53,9 +53,8 @@ int
 
 	rl_catch_signals = 1;
 	rl_event_hook = sh_nop1;
-	src_init(&src, in);
-	lex_init(&lex);
 	pr_init(&pr);
+	src_init(&src, in);
 	lex.src = &src;
 	pr.lexer = &lex;
 	std_io[SH_STDIN_INDEX] = STDIN_FILENO;
@@ -65,12 +64,12 @@ int
 	arith_init();
 	while (1)
 	{
+		src_destroy(&src);
+		pr_destroy(&pr);
 		src_init(&src, in);
 		lex_init(&lex);
 		pr_init(&pr);
 		sh_new_command(in, &pr);
-		if (pr.current.id != tk_invalid)
-			token_destroy(&pr.current);
 		pr_next_token(&pr);
 		if (pr.current.id == tk_null && sh()->interactive)
 			ft_putstr_fd("exit\n", STDERR_FILENO);
@@ -90,6 +89,7 @@ int
 		if (pr.lexer->error || lex.quote != 0 || lex.btick != 0)
 		{
 			sh_err1("syntax error");
+			node_destroy(node);
 			continue ;
 		}
 		sh_get_term_attr(&term_attr);
@@ -98,6 +98,7 @@ int
 		sh_set_term_attr(&term_attr);
 		node_destroy(node);
 	}
+	src_destroy(&src);
 	pr_destroy(&pr);
 	// TODO: errors?
 	return (0);

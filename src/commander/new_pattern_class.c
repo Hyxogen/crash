@@ -19,7 +19,8 @@
  * This function must be called with the pattern starting with: [.
  */
 int
-	_pattern_process_collating_class(char **pattern, t_pattern_node *node, char *ch)
+	_pattern_process_collating_class(char **pattern, t_pattern_node *node,
+			char *ch)
 {
 	if (*(*pattern + 1)
 		&& *(*pattern + 2)
@@ -47,7 +48,7 @@ int
 		&& *(*(pattern) + 3) == '='
 		&& *(*(pattern) + 4) == ']')
 	{
-		node->chars[(size_t) *(*pattern + 2)] = 0x1;
+		node->chars[(t_byte) *(*pattern + 2)] = 0x1;
 		*pattern += 5;
 		return (5);
 	}

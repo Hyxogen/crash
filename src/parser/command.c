@@ -31,7 +31,8 @@ int
 			|| pr_case_clause(pr, parent))
 		{
 			if (!pr_redirect_list(pr, parent->childs[parent->childs_size - 1]))
-				node_add_child(parent->childs[parent->childs_size - 1], snode(sx_io_redirect_list));
+				node_add_child(parent->childs[parent->childs_size - 1],
+					snode(sx_io_redirect_list));
 			return (1);
 		}
 	}
@@ -74,7 +75,6 @@ int
 		pr_next_token(pr);
 	while (pr_complete_cmd(pr, node))
 	{
-		token_destroy(&pr->current);
 		pr_next_token(pr);
 		while (pr->current.id == tk_newline)
 			pr_next_token(pr);

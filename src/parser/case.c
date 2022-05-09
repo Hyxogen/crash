@@ -18,6 +18,7 @@ int
 	t_token	token;
 	int		should_error;
 
+	token_init(&token);
 	should_error = pr_token(pr, NULL, sx_none, op_lparen);
 	if (pr_pattern(pr, &token)
 		&& pr_error_token(pr, NULL, sx_none, op_rparen))
@@ -33,12 +34,14 @@ int
 		{
 			while (pr_token(pr, NULL, sx_none, tk_newline))
 				continue ;
+			token_destroy(&token);
 			return (1);
 		}
 		should_error = 1;
 	}
 	if (should_error)
 		pr->lexer->error = SH_PR_UNEXTOKEN;
+	token_destroy(&token);
 	return (0);
 }
 

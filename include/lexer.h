@@ -170,6 +170,7 @@ void		lex_debug(void);
 
 void		lex_init(t_lexer *lex);
 void		src_init(t_source *src, t_input *in);
+void		src_destroy(t_source *src);
 void		token_init(t_token *tok);
 
 void		token_destroy(t_token *tok);

@@ -90,7 +90,6 @@ void
 	lexer.end = end;
 	lexer.here_flags = flags;
 	lexer.tok = tok;
-	token_init(lexer.tok);
 	lexer.tok->id = tk_word;
 	if (lexer.src->cur == -1)
 		lex_advance(&lexer);

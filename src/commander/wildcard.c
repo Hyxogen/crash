@@ -58,11 +58,11 @@ void
 		i += 1;
 	slash = rest[i] == '/';
 	rest[i] = '\0';
+	has_match = 0;
 	if (prefix[0] == '\0')
 		dir = opendir(".");
 	else
 		dir = opendir(prefix);
-	has_match = 0;
 	if (dir != NULL)
 	{
 		pattern = pattern_compile(rest, info);

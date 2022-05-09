@@ -7,6 +7,7 @@ void
 	history_append(const char *line)
 {
 	char	*last_command;
+	char	*norminette_satisfier;
 
 	last_command = sh()->last_command;
 	if (last_command == NULL)
@@ -15,7 +16,8 @@ void
 	}
 	else
 	{
-		sh()->last_command = sh_join2(last_command, '\n', line);
+		norminette_satisfier = sh_join2(last_command, '\n', line);
+		sh()->last_command = norminette_satisfier;
 		free(last_command);
 	}
 }

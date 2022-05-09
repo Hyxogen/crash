@@ -4,8 +4,10 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-long			expand_arith_str(const char *str, int *error, int recursion_level);
-t_arith_value	arith_parse_binary(t_arith_parser *pr, t_arith_value lhs, int min_prec);
+long			expand_arith_str(const char *str,
+					int *error, int recursion_level);
+t_arith_value	arith_parse_binary(t_arith_parser *pr,
+					t_arith_value lhs, int min_prec);
 
 void
 	arith_init(void)

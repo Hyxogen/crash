@@ -35,8 +35,7 @@ int
 	lex.tok = token;
 	token_init(lex.tok);
 	lex.tok->id = tk_word;
-	if (lex.src->cur == -1)
-		lex_advance(&lex);
+	lex_advance(&lex);
 	lex_main(&lex);
 	input_destroy(&in);
 	return (lex.error || lex.src->cur != -1);
@@ -62,6 +61,7 @@ ssize_t
 	child_reaper_lock();
 	prompt = cm_expand_str(&token, NULL, ' ', 0);
 	child_reaper_unlock();
+	token_destroy(&token);
 	if (prompt == NULL)
 		prompt = ft_strdup("$ ");
 	*lp = readline(prompt);

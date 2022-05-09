@@ -1,3 +1,5 @@
+sleep 10
+
 mem_size=7
 stride=3
 dataptr=0

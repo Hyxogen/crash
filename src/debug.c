@@ -300,7 +300,6 @@ int
 		{
 			if (pr.current.id == tk_null)
 				break ;
-			token_destroy(&pr.current);
 			pr_next_token(&pr);
 		}
 		else

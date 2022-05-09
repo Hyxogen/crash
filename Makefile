@@ -30,7 +30,8 @@ COMMANDER_FILES	:= \
 	env_util.c expand_special1.c expand_special2.c expand_param_util.c \
 	expand_arith_tok.c expand_arith_bin_init1.c expand_arith_bin_init2.c \
 	expand_arith_optok_init.c expand_arith_unary.c expand_arith_bin.c \
-	expand_arith_lex.c
+	expand_arith_lex.c builtins.c pipe_sequence_rec.c pipe_sequence_command.c \
+	wait.c word_list.c
 ARITH_FILES		:= \
 	arith_plus.c arith_minus.c arith_modulo.c arith_divide.c arith_multiply.c \
 	arith_ternary.c arith_shift.c arith_inequality.c arith_equality.c \
@@ -41,7 +42,7 @@ BUILTINS_FILES	:= \
 	getopts.c cd.c pwd.c unset.c env.c true.c false.c unimplemented.c
 UTIL_FILES		:= \
 	die.c memory.c op.c util.c wrap.c strlst.c err.c atol.c file.c ltoa.c \
-	wrap2.c wrap3.c termios.c stringlst.c basename.c
+	wrap2.c wrap3.c termios.c stringlst.c basename.c global.c
 
 FILE_NAMES		:= \
 	$(BASE_FILES) \
@@ -170,7 +171,7 @@ re: fclean
 test:
 	make CC=clang
 	# ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=suppressions.txt ./$(NAME) tests/scripts/bf.sh
-	ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=suppressions.txt ./$(NAME) tests/scripts/cowsay.sh
+	ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=suppressions.txt ./$(NAME) tests/scripts/cowsay.sh "Hello, World!"
 	ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=suppressions.txt ./$(NAME) tests/scripts/fib.sh
 	ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=suppressions.txt ./$(NAME) tests/scripts/tableflip.sh
 

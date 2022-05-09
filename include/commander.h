@@ -23,9 +23,9 @@
 #  define SH_RETCODE_SIGNALLED_OFFSET 128
 # endif
 
-#define SH_BINARY_OP_COUNT 30
-#define SH_UNARY_OP_COUNT 4
-#define SH_OP_TOK_COUNT 35
+# define SH_BINARY_OP_COUNT 30
+# define SH_UNARY_OP_COUNT 4
+# define SH_OP_TOK_COUNT 35
 
 enum e_associativity {
 	ass_left,
@@ -74,11 +74,13 @@ enum e_arith_token_id {
 	ar_op_pipe_eq
 };
 
-typedef int						(*t_commandeer_proc)(const t_snode*, const int[3]);
+typedef int						(*t_commandeer_proc)(const t_snode*,
+									const int[3]);
 typedef pid_t					(*t_cm_cmd_proc)(const t_snode*, const int[3]);
 typedef pid_t					(*t_command)(const t_snode *, const int[3]);
 typedef int						(*t_cm_cmd_wait)(pid_t pid);
-typedef long					(*t_cm_eval_proc)(const char *ptr, long a, long b, long c);
+typedef long					(*t_cm_eval_proc)(const char *ptr,
+									long a, long b, long c);
 typedef enum e_associativity	t_associativity;
 typedef enum e_arith_token_id	t_arith_token_id;
 typedef struct s_cmd_base		t_cmd_base;
@@ -175,41 +177,63 @@ struct s_arith_value {
 
 int				command(t_snode *cmd_node, int io[3]);
 
-void			_cm_close_nostd(int fd);
-/* Closes all the non std filedescriptors that differ between the orginal and redirect */
-void			cm_close_nstd_nred(const int original[3], const int redirect[3]);
-
 pid_t			cm_convert_retcode(int rc);
 pid_t			cm_simple_cmd_command(const t_snode *cmd_node, const int io[3]);
 pid_t			commandeer_simple_command(const t_snode *command,
 					const int io[SH_STDIO_SIZE]);
-pid_t			cm_if_clause(const t_snode *ifnode, const int io[3]);
-pid_t			cm_for_clause(const t_snode *ifnode, const int io[3]);
-pid_t			cm_case_clause(const t_snode *ifnode, const int io[3]);
-pid_t			cm_while_until_clause(const t_snode *ifnode, const int io[3]);
-pid_t			cm_function(const t_snode *ifnode, const int io[3]);
-pid_t			cm_function_define(const t_snode *ifnode, const int io[3]);
-pid_t			cm_compound_list(const t_snode *node, const int io[SH_STDIO_SIZE]);
+pid_t			cm_if_clause(const t_snode *ifnode,
+					const int io[3]);
+pid_t			cm_for_clause(const t_snode *ifnode,
+					const int io[3]);
+pid_t			cm_case_clause(const t_snode *ifnode,
+					const int io[3]);
+pid_t			cm_while_until_clause(const t_snode *ifnode,
+					const int io[3]);
+pid_t			cm_function(const t_snode *ifnode,
+					const int io[3]);
+pid_t			cm_function_define(const t_snode *ifnode,
+					const int io[3]);
+pid_t			cm_compound_list(const t_snode *node,
+					const int io[SH_STDIO_SIZE]);
 
-int				execute_pipe_seq(const t_snode *list_node, const int io[3]);
-int				cm_and_if(const t_snode *node, const int io[3]);
-int				cm_or_if(const t_snode *node, const int io[3]);
-int				commandeer_inner(const t_snode *node, const int io[3]);
-int				commandeer(const t_snode *node, const int io[3]);
-int				commandeer_term(const t_snode *node, const int io[SH_STDIO_SIZE]);
+pid_t			execute_command_nofork(const t_snode *command,
+					const int io[SH_STDIO_SIZE]);
+pid_t			execute_command_fork(const t_snode *command,
+					const int io[SH_STDIO_SIZE]);
+int				create_pipe_and_execute_command(const t_snode *command,
+					pid_t *command_pid, int input_fd);
+int				execute_commands_recursive(const t_snode *pipe_seq,
+					const int final_out_fd, int previous_out_fd, size_t index);
+int				execute_pipe_seq(const t_snode *list_node,
+					const int io[3]);
+int				cm_and_if(const t_snode *node,
+					const int io[3]);
+int				cm_or_if(const t_snode *node,
+					const int io[3]);
+int				commandeer_inner(const t_snode *node,
+					const int io[3]);
+int				commandeer(const t_snode *node,
+					const int io[3]);
+int				commandeer_term(const t_snode *node,
+					const int io[SH_STDIO_SIZE]);
 
 int				sh_execvp(char **argv);
 
-int				command_restore_internal_redirects(const int io[SH_STDIO_SIZE], const int old_io[SH_STDIO_SIZE]);
-int				command_setup_internal_redirects(const t_snode *redirect_list, const int io[SH_STDIO_SIZE], int old_io[SH_STDIO_SIZE]);
+int				command_restore_internal_redirects(const int io[SH_STDIO_SIZE],
+					const int old_io[SH_STDIO_SIZE]);
+int				command_setup_internal_redirects(const t_snode *redirect_list,
+					const int io[SH_STDIO_SIZE], int old_io[SH_STDIO_SIZE]);
 
 int				_cm_get_redi_flags(t_syntax_id type);
-int				_cm_create_and_write_here(const char *str, int skip_leading_tabs);
+int				_cm_create_and_write_here(const char *str,
+					int skip_leading_tabs);
 int				_cm_setup_process_redirects(const t_snode *redi_list);
-int				_cm_setup_builtin_redirects(const t_snode *redi_list, int io[3]);
+int				_cm_setup_builtin_redirects(const t_snode *redi_list,
+					int io[3]);
 int				cm_expand_list(t_expand *exp, const t_token *token, int mode);
 char			**cm_expand(const t_token *token, int ***quote, int mode);
-char			*cm_expand_str(const t_token *token, int **quote, int ch, int mode);
+char			*cm_expand_str(const t_token *token,
+					int **quote, int ch, int mode);
 int				expand_param(t_expand *exp, t_token *token, int mode);
 int				expand_command(t_expand *exp, t_snode *node);
 int				expand_backtick(t_expand *exp, char *str);
@@ -228,7 +252,8 @@ size_t			expand_length(t_expand *exp);
 int				expand_error(t_param_ctx *ctx, size_t i);
 int				expand_special(t_expand *exp, char *key);
 
-pid_t			cm_unimplemented_cmd_command(const t_snode *node, const int io[3]);
+pid_t			cm_unimplemented_cmd_command(const t_snode *node,
+					const int io[3]);
 
 char			**cm_word_list_to_array(const t_snode *word_list);
 
@@ -240,22 +265,29 @@ void			enable_signal_child_reaper_handler(void);
 int				status_code_to_return_code(int status_code);
 int				internal_pid_to_return_code(pid_t command_pid);
 pid_t			return_code_to_internal_pid(int return_code);
+int				process_wait_and_get_return_code(pid_t pid);
 int				wait_and_get_return_code(pid_t command_pid);
 
 int				sh_cm_run(t_input *in);
-int				match_pattern(const char *str, const char *pattern, const char *info);
+int				match_pattern(const char *str, const char *pattern,
+					const char *info);
 
 void			expansion_destroy(t_expand *exp);
 void			expansion_init(t_expand *exp);
 void			expansion_add_part(t_expand *exp, char **str, int quote);
 void			expansion_copy_parts(t_expand *dst, t_expand *src);
 
-int				_pattern_process_collating_class(char **pattern, t_pattern_node *node, char *ch);
-int				_pattern_process_equivalence_class(char **pattern, t_pattern_node *node);
-int				_pattern_process_char_class(char **pattern, t_pattern_node *node);
-int				_pattern_process_brackets(char **pattern, t_pattern_node *node, int moved, int local_moved);
+int				_pattern_process_collating_class(char **pattern,
+					t_pattern_node *node, char *ch);
+int				_pattern_process_equivalence_class(char **pattern,
+					t_pattern_node *node);
+int				_pattern_process_char_class(char **pattern,
+					t_pattern_node *node);
+int				_pattern_process_brackets(char **pattern,
+					t_pattern_node *node, int moved, int local_moved);
 t_pattern_node	*pattern_compile(char *pattern, int *info);
-int				pattern_match(const char *str, t_pattern_node *pattern, int filename);
+int				pattern_match(const char *str,
+					t_pattern_node *pattern, int filename);
 void			pattern_destroy(t_pattern_node *node);
 void			pattern_debug_print_node(t_pattern_node *node);
 void			pattern_debug_print_chain(t_pattern_node *head);

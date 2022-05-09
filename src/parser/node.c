@@ -35,12 +35,14 @@ void
 	node->childs_size++;
 }
 
+/* ft_memset(src, 0, sizeof(*src)); */
 void
 	node_move(t_snode *dest, t_snode *src)
 {
 	if (dest == src)
 		return ;
 	ft_memcpy(dest, src, sizeof(*src));
-	// ft_memset(src, 0, sizeof(*src));
+	token_init(&src->token);
+	token_init(&src->here_content);
 	src->type = sx_invalid;
 }

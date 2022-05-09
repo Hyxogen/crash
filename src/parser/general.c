@@ -19,8 +19,8 @@
 void
 	pr_init(t_parser *pr)
 {
-	pr->current.id = tk_invalid;
-	pr->next.id = tk_invalid;
+	token_init(&pr->current);
+	token_init(&pr->next);
 	pr->here_docs = NULL;
 }
 

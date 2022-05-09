@@ -42,7 +42,6 @@ int
 	if (pr->current.id == tk_invalid)
 		return (0);
 	token_init(&token); /* NOTE: Can prob be removed */
-	token.id = tk_invalid;
 	if (pr->current.id == tk_ionumber)
 	{
 		token_move(&token, &pr->current);
@@ -52,10 +51,10 @@ int
 		|| pr_io_here(pr, parent))
 	{
 		token_move(&parent->childs[parent->childs_size - 1]->token, &token);
+		token_destroy(&token);
 		return (1);
 	}
-	if (token.id != tk_invalid)
-		token_destroy(&token);
+	token_destroy(&token);
 	return (0);
 }
 

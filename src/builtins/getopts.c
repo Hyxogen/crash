@@ -70,7 +70,7 @@ int
 	if (argc == 3)
 		opt_argv = sh()->args;
 	optind = 0;
-	while (optind < i && opt_argv[i] != NULL)
+	while (optind < i && opt_argv[optind] != NULL)
 		optind += 1;
 	result = sh_getopt(argv[1], argv[2], &optind, opt_argv);
 	optind_str = sh_safe_malloc(21);

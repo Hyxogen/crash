@@ -2,16 +2,12 @@
 
 #include "commander.h"
 
-
-#include <stdio.h>
-
 long
 	arith_plus(const char *str, long lhs, long rhs, long c)
 {
 	(void) str;
 	(void) c;
 	return (lhs + rhs);
-	fprintf(stderr, "arith_plus\n");
 }
 
 long
