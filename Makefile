@@ -71,6 +71,9 @@ FT_PRINTF_LIB	:= $(FT_PRINTF_DIR)/libftprintf.a
 
 INC_DIR			:= include $(LIBFT_DIR) $(FT_PRINTF_DIR)
 
+CFLAGS          += -I$(HOME)/.brew/opt/readline/include
+LFLAGS          += -L$(HOME)/.brew/opt/readline/lib
+
 SOURCES			:= $(patsubst %.c,$(SRC_DIR)/%.c,$(FILE_NAMES))
 OBJECTS			:= $(patsubst %.c,$(OBJ_DIR)/%.o,$(FILE_NAMES))
 DEPENDS			:= $(patsubst %.c,$(DEP_DIR)/%.d,$(FILE_NAMES))

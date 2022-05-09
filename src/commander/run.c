@@ -8,9 +8,9 @@
 #include <stdio.h>
 #include <termios.h>
 #include <readline/readline.h>
+#include <readline/history.h>
 
 extern int rl_catch_signals;
-extern void (*rl_event_hook)(void);
 
 t_snode
 	*pr_parse(t_parser *pr)
@@ -42,6 +42,12 @@ void
 }
 
 int
+	sh_cm_nop(void)
+{
+	return (0);
+}
+
+int
 	sh_cm_run(t_input *in)
 {
 	t_source		src;
@@ -52,7 +58,7 @@ int
 	t_mega_termios	term_attr;
 
 	rl_catch_signals = 1;
-	rl_event_hook = sh_nop1;
+	rl_event_hook = sh_cm_nop;
 	pr_init(&pr);
 	src_init(&src, in);
 	lex.src = &src;
