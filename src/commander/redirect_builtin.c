@@ -82,16 +82,18 @@ static int
 }
 
 static int
-	_cm_handle_here_redi(const t_snode *redi_node, int io[3])
+	_cm_handle_here_redi(const t_snode *redi_node, int io[3], int io_index)
 {
 	char	*str;
 	int		here_read;
 
+	if (io_index == -1)
+		io_index = SH_STDIN_INDEX;
 	str = cm_expand_str(&redi_node->childs[0]->here_content, NULL, ' ', 0);
 	if (str == NULL)
 		return (-1);
 	here_read = _cm_create_and_write_here(str, redi_node->childs[0]->flags & flag_trim);
-	io[SH_STDIN_INDEX] = here_read;
+	io[io_index] = here_read;
 	sh_fdctl(here_read, SH_FD_FIOCLEX, 1);
 	free(str);
 	return (0);
@@ -117,7 +119,7 @@ static int
 	if (redi_node->type == sx_greatand)
 		return (_cm_handle_greatand_redi(redi_node, io_index, filen, io));
 	if (redi_node->type == sx_io_here)
-		return (_cm_handle_here_redi(redi_node, io));
+		return (_cm_handle_here_redi(redi_node, io, io_index));
 	if (redi_node->type == sx_less || redi_node->type == sx_clobber || redi_node->type == sx_lessgreat)
 	{
 		if (io_index == -1)

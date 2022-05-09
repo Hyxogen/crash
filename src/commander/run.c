@@ -81,6 +81,19 @@ static void
 	node_destroy(node);
 }
 
+static void
+	sh_setup(t_input *in, t_parser *pr, t_lexer *lex, t_source *src)
+{
+	rl_catch_signals = 1;
+	rl_event_hook = sh_cm_nop;
+	pr_init(pr);
+	src_init(src, in);
+	lex->src = src;
+	pr->lexer = lex;
+	sh()->last_command = NULL;
+	arith_init();
+}
+
 int
 	sh_cm_run(t_input *in)
 {
@@ -89,14 +102,7 @@ int
 	t_parser		pr;
 	t_mega_termios	term_attr;
 
-	rl_catch_signals = 1;
-	rl_event_hook = sh_cm_nop;
-	pr_init(&pr);
-	src_init(&src, in);
-	lex.src = &src;
-	pr.lexer = &lex;
-	sh()->last_command = NULL;
-	arith_init();
+	sh_setup(in, &pr, &lex, &src);
 	while (1)
 	{		
 		sh_new_command(in, &pr, &lex, &src);

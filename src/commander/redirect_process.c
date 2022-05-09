@@ -88,14 +88,16 @@ static int
 
 /* TODO check if here docs can be redirected to a specific file descriptor */
 static int
-	_cm_handle_here_redi(const t_snode *redi_node)
+	_cm_handle_here_redi(const t_snode *redi_node, int from_fd)
 {
 	char	*str;
 
+	if (from_fd == -1)
+		from_fd = STDIN_FILENO;
 	str = cm_expand_str(&redi_node->childs[0]->here_content, NULL, ' ', 0);
 	if (str == NULL)
 		return (-1);
-	sh_dup2(_cm_create_and_write_here(str, redi_node->childs[0]->flags & flag_trim), STDIN_FILENO);
+	sh_dup2(_cm_create_and_write_here(str, redi_node->childs[0]->flags & flag_trim), from_fd);
 	free(str);
 	return (0);
 }
@@ -121,7 +123,7 @@ static int
 	if (redi_node->type == sx_greatand)
 		return (_cm_handle_greatand_redi(redi_node, from_fd, filen));
 	if (redi_node->type == sx_io_here)
-		return (_cm_handle_here_redi(redi_node));
+		return (_cm_handle_here_redi(redi_node, from_fd));
 	if (redi_node->type == sx_less || redi_node->type == sx_clobber || redi_node->type == sx_lessgreat)
 	{
 		if (from_fd == -1)

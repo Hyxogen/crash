@@ -91,6 +91,7 @@ void
 		sh()->functions_size += 1;
 	}
 	free(entry->key);
+	node_destroy(entry->body);
 	entry->key = ft_strdup(key);
 	entry->body = body;
 	body->refcount += 1;
