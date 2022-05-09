@@ -18,7 +18,7 @@ pid_t
 }
 
 pid_t
-	execute_function(const t_snode *command, const t_function *function,
+	execute_function(const t_snode *command, t_snode *body,
 			char **argv, const int io[SH_STDIO_SIZE])
 {
 	pid_t	internal_pid;
@@ -30,7 +30,9 @@ pid_t
 	argv[0] = sh()->args[0];
 	old_args = sh()->args;
 	sh()->args = argv;
-	internal_pid = cm_function(function->body, io);
+	body->refcount += 1;
+	internal_pid = cm_function(body, io);
+	node_destroy(body);
 	argv[0] = old_arg0;
 	sh()->args = old_args;
 	sh_env_clean();
@@ -74,7 +76,7 @@ pid_t
 		function_func = &sh()->functions[index];
 		if (ft_strcmp(argv[0], function_func->key) == 0)
 		{
-			return (execute_function(command, function_func, argv, io));
+			return (execute_function(command, function_func->body, argv, io));
 		}
 		index++;
 	}

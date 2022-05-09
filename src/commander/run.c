@@ -32,13 +32,20 @@ t_snode
 }
 
 void
-	sh_new_command(t_input *in, t_parser *pr)
+	sh_new_command(t_input *in, t_parser *pr, t_lexer *lex, t_source *src)
 {
+	src_destroy(src);
+	pr_destroy(pr);
+	src_init(src, in);
+	lex_init(lex);
+	pr_init(pr);
+	try_reap_all_childs();
 	history_new_command();
 	sh()->restart = 0;
 	sh()->continuing = 0;
 	in->more = 0;
 	pr->lexer->error = 0;
+	pr_next_token(pr);
 }
 
 int
@@ -47,14 +54,39 @@ int
 	return (0);
 }
 
+static void
+	sh_parse_and_exec(t_parser *pr, t_lexer *lex)
+{
+	t_snode			*node;
+
+	node = pr_parse(pr);
+	if (sh()->restart != 0)
+	{
+		node_destroy(node);
+		return ;
+	}
+	if (sh()->interactive)
+	{
+		add_history(history_get_last_command());
+		history_new_command();
+	}
+	if (pr->lexer->error || lex->quote != 0 || lex->btick != 0)
+	{
+		sh_err1("syntax error");
+		node_destroy(node);
+		return ;
+	}
+	if (node != NULL)
+		commandeer(node, sh()->io);
+	node_destroy(node);
+}
+
 int
 	sh_cm_run(t_input *in)
 {
 	t_source		src;
 	t_lexer			lex;
 	t_parser		pr;
-	t_snode			*node;
-	int				std_io[3];
 	t_mega_termios	term_attr;
 
 	rl_catch_signals = 1;
@@ -63,47 +95,18 @@ int
 	src_init(&src, in);
 	lex.src = &src;
 	pr.lexer = &lex;
-	std_io[SH_STDIN_INDEX] = STDIN_FILENO;
-	std_io[SH_STDOUT_INDEX] = STDOUT_FILENO;
-	std_io[SH_STDERR_INDEX] = STDERR_FILENO;
 	sh()->last_command = NULL;
 	arith_init();
 	while (1)
-	{
-		try_reap_all_childs();
-		src_destroy(&src);
-		pr_destroy(&pr);
-		src_init(&src, in);
-		lex_init(&lex);
-		pr_init(&pr);
-		sh_new_command(in, &pr);
-		pr_next_token(&pr);
+	{		
+		sh_new_command(in, &pr, &lex, &src);
 		if (pr.current.id == tk_null && sh()->interactive)
 			ft_putstr_fd("exit\n", STDERR_FILENO);
 		if (pr.current.id == tk_invalid || pr.current.id == tk_null)
 			break ;
-		node = pr_parse(&pr);
-		if (sh()->restart != 0)
-		{
-			node_destroy(node);
-			continue ;
-		}
-		if (sh()->interactive)
-		{
-			add_history(history_get_last_command());
-			history_new_command();
-		}
-		if (pr.lexer->error || lex.quote != 0 || lex.btick != 0)
-		{
-			sh_err1("syntax error");
-			node_destroy(node);
-			continue ;
-		}
 		sh_get_term_attr(&term_attr);
-		if (node != NULL)
-			commandeer(node, std_io);
+		sh_parse_and_exec(&pr, &lex);
 		sh_set_term_attr(&term_attr);
-		node_destroy(node);
 	}
 	try_reap_all_childs();
 	src_destroy(&src);

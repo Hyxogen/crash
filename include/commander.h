@@ -309,7 +309,7 @@ pid_t			execute_builtin(const t_snode *command,
 					const t_builtin *function, char **argv,
 					const int io[SH_STDIO_SIZE]);
 pid_t			execute_function(const t_snode *command,
-					const t_function *function, char **argv,
+					t_snode *body, char **argv,
 					const int io[SH_STDIO_SIZE]);
 pid_t			find_and_execute_builtin(const t_snode *command,
 					char **argv, const int io[SH_STDIO_SIZE]);
