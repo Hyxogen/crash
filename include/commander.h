@@ -259,6 +259,7 @@ char			**cm_word_list_to_array(const t_snode *word_list);
 
 int				child_reaper_lock(void);
 int				child_reaper_unlock(void);
+void			try_reap_all_childs(void);
 void			disable_signal_child_reaper_handler(void);
 void			enable_signal_child_reaper_handler(void);
 

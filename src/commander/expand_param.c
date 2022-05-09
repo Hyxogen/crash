@@ -88,6 +88,8 @@ int
 	expand_promote(exp, tmp);
 	i = 0;
 	comp_pattern = pattern_compile(pattern, info);
+	free(pattern);
+	free(info);
 	while (exp->parts[exp->count - 1].str[i] != NULL)
 	{
 		j = 0;

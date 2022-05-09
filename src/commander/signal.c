@@ -23,7 +23,7 @@
 extern int	rl_done;
 extern void	rl_replace_line(const char *text, int clear_undo);
 
-static void
+void
 	try_reap_all_childs(void)
 {
 	int	rc;
@@ -71,17 +71,17 @@ void
 void
 	disable_signal_child_reaper_handler(void)
 {
-	sh()->child_reaper.sa_handler = NULL;
-	sh_sigaction(SIGCHLD, &sh()->child_reaper, NULL);
+	// sh()->child_reaper.sa_handler = NULL;
+	// sh_sigaction(SIGCHLD, &sh()->child_reaper, NULL);
 }
 
 void
 	enable_signal_child_reaper_handler(void)
 {
-	sigemptyset(&sh()->child_reaper.sa_mask);
-	sh()->child_reaper.sa_handler = signal_try_reap_all_childs;
-	sh()->child_reaper.sa_flags = SA_RESTART;
-	sh_sigaction(SIGCHLD, &sh()->child_reaper, NULL);
+	// sigemptyset(&sh()->child_reaper.sa_mask);
+	// sh()->child_reaper.sa_handler = signal_try_reap_all_childs;
+	// sh()->child_reaper.sa_flags = SA_RESTART;
+	// sh_sigaction(SIGCHLD, &sh()->child_reaper, NULL);
 }
 
 static int
@@ -101,7 +101,9 @@ int
 	if (*lock_counter >= INT_MAX)
 		return (-1);
 	if (*lock_counter == 0)
+	{
 		disable_signal_child_reaper_handler();
+	}
 	*lock_counter += 1;
 	return (0);
 }

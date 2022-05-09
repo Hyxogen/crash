@@ -62,6 +62,8 @@ static int
 	pattern = pattern_compile(rhs_str, escape_info);
 	match = pattern_match(lhs, pattern, 0);
 	pattern_destroy(pattern);
+	free(escape_info);
+	free(rhs_str);
 	return (!match);
 }
 

@@ -62,9 +62,15 @@ pid_t
 	if (argv == NULL
 		|| _do_assignments(command->childs[command->childs_size - 1],
 			!!argv[0]))
+	{
+		sh_strlst_clear(argv);
 		return (return_code_to_internal_pid(1));
+	}
 	if (argv[0] == NULL)
+	{
+		sh_strlst_clear(argv);
 		return (return_code_to_internal_pid(0));
+	}
 	command_pid = execute_internal_command(command, argv, io);
 	if (command_pid == SH_INVALID_INTERNAL_PID)
 	{

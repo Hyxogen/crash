@@ -70,6 +70,7 @@ int
 	arith_init();
 	while (1)
 	{
+		try_reap_all_childs();
 		src_destroy(&src);
 		pr_destroy(&pr);
 		src_init(&src, in);
@@ -104,6 +105,7 @@ int
 		sh_set_term_attr(&term_attr);
 		node_destroy(node);
 	}
+	try_reap_all_childs();
 	src_destroy(&src);
 	pr_destroy(&pr);
 	// TODO: errors?
