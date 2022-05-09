@@ -91,7 +91,6 @@
  * don't export invalid identifiers
  * shell flags (set -)
  * remove globals according to the subject/norminette
- * fix readline segfault
  */
 # define SH_ENV_EXPORT 1
 # define SH_ENV_READONLY 2
@@ -213,6 +212,7 @@ struct s_minishell
 	int					exec_count;
 	int					restart;
 	pid_t				last_bg_proc;
+	int					is_subshell;
 };
 
 char		*sh_join2(const char *lhs, char delim, const char *rhs);

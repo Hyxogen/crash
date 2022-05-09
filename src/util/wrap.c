@@ -52,6 +52,8 @@ pid_t
 
 	ret = fork();
 	sh_check(ret >= 0, "fork");
+	if (ret == 0)
+		sh()->is_subshell = 1;
 	return (ret);
 }
 

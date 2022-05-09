@@ -75,7 +75,6 @@ int
 		rl_clear_history();
 		input_new(&in, in_readline, NULL);
 	} else {
-		sh()->interactive = 0;
 		input_new(&in, in_file, (void *) (unsigned long long) STDIN_FILENO);
 	}
 	sh_cm_run(&in);

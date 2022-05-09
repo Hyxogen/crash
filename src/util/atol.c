@@ -66,13 +66,10 @@ int
 			base = 16;
 		str += (*str == 'x' || *str == 'X' || *str == 'o' || *str == 'O');
 	}
-	if (!ft_isdigit(*str))
+	if (sh_arith_digit(base, *str, v) < 0)
 		return (-1);
-	while (ft_isdigit(*str))
-	{
-		if (sh_arith_digit(base, *str, v) < 0)
-			return (-1);
+	str += 1;
+	while (sh_arith_digit(base, *str, v) == 0)
 		str += 1;
-	}
 	return (-(*str != '\0'));
 }

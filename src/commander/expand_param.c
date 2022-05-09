@@ -180,7 +180,7 @@ int
 
 	ctx.token = token;
 	if (token->str[0] == '#' && (token->str[1] != '#'
-			|| token->str[2] == '\0'))
+			|| token->str[2] == '\0') && token->str[1] != '\0')
 	{
 		ctx.i = expand_key_length(token->str + 1) + 1;
 		if (token->str[ctx.i] != '\0')

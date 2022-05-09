@@ -83,13 +83,14 @@ void
 	sh()->utilities = get_utilities();
 	sh()->utilities_size = get_utilities_count();
 	sh()->args = sh_strlst_dup(argv);
-	sh()->interactive = 1; // TODO: check if interactive
+	sh()->interactive = sh_has_term(STDIN_FILENO);
 	sh()->io[SH_STDIN_INDEX] = STDIN_FILENO;
 	sh()->io[SH_STDOUT_INDEX] = STDOUT_FILENO;
 	sh()->io[SH_STDERR_INDEX] = STDERR_FILENO;
 	sh()->last_bg_proc = -1;
+	sh()->is_subshell = 0;
 	tmp = ft_strdup(argv[0]);
-	sh()->name = sh_basename(tmp); // TODO: can't use basename
+	sh()->name = sh_basename(tmp);
 	free(tmp);
 	sh_setenv("OPTIND", "1", 0);
 	sh_setenv("PS1", "$ ", 0);
@@ -152,5 +153,4 @@ void
 	entry->key = ft_strdup(key);
 	entry->body = sh_safe_malloc(sizeof(*body));
 	node_move(entry->body, body);
-	// sh()->functions[sh()->functions_size].body = body; // TODO: duplicate body?
 }

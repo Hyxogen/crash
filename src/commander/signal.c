@@ -52,7 +52,7 @@ static void
 		sh()->continuing = 1;
 	}
 	rl_done = 1;
-	if (sh()->exec_count)
+	if (sh()->exec_count && sh()->interactive && !sh()->is_subshell)
 		ft_putchar_fd('\n', STDOUT_FILENO);
 }
 
@@ -142,5 +142,6 @@ void
 	action.sa_flags = SA_NODEFER | SA_RESTART;
 	sh_sigaction(SIGQUIT, &action, NULL);
 	action.sa_handler = sigint_handler;
+	action.sa_flags = SA_RESTART;
 	sh_sigaction(SIGINT, &action, NULL);
 }

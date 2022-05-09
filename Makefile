@@ -29,12 +29,13 @@ COMMANDER_FILES	:= \
 	command_util.c command_internal_exec.c command_redirect.c env_int.c \
 	env_util.c expand_special1.c expand_special2.c expand_param_util.c \
 	expand_arith_tok.c expand_arith_bin_init1.c expand_arith_bin_init2.c \
-	expand_arith_optok_init.c expand_arith_unary.c
+	expand_arith_optok_init.c expand_arith_unary.c expand_arith_bin.c \
+	expand_arith_lex.c
 ARITH_FILES		:= \
 	arith_plus.c arith_minus.c arith_modulo.c arith_divide.c arith_multiply.c \
 	arith_ternary.c arith_shift.c arith_inequality.c arith_equality.c \
 	arith_bitwise.c arith_bitwise_assign.c arith_condition.c arith_unary.c \
-	arith_assign.c
+	arith_assign.c arith_identity.c
 BUILTINS_FILES	:= \
 	set.c echo.c dot.c colon.c exit.c break.c export.c continue.c shift.c \
 	getopts.c cd.c pwd.c unset.c env.c true.c false.c unimplemented.c

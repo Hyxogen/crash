@@ -16,8 +16,6 @@ pid_t
 	return (cm_convert_retcode(0));
 }
 
-/* TODO perhaps try to change implementation so that the
-	pipe sequence won't have to wait for the entire function to finish? */
 pid_t
 	cm_function(const t_snode *node, const int io[3])
 {

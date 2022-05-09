@@ -302,6 +302,7 @@ void			arith_binary_init(void);
 void			arith_optok_init(void);
 void			arith_init(void);
 t_arith_op		*arith_get_unary_op(t_arith_token_id id);
+t_arith_op		*arith_get_binary_op(t_arith_token_id id);
 long			arith_plus(const char *str,
 					long lhs, long rhs, long c);
 long			arith_plus_eq(const char *str,

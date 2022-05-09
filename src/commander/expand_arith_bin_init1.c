@@ -51,7 +51,7 @@ void
 	get_binary_operators()[8].token = ar_op_less_eq;
 	get_binary_operators()[8].prec = 100 - 6;
 	get_binary_operators()[8].ass = ass_left;
-	get_binary_operators()[8].proc = arith_greater_than_or_eq;
+	get_binary_operators()[8].proc = arith_less_than_or_eq;
 	get_binary_operators()[8].is_assignment = 0;
 	get_binary_operators()[9].token = ar_op_great;
 	get_binary_operators()[9].prec = 100 - 6;

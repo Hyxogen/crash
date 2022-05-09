@@ -5,6 +5,11 @@ long
 {
 	(void) str;
 	(void) c;
+	if (divisor == 0)
+	{
+		sh_err1("division by zero");
+		return (0);
+	}
 	return (dividend / divisor);
 }
 
