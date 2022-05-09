@@ -307,4 +307,5 @@ void		disable_kill_signals(void);
 
 void		sh_get_term_attr(t_mega_termios *attr);
 void		sh_set_term_attr(t_mega_termios *attr);
+int			sh_has_term(int fd);
 #endif

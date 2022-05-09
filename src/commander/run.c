@@ -82,8 +82,11 @@ int
 			node_destroy(node);
 			continue ;
 		}
-		add_history(history_get_last_command());
-		history_new_command();
+		if (sh()->interactive)
+		{
+			add_history(history_get_last_command());
+			history_new_command();
+		}
 		if (pr.lexer->error || lex.quote != 0 || lex.btick != 0)
 		{
 			sh_err1("syntax error");
