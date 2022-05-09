@@ -62,7 +62,7 @@ static int
 		{
 			if (ch > *(*pattern + 1)) /* TODO error or something */
 				return (0);
-			ft_memset(&node->chars[(unsigned chars) ch], 0x1, *(*pattern + 1) - ch);
+			ft_memset(&node->chars[(unsigned char) ch], 0x1, *(*pattern + 1) - ch);
 			moved += 2;
 			*pattern += 2;
 		}
