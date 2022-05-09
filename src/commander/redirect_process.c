@@ -139,18 +139,25 @@ static int
 }
 
 static int
-	_cm_handle_redi_node(const t_snode *redi_node)
+	_cm_handle_redi_node(const t_snode *redi_node, int io[3])
 {
 	char	**filen;
+	int		return_code;
 
 	if (redi_node->childs_size == 0)
-		return (sh_err1("no file specified"), 1);
+		return (sh_err1("no file specified"), -1);
+	sh_assert(redi_node->childs[0]->token.id != tk_invalid);
 	filen = cm_wildcard_expand(&redi_node->childs[0]->token);
 	if (!filen)
 		return (-1);
 	if (!*filen || *(filen + 1))
-		return (sh_err1("ambiguous redirect"), 1);
-	return (_cm_handle_redi_node_noerr(redi_node, *filen));
+	{
+		sh_strlst_free(filen);
+		return (sh_err1("ambigious redirect"), -1);
+	}
+	return_code = _cm_handle_redi_node_noerr(redi_node, *filen, io);
+	sh_strlst_free(filen);
+	return (return_code);
 }
 
 int
