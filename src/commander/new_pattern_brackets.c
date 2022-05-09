@@ -22,7 +22,7 @@ static int
 	}
 	if (*(*pattern) == '-')
 	{
-		node->chars[(size_t) *(*pattern)] = 0x1;
+		node->chars[(unsigned char) *(*pattern)] = 0x1;
 		*pattern += 1;
 		moved += 1;
 	}
@@ -62,7 +62,7 @@ static int
 		{
 			if (ch > *(*pattern + 1)) /* TODO error or something */
 				return (0);
-			ft_memset(&node->chars[(size_t) ch], 0x1, *(*pattern + 1) - ch);
+			ft_memset(&node->chars[(unsigned chars) ch], 0x1, *(*pattern + 1) - ch);
 			moved += 2;
 			*pattern += 2;
 		}
@@ -74,7 +74,7 @@ static int
 		{
 			if (*(*pattern) > *(*pattern + 2)) /* TODO error or something */
 				return (0);
-			ft_memset(&node->chars[(size_t) *(*pattern)], 0x1, *(*pattern + 2) - *(*pattern));
+			ft_memset(&node->chars[(unsigned char) *(*pattern)], 0x1, *(*pattern + 2) - *(*pattern));
 			*pattern += 3;
 			return (moved + 3);
 		}
