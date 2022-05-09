@@ -32,8 +32,8 @@ void
 }
 
 int
-{
 	pr_check_here(t_parser *pr)
+{
 	if (pr->current.id == tk_newline
 		&& ft_lstsize(pr->here_docs))
 	{
