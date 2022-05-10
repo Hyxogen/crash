@@ -20,6 +20,8 @@ int
 	size_t	i;
 
 	i = 0;
+	if (*str == '\0' || (!ft_isalpha(*str) && *str != '_'))
+		return (0);
 	while (i < size)
 	{
 		if (!ft_isalnum(str[i]) && str[i] != '_')

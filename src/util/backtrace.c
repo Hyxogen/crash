@@ -12,6 +12,7 @@
 
 #include <execinfo.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #ifdef SH_BACKTRACE
 

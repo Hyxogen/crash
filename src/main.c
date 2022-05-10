@@ -56,7 +56,9 @@ static void
 {
 	int	fd;
 
-	fd = open(argv[1], O_RDONLY);
+	fd = sh_open(argv[1], O_RDONLY, 0);
+	if (fd < 0)
+		exit(127);
 	sh_fdctl(fd, SH_FD_FIOCLEX, 1);
 	sh_strlst_clear(sh()->args);
 	sh()->args = sh_strlst_dup(argv + 1);

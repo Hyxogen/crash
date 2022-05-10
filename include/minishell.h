@@ -124,6 +124,10 @@ typedef unsigned char			t_byte;
 #  define SH_FD_FIOCLEX 0x1
 # endif
 
+# ifndef SH_FD_FIOCLFK
+#  define SH_FD_FIOCLFK 0x2
+# endif
+
 # ifndef SH_INVALID_INTERNAL_PID
 #  define SH_INVALID_INTERNAL_PID 1
 # endif

@@ -35,12 +35,15 @@ void
 	i = 0;
 	while (i < sh()->vars_size)
 	{
-		if ((sh()->vars[i].attr & SH_ENV_EXPORT) && sh()->vars[i].value != NULL)
+		if (sh()->vars[i].attr & SH_ENV_EXPORT)
 		{
 			ft_putstr_fd("export ", sh()->io[SH_STDOUT_INDEX]);
 			ft_putstr_fd(sh()->vars[i].key, sh()->io[SH_STDOUT_INDEX]);
-			ft_putchar_fd('=', sh()->io[SH_STDOUT_INDEX]);
-			dump_export(sh()->vars[i].value);
+			if (sh()->vars[i].value != NULL)
+			{
+				ft_putchar_fd('=', sh()->io[SH_STDOUT_INDEX]);
+				dump_export(sh()->vars[i].value);
+			}
 			ft_putchar_fd('\n', sh()->io[SH_STDOUT_INDEX]);
 		}
 		i += 1;

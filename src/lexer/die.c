@@ -60,5 +60,5 @@ void
 	src_destroy(t_source *src)
 {
 	free(src->str);
-	ft_lstclear(&src->lst, sh_nop);
+	ft_lstclear(&src->lst, free);
 }

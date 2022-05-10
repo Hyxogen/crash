@@ -11,12 +11,16 @@
 /* ************************************************************************** */
 
 #include "input.h"
+#include "libft.h"
+#include "minishell.h"
+#include <stdlib.h>
 
 void
 	input_new(t_input *in, t_in_mode mode, void *param)
 {
 	in->more = 0;
 	in->mode = mode;
+	in->lst = sh_strlst_empty();
 	if (mode == in_string)
 	{
 		in->string_handle = param;
@@ -36,6 +40,7 @@ void
 void
 	input_destroy(t_input *in)
 {
+	sh_strlst_clear(in->lst);
 	if (in->mode == in_file)
 		close_file_handle(in->file_handle);
 }
@@ -43,5 +48,24 @@ void
 ssize_t
 	input_get_line(t_input *in, char **lp)
 {
-	return (in->line_proc(in, lp));
+	size_t	i;
+	ssize_t	ret;
+
+	if (in->lst[0] == NULL)
+	{
+		ret = in->line_proc(in, lp);
+		if (ret <= 0)
+			return (ret);
+		sh_strlst_clear(in->lst);
+		in->lst = ft_split(*lp, '\n');
+		free(*lp);
+	}
+	*lp = in->lst[0];
+	i = 0;
+	while (in->lst[i] != NULL)
+	{
+		in->lst[i] = in->lst[i + 1];
+		i += 1;
+	}
+	return (ft_strlen(*lp));
 }

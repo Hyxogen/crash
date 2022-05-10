@@ -47,6 +47,7 @@ struct s_input {
 	t_file_handle		*file_handle;
 	t_read_line_proc	line_proc;
 	t_in_mode			mode;
+	char				**lst;
 };
 
 t_file_handle	*start_read(int fd);
