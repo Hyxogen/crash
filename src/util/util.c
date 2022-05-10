@@ -17,7 +17,6 @@
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <execinfo.h>
 
 char
 	*sh_join2(const char *lhs, char delim, const char *rhs)
@@ -67,30 +66,6 @@ int
 
 	if (!stat(filen, &info))
 		return (1);
-	SH_ASSERT(errno == ENOENT);
+	sh_assert(errno == ENOENT);
 	return (0);
 }
-
-// TODO: debug function, remove!!!
-#ifdef SH_BACKTRACE
-
-void
-	sh_backtrace(int count)
-{
-	void	**buffer;
-
-	buffer = malloc(sizeof(*buffer) * (count + 1));
-	count = backtrace(buffer, count + 1);
-	backtrace_symbols_fd(buffer + 1, count - 1, STDERR_FILENO);
-	free(buffer);
-}
-
-#else
-
-void
-	sh_backtrace(int count)
-{
-	(void) count;
-}
-
-#endif

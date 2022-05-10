@@ -68,7 +68,7 @@ pid_t
 
 	sh()->loop_depth += 1;
 	rc = -1;
-	SH_ASSERT(node->childs_size >= 3);
+	sh_assert(node->childs_size >= 3);
 	command_setup_internal_redirects(node->childs[node->childs_size - 1],
 		io, old_io);
 	while (!commandeer(node->childs[0], sh()->io) == !(node->flags & flag_until)

@@ -18,7 +18,7 @@
 void
 	sh_fdctl(int fd, int flag, int on)
 {
-	SH_ASSERT(fd <= OPEN_MAX);
+	sh_assert(fd <= OPEN_MAX);
 	if (fd < 0)
 		return ;
 	sh()->fd_flags[fd] |= flag * !!on;
@@ -37,7 +37,7 @@ void
 		if (flags[index] & SH_FD_FIOCLEX)
 		{
 			close(index);
-			SH_ASSERT(!(errno <= 0 && errno != EBADF));
+			sh_assert(!(errno <= 0 && errno != EBADF));
 		}
 		index++;
 	}

@@ -19,7 +19,7 @@ int
 {
 	int	return_code;
 
-	SH_ASSERT(node->childs_size >= 2);
+	sh_assert(node->childs_size >= 2);
 	return_code = commandeer(node->childs[0], io);
 	if (return_code == 0)
 		return (commandeer(node->childs[1], io));
@@ -31,7 +31,7 @@ int
 {
 	int	return_code;
 
-	SH_ASSERT(node->childs_size >= 2);
+	sh_assert(node->childs_size >= 2);
 	return_code = commandeer(node->childs[0], io);
 	if (return_code != 0)
 		return (commandeer(node->childs[1], io));

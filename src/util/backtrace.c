@@ -1,47 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                           :      .         */
-/*   die.c                                            -=-:::+*+:-+*#.         */
+/*   backtrace.c                                      -=-:::+*+:-+*#.         */
 /*                                                :-:::+#***********----:     */
 /*   By: csteenvo <csteenvo@student.codam.n>        .:-*#************#-       */
 /*                                                 :=+*+=+*********####+:     */
-/*   Created: 2022/05/10 12:00:38 by csteenvo     ..     +**=-=***-           */
-/*   Updated: 2022/05/10 12:00:38 by csteenvo            :      ..            */
+/*   Created: 2022/05/10 12:00:46 by csteenvo     ..     +**=-=***-           */
+/*   Updated: 2022/05/10 12:00:46 by csteenvo            :      ..            */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
-
-#include <signal.h>
+#include <execinfo.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-#include <errno.h>
+
+#ifdef SH_BACKTRACE
 
 void
-	sh_abort(void)
+	sh_backtrace(int count)
 {
-	kill(0, SIGTERM);
+	void	**buffer;
+
+	buffer = malloc(sizeof(*buffer) * (count + 1));
+	count = backtrace(buffer, count + 1);
+	backtrace_symbols_fd(buffer + 1, count - 1, STDERR_FILENO);
+	free(buffer);
 }
 
-void
-	sh_assert(int test)
-{
-	if (!test)
-	{
-		sh_err1("assertion failed");
-		exit(EXIT_FAILURE);
-	}
-}
+#else
 
 void
-	sh_check(int test, const char *s)
+	sh_backtrace(int count)
 {
-	if (!test)
-	{
-		sh_backtrace(64);
-		sh_err2(s, strerror(errno));
-		exit(EXIT_FAILURE);
-	}
+	(void) count;
 }
+
+#endif

@@ -20,7 +20,7 @@ void
 	void	*ptr;
 
 	ptr = malloc(size);
-	SH_ASSERT(ptr != NULL);
+	sh_assert(ptr != NULL);
 	return (ptr);
 }
 

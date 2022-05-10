@@ -48,7 +48,7 @@ static int
 
 	if (redi_node->childs_size == 0)
 		return (sh_err1("no file specified"), -1);
-	SH_ASSERT(redi_node->childs[0]->token.id != tk_invalid);
+	sh_assert(redi_node->childs[0]->token.id != tk_invalid);
 	filen = cm_wildcard_expand(&redi_node->childs[0]->token);
 	if (!filen)
 		return (-1);
@@ -70,7 +70,7 @@ int
 	size_t	index;
 	int		rc;
 
-	SH_ASSERT(redi_list->type == sx_io_redirect_list);
+	sh_assert(redi_list->type == sx_io_redirect_list);
 	index = 0;
 	size = redi_list->childs_size;
 	while (index < size)

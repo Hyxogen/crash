@@ -314,11 +314,11 @@ void			expansion_init(t_expand *exp);
 void			expansion_add_part(t_expand *exp, char **str, int quote);
 void			expansion_copy_parts(t_expand *dst, t_expand *src);
 
-
 void			expand_tilde(t_epart *part, int first, int last, int ass);
 int				cm_expand_list(t_expand *exp, const t_token *token, int mode);
 char			*cm_expand_str_end(int **quote, t_stringlst *lst);
-char			*cm_expand_str(const t_token *token, int **quote, int ch, int mode);
+char			*cm_expand_str(const t_token *token,
+					int **quote, int ch, int mode);
 char			**cm_expand(const t_token *token, int ***quotes, int mode);
 char			*expand_tilde1(char *str, t_stringlst *lst, int last, int ass);
 void			expand_str_add_part(t_stringlst *lst, t_epart *part, int delim);

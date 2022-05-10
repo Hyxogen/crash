@@ -44,7 +44,7 @@ BUILTINS_FILES	:= \
 UTIL_FILES		:= \
 	die.c memory.c op.c util.c wrap.c strlst1.c err.c atol.c file.c ltoa.c \
 	wrap2.c wrap3.c termios.c stringlst1.c basename.c global.c stringlst2.c \
-	strlst2.c
+	strlst2.c backtrace.c
 
 FILE_NAMES		:= \
 	$(BASE_FILES) \

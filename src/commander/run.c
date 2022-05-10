@@ -34,7 +34,7 @@ t_snode
 		node_destroy(node);
 		return (NULL);
 	}
-	SH_ASSERT(node->childs_size == 1);
+	sh_assert(node->childs_size == 1);
 	child = node->childs[0];
 	node->childs_size = 0;
 	node_destroy(node);

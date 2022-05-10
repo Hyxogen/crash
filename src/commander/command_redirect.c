@@ -49,7 +49,7 @@ int
 	command_setup_external_redirects(const t_snode *redirect_list,
 			const int io[SH_STDIO_SIZE])
 {
-	SH_ASSERT(redirect_list->type == sx_io_redirect_list);
+	sh_assert(redirect_list->type == sx_io_redirect_list);
 	close_or_dup2_fd(io[SH_STDIN_INDEX], STDIN_FILENO);
 	close_or_dup2_fd(io[SH_STDOUT_INDEX], STDOUT_FILENO);
 	close_or_dup2_fd(io[SH_STDERR_INDEX], STDERR_FILENO);

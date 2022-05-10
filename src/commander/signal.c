@@ -32,7 +32,7 @@ void
 		rc = waitpid(0, NULL, WUNTRACED | WNOHANG);
 		if (rc < 0)
 		{
-			SH_ASSERT(errno == ECHILD);
+			sh_assert(errno == ECHILD);
 			break ;
 		}
 		else if (rc == 0)

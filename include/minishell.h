@@ -95,12 +95,14 @@
 # define SH_ENV_EXPORT 1
 # define SH_ENV_READONLY 2
 
+/*
 # ifdef SH_DEBUG
 #  include <assert.h>
-#  define SH_ASSERT assert
+#  define sh_assert assert
 # else
-#  define SH_ASSERT SH_ASSERT_impl
+#  define sh_assert sh_assert_impl
 # endif
+*/
 
 typedef struct s_minishell		t_minishell;
 typedef struct s_envvar			t_envvar;
@@ -232,7 +234,7 @@ void				sh_env_init(char **env);
 void				sh_env_destroy(void);
 
 void				pr_debug(void);
-void				SH_ASSERT_impl(int test);
+void				sh_assert(int test);
 void				sh_check(int test, const char *s);
 void				sh_abort(void);
 void				sh_nop(void *ptr);
