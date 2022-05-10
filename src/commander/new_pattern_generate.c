@@ -9,7 +9,7 @@
 static void
 	_pattern_init_node(t_pattern_node *node)
 {
-	ft_memset(node->chars, 0, sizeof(node->chars)/sizeof(node->chars[0]));
+	ft_memset(node->chars, 0, sizeof(node->chars) / sizeof(node->chars[0]));
 	node->infinite = 0;
 	node->invert = 0;
 	node->wildcard = 0;

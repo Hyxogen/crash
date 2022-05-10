@@ -31,6 +31,7 @@ static void
 {
 	if (command_setup_external_redirects(command->childs[1], io))
 		exit(EXIT_FAILURE);
+	setup_default_signal_handlers();
 	sh_execvp(argv);
 }
 

@@ -27,7 +27,7 @@ char
 	size_t	i;
 	size_t	j;
 
-	sh_assert(word_list->type == sx_wordlist);
+	SH_ASSERT(word_list->type == sx_wordlist);
 	ret = sh_safe_malloc(sizeof(*ret));
 	ret[0] = NULL;
 	i = 0;

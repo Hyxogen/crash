@@ -50,15 +50,11 @@ int
 		while (i < argc)
 		{
 			if (ft_strchr(argv[i], '=') != NULL)
-			{
 				var = _do_assignment(argv[i], 0);
-				var->attr |= SH_ENV_EXPORT;
-			}
 			else
-			{
 				var = sh_getenv_int(argv[i], 1);
+			if (var != NULL)
 				var->attr |= SH_ENV_EXPORT;
-			}
 			i += 1;
 		}
 	}

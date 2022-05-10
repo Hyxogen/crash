@@ -20,7 +20,6 @@
 #include <libft.h>
 #include <unistd.h>
 
-extern int	rl_done;
 extern void	rl_replace_line(const char *text, int clear_undo);
 
 void
@@ -33,7 +32,7 @@ void
 		rc = waitpid(0, NULL, WUNTRACED | WNOHANG);
 		if (rc < 0)
 		{
-			sh_assert(errno == ECHILD);
+			SH_ASSERT(errno == ECHILD);
 			break ;
 		}
 		else if (rc == 0)
@@ -44,6 +43,8 @@ void
 static void
 	sigint_handler(int signal)
 {
+	extern int	rl_done;
+
 	(void) signal;
 	rl_replace_line("", 1);
 	sh()->restart = 1;

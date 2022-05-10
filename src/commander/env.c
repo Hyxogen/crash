@@ -37,6 +37,8 @@ t_envvar
 	t_envvar	*var;
 
 	var = sh_getenv_int(key, 1);
+	if (var == NULL)
+		return (NULL);
 	if (var->attr & SH_ENV_READONLY)
 	{
 		sh_err2(key, "readonly variable");

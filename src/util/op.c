@@ -22,3 +22,9 @@ void
 	sh_nop1(void)
 {
 }
+
+int
+	sh_nop2(void)
+{
+	return (0);
+}

@@ -18,7 +18,8 @@ void
 	{
 		sh_split2(env[i], '=', &key, &value);
 		var = sh_setenv(key, value, 0);
-		var->attr |= SH_ENV_EXPORT;
+		if (var != NULL)
+			var->attr |= SH_ENV_EXPORT;
 		free(key);
 		free(value);
 		i += 1;

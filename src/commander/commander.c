@@ -39,7 +39,7 @@ static t_commandeer_proc
 	{
 		sh_backtrace(32);
 		ft_fprintf(sh()->io[SH_STDERR_INDEX], "No command proc for %d\n", id);
-		sh_assert(procs[id] != NULL);
+		SH_ASSERT(procs[id] != NULL);
 	}
 	return (procs[id]);
 }

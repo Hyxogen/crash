@@ -4,6 +4,8 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <ft_printf.h>
+#include <errno.h>
+#include <string.h>
 
 int
 	sh_waitpid(pid_t pid, int *stat_loc, int options)
@@ -36,7 +38,11 @@ int
 		ret = open(path, oflag, mode);
 	else
 		ret = open(path, oflag);
-	sh_check(ret >= 0, path);
+	if (sh()->is_subshell)
+		sh_check(ret >= 0, path);
+	else
+		if (ret < 0)
+			sh_err2(path, strerror(errno));
 	return (ret);
 }
 

@@ -22,7 +22,7 @@ PARSER_FILES	:= \
 COMMANDER_FILES	:= \
 	commander.c execvp.c pipe_sequence.c env.c redirect_process1.c signal.c \
 	redirect_builtin1.c redirect_builtin2.c run.c condition.c loop.c \
-	command.c expansion.c expand.c expand_param.c expand_command.c \
+	command.c expansion.c expand1.c expand_param1.c expand_command.c \
 	expand_arith.c new_pattern.c new_pattern_brackets.c new_pattern_class.c \
 	new_pattern_generate.c function.c init.c redirect_general.c and_or_if.c \
 	return_code.c assignment.c compound_command.c term.c wildcard.c \
@@ -31,7 +31,8 @@ COMMANDER_FILES	:= \
 	expand_arith_tok.c expand_arith_bin_init1.c expand_arith_bin_init2.c \
 	expand_arith_optok_init.c expand_arith_unary.c expand_arith_bin1.c \
 	expand_arith_lex.c builtins.c pipe_sequence_rec.c pipe_sequence_command.c \
-	wait.c word_list.c expand_arith_bin2.c redirect_process2.c
+	wait.c word_list.c expand_arith_bin2.c redirect_process2.c \
+	expand_param2.c wildcard2.c expand2.c expand3.c
 ARITH_FILES		:= \
 	arith_plus.c arith_minus.c arith_modulo.c arith_divide.c arith_multiply.c \
 	arith_ternary.c arith_shift.c arith_inequality.c arith_equality.c \
@@ -41,8 +42,9 @@ BUILTINS_FILES	:= \
 	set.c echo.c dot.c colon.c exit.c break.c export.c continue.c shift.c \
 	getopts.c cd.c pwd.c unset.c env.c true.c false.c unimplemented.c
 UTIL_FILES		:= \
-	die.c memory.c op.c util.c wrap.c strlst.c err.c atol.c file.c ltoa.c \
-	wrap2.c wrap3.c termios.c stringlst.c basename.c global.c
+	die.c memory.c op.c util.c wrap.c strlst1.c err.c atol.c file.c ltoa.c \
+	wrap2.c wrap3.c termios.c stringlst1.c basename.c global.c stringlst2.c \
+	strlst2.c
 
 FILE_NAMES		:= \
 	$(BASE_FILES) \
@@ -104,7 +106,7 @@ OBJECT_COLOR			:= $(RED)
 CLEAN_COLOR				:= $(PURPLE)
 
 ifndef config
-	config = debug
+	config = distr
 endif
 
 ifndef san
@@ -112,7 +114,7 @@ ifndef san
 endif 
 
 ifeq ($(config), debug)
-	CFLAGS		+= -DSH_DEBUG=1 -fno-inline -g3 -O0
+	CFLAGS		+= -DSH_DEBUG=1 -fno-inline -g3 -O0 -DSH_BACKTRACE
 	LFLAGS		+= -DSH_DEBUG=1 -fno-inline
 	ifeq ($(san), address)
 		CFLAGS	+= -fsanitize=address,undefined
@@ -125,8 +127,8 @@ else ifeq ($(config), release)
 	CFLAGS		+= -g3 -O2
 	LFLAGS		+=
 else ifeq ($(config), distr)
-	CFLAGS		+= -g0 -Ofast -flto
-	LFLAGS		+= -g0 -Ofast -flto
+	CFLAGS		+= -Werror -g0 -Ofast -flto
+	LFLAGS		+= -Werror -g0 -Ofast -flto
 else
 $(error "invalid config $(config"))
 endif

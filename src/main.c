@@ -51,11 +51,23 @@ void
 	}	
 }
 
+static void
+	sh_setup_file(t_input *in, char **argv)
+{
+	int	fd;
+
+	fd = open(argv[1], O_RDONLY);
+	sh_fdctl(fd, SH_FD_FIOCLEX, 1);
+	sh_strlst_clear(sh()->args);
+	sh()->args = sh_strlst_dup(argv + 1);
+	sh()->interactive = 0;
+	input_new(in, in_file, (void *)(unsigned long long) fd);
+}
+
 int
 	main(int argc, char **argv, char **envp)
 {
 	t_input		in;
-	int			fd;
 
 	sh_init(argv, envp);
 	if (argc >= 3 && !ft_strncmp(argv[1], "-c", 3))
@@ -64,14 +76,7 @@ int
 		input_new(&in, in_string, argv[2]);
 	}
 	else if (argc >= 2)
-	{
-		fd = open(argv[1], O_RDONLY);
-		sh_fdctl(fd, SH_FD_FIOCLEX, 1);
-		sh_strlst_clear(sh()->args);
-		sh()->args = sh_strlst_dup(argv + 1);
-		sh()->interactive = 0;
-		input_new(&in, in_file, (void *)(unsigned long long) fd);
-	}
+		sh_setup_file(&in, argv);
 	else if (sh_has_term(STDIN_FILENO) == 1)
 	{
 		disable_kill_signals();

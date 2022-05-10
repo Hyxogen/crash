@@ -37,15 +37,14 @@ char
 	return (str);
 }
 
-/* TODO: what to do if delim not found */
-/* TODO: other functions like ft_strdup() */
+/* ODOT: what to do if delim not found */
 void
 	sh_split2(char *str, char delim, char **lhs, char **rhs)
 {
 	size_t	i;
 
 	i = 0;
-	while (str[i] != delim)
+	while (str[i] != delim && str[i] != '\0')
 		i += 1;
 	*lhs = sh_safe_malloc(i + 1);
 	ft_memcpy(*lhs, str, i);
@@ -68,11 +67,13 @@ int
 
 	if (!stat(filen, &info))
 		return (1);
-	sh_assert(errno == ENOENT);
+	SH_ASSERT(errno == ENOENT);
 	return (0);
 }
 
 // TODO: debug function, remove!!!
+#ifdef SH_BACKTRACE
+
 void
 	sh_backtrace(int count)
 {
@@ -83,3 +84,13 @@ void
 	backtrace_symbols_fd(buffer + 1, count - 1, STDERR_FILENO);
 	free(buffer);
 }
+
+#else
+
+void
+	sh_backtrace(int count)
+{
+	(void) count;
+}
+
+#endif

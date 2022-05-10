@@ -1,6 +1,6 @@
-echo 'put() { printf \\x$(printf %x $1); }'
+echo 'put() { printf \\$(printf %o $1); }'
 echo 'get() { read -n 1; printf %d \'\''$REPLY; }'
-for cmd in $(sed 's/./\0 /g' "$1"); do
+for cmd in $(sed 's/\(.\)/\1 /g' "$1"); do
 	case $cmd in
 		">") echo ': $((bf_ptr+=1))';;
 		"<") echo ': $((bf_ptr-=1))';;

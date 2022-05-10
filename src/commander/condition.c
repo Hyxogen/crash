@@ -12,7 +12,7 @@ static pid_t
 	int	statement_ret;
 	int	body_ret;
 
-	sh_assert(node->type == sx_if_clause);
+	SH_ASSERT(node->type == sx_if_clause);
 	statement_ret = commandeer(node->childs[0], io);
 	body_ret = 0;
 	if (!statement_ret)
@@ -32,7 +32,7 @@ pid_t
 	int	statement_ret;
 	int	body_ret;
 
-	sh_assert(node->type == sx_if_clause);
+	SH_ASSERT(node->type == sx_if_clause);
 	command_setup_internal_redirects(node->childs[node->childs_size - 1],
 		io, old_io);
 	statement_ret = commandeer(node->childs[0], sh()->io);
@@ -103,7 +103,7 @@ pid_t
 	int		old_io[3];
 	int		rc;
 
-	sh_assert(node->type == sx_case_clause);
+	SH_ASSERT(node->type == sx_case_clause);
 	clauses = node->childs_size - 1;
 	lhs = cm_expand_str(&node->token, NULL, ' ', 1);
 	if (!lhs)

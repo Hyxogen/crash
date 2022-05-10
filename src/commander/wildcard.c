@@ -7,85 +7,61 @@
 #include <dirent.h>
 #include <stdlib.h>
 
+void	cm_wildcard_int(char *prefix, char *rest, int *info, char ***out);
+
 void
-	cm_wildcard_add(char *filename, char ***out)
+	cm_wildcard_dir(char *prefix, char *rest, int *info, t_wildcard_ctx *ctx)
 {
-	size_t	i;
+	DIR				*dir;
+	t_pattern_node	*pattern;
+	struct dirent	*ent;
+	char			*tmp;
 
-	i = 0;
-	while ((*out)[i] != NULL)
-		i += 1;
-	*out = sh_safe_reallog(*out,
-		sizeof(**out) * (i + 1),
-		sizeof(**out) * (i + 2));
-	(*out)[i] = ft_strdup(filename);
-	(*out)[i + 1] = NULL;
-}
-
-char
-	*cm_wildcard_join(char *prefix, char *name, char *suffix)
-{
-	char	*result;
-	size_t	size;
-
-	size = ft_strlen(prefix) + ft_strlen(name) + ft_strlen(suffix) + 1;
-	result = sh_safe_malloc(size);
-	result[0] = '\0';
-	ft_strlcat(result, prefix, size);
-	ft_strlcat(result, name, size);
-	ft_strlcat(result, suffix, size);
-	return (result);
+	if (prefix[0] == '\0')
+		dir = opendir(".");
+	else
+		dir = opendir(prefix);
+	if (dir == NULL)
+		return ;
+	pattern = pattern_compile(rest, info);
+	ent = readdir(dir);
+	while (ent != NULL)
+	{
+		if (pattern_match(ent->d_name, pattern, 1))
+		{
+			tmp = cm_wildcard_join(prefix, ent->d_name, &"/"[!ctx->slash]);
+			cm_wildcard_int(tmp, rest + ctx->i + ctx->slash,
+				info + ctx->i + 1, ctx->out);
+			ctx->has_match = (free(tmp), 1);
+		}
+		ent = readdir(dir);
+	}
+	(void) (pattern_destroy(pattern), closedir(dir));
 }
 
 void
 	cm_wildcard_int(char *prefix, char *rest, int *info, char ***out)
 {
-	size_t			i;
-	t_pattern_node	*pattern;
-	DIR				*dir;
-	struct dirent	*ent;
+	t_wildcard_ctx	ctx;
 	char			*tmp;
-	int				slash;
-	int				has_match;
 
 	if (*rest == '\0')
 	{
 		cm_wildcard_add(prefix, out);
 		return ;
 	}
-	i = 0;
-	while (rest[i] != '/' && rest[i] != '\0')
-		i += 1;
-	slash = rest[i] == '/';
-	rest[i] = '\0';
-	has_match = 0;
-	if (prefix[0] == '\0')
-		dir = opendir(".");
-	else
-		dir = opendir(prefix);
-	if (dir != NULL)
+	ctx.out = out;
+	ctx.i = 0;
+	while (rest[ctx.i] != '/' && rest[ctx.i] != '\0')
+		ctx.i += 1;
+	ctx.slash = rest[ctx.i] == '/';
+	rest[ctx.i] = '\0';
+	ctx.has_match = 0;
+	cm_wildcard_dir(prefix, rest, info, &ctx);
+	if (!ctx.has_match)
 	{
-		pattern = pattern_compile(rest, info);
-		while (1)
-		{
-			ent = readdir(dir);
-			if (ent == NULL)
-				break ;
-			if (pattern_match(ent->d_name, pattern, 1))
-			{
-				tmp = cm_wildcard_join(prefix, ent->d_name, &"/"[!slash]);
-				cm_wildcard_int(tmp, rest + i + slash, info + i + 1, out);
-				free(tmp);
-				has_match = 1;
-			}
-		}
-		pattern_destroy(pattern);
-		closedir(dir);
-	}
-	if (!has_match)
-	{
-		tmp = cm_wildcard_join(prefix, rest, &"/"[!slash]);
-		cm_wildcard_int(tmp, rest + i + slash, info + i + 1, out);
+		tmp = cm_wildcard_join(prefix, rest, &"/"[!ctx.slash]);
+		cm_wildcard_int(tmp, rest + ctx.i + ctx.slash, info + ctx.i + 1, out);
 		free(tmp);
 	}
 }

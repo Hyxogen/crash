@@ -10,8 +10,6 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-extern int rl_catch_signals;
-
 t_snode
 	*pr_parse(t_parser *pr)
 {
@@ -24,7 +22,7 @@ t_snode
 		node_destroy(node);
 		return (NULL);
 	}
-	sh_assert(node->childs_size == 1);
+	SH_ASSERT(node->childs_size == 1);
 	child = node->childs[0];
 	node->childs_size = 0;
 	node_destroy(node);
@@ -46,12 +44,6 @@ void
 	in->more = 0;
 	pr->lexer->error = 0;
 	pr_next_token(pr);
-}
-
-int
-	sh_cm_nop(void)
-{
-	return (0);
 }
 
 static void
@@ -84,8 +76,10 @@ static void
 static void
 	sh_setup(t_input *in, t_parser *pr, t_lexer *lex, t_source *src)
 {
+	extern int	rl_catch_signals;
+
 	rl_catch_signals = 1;
-	rl_event_hook = sh_cm_nop;
+	rl_event_hook = sh_nop2;
 	pr_init(pr);
 	src_init(src, in);
 	lex->src = src;

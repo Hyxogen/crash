@@ -10,7 +10,7 @@ pid_t
 
 	argc = get_argument_count(argv);
 	if (command_setup_internal_redirects(command->childs[1], io, old_io))
-		return (SH_ERROR_INTERNAL_PID);
+		return (SH_FAILURE_INTERNAL_PID);
 	return_code = function->fn(argc, argv);
 	command_restore_internal_redirects(io, old_io);
 	sh_env_clean();

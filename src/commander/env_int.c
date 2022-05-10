@@ -1,6 +1,7 @@
 #include "minishell.h"
 
 #include "memory.h"
+#include "parser.h"
 #include <libft.h>
 
 /* Yes, if we don't use 'norminette_uncrasher'
@@ -11,6 +12,11 @@ t_envvar
 	t_envvar	*norminette_uncrasher;
 	t_envvar	*var;
 
+	if (!pr_is_name(key, ft_strlen(key)))
+	{
+		sh_err2(key, "not a valid identifier");
+		return (NULL);
+	}
 	norminette_uncrasher = sh_safe_realloc(sh()->vars,
 			sizeof(*sh()->vars) * sh()->vars_size,
 			sizeof(*sh()->vars) * (sh()->vars_size + 1));

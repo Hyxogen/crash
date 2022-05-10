@@ -23,8 +23,7 @@ t_snode
 
 	node = snode(sx_none);
 	pr_complete_cmdlst(pr, node);
-	// TODO: more than 1 child?
-	sh_assert(node->childs_size == 1);
+	SH_ASSERT(node->childs_size == 1);
 	child = node->childs[0];
 	node->childs_size = 0;
 	node_destroy(node);

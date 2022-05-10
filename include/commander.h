@@ -97,6 +97,8 @@ typedef struct s_arith_parser	t_arith_parser;
 typedef struct s_arith_operator	t_arith_op;
 typedef struct s_arith_optok	t_arith_optok;
 typedef struct s_arith_value	t_arith_value;
+typedef struct s_exp_param_ctx	t_exp_param_ctx;
+typedef struct s_wildcard_ctx	t_wildcard_ctx;
 
 struct s_simple_cmd_ctx {
 	const t_snode		*cmd_node;
@@ -173,6 +175,26 @@ struct s_arith_value {
 	long		value;
 	const char	*str;
 	size_t		size;
+};
+
+struct s_exp_param_ctx {
+	int				*info;
+	char			*pattern;
+	int				long_mode;
+	size_t			i;
+	size_t			j;
+	size_t			best;
+	char			*str;
+	int				ch;
+	int				match;
+	t_pattern_node	*comp_pattern;
+};
+
+struct s_wildcard_ctx {
+	int		slash;
+	size_t	i;
+	int		has_match;
+	char	***out;
 };
 
 int				command(t_snode *cmd_node, int io[3]);
@@ -261,6 +283,14 @@ int				expand_empty(t_expand *exp, int empty_is_null);
 size_t			expand_length(t_expand *exp);
 int				expand_error(t_param_ctx *ctx, size_t i);
 int				expand_special(t_expand *exp, char *key);
+int				expand_assign(t_expand *exp,
+					t_param_ctx *ctx, size_t i, int mode);
+int				expand_right(t_expand *exp,
+					t_param_ctx *ctx, size_t i, int mode);
+int				expand_promote(t_expand *exp,
+					t_expand *tmp);
+void			expand_pattern_percent(t_exp_param_ctx *ctxx);
+void			expand_pattern_hash(t_exp_param_ctx *ctxx, t_expand *exp);
 
 pid_t			cm_unimplemented_cmd_command(const t_snode *node,
 					const int io[3]);
@@ -283,6 +313,20 @@ void			expansion_destroy(t_expand *exp);
 void			expansion_init(t_expand *exp);
 void			expansion_add_part(t_expand *exp, char **str, int quote);
 void			expansion_copy_parts(t_expand *dst, t_expand *src);
+
+
+void			expand_tilde(t_epart *part, int first, int last, int ass);
+int				cm_expand_list(t_expand *exp, const t_token *token, int mode);
+char			*cm_expand_str_end(int **quote, t_stringlst *lst);
+char			*cm_expand_str(const t_token *token, int **quote, int ch, int mode);
+char			**cm_expand(const t_token *token, int ***quotes, int mode);
+char			*expand_tilde1(char *str, t_stringlst *lst, int last, int ass);
+void			expand_str_add_part(t_stringlst *lst, t_epart *part, int delim);
+void			expand_collate(t_expand *e, t_stringlst *l);
+void			expand_split(t_stringlst *lst, int *new, char *str, int quot);
+void			expand_add_str(t_stringlst *lst, int *new, char *str, int quot);
+void			expand_add(t_stringlst *lst, int *new, int tmp, int quot);
+int				expand_part(t_expand *exp, const t_tpart *part, int mode);
 
 int				_pattern_process_collating_class(char **pattern,
 					t_pattern_node *node, char *ch);
@@ -427,6 +471,8 @@ int				arith_lex(t_arith_lexer *lex, t_arith_token *tok);
 long			expand_arith_str(const char *str,
 					int *error, int recursion_level);
 
+void			cm_wildcard_add(char *filename, char ***out);
+char			*cm_wildcard_join(char *prefix, char *name, char *suffix);
 void			cm_wildcard(const char *path, int *info, char ***out);
 char			**cm_wildcard_expand(const t_token *token);
 #endif

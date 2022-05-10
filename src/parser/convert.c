@@ -14,7 +14,7 @@
 #include "parser.h"
 #include <libft.h>
 
-static int
+int
 	pr_is_name(const char *str, size_t size)
 {
 	size_t	i;
@@ -59,7 +59,7 @@ int
 	if (token == NULL || token->id != tk_word)
 		return (0);
 	len = ft_strlen(pr_get_keywords()[id - kw_if]);
-	sh_assert(token->str != NULL);
+	SH_ASSERT(token->str != NULL);
 	if (ft_memcmp(pr_get_keywords()[id - kw_if], token->str, len + 1) == 0)
 	{
 		token->id = id;

@@ -17,7 +17,10 @@ int
 	ft_memcpy(old_io, sh()->io, sizeof(sh()->io));
 	ft_memcpy(sh()->io, io, sizeof(sh()->io));
 	if (_cm_setup_builtin_redirects(redirect_list, sh()->io))
+	{
+		ft_memcpy(sh()->io, old_io, sizeof(sh()->io));
 		return (-1);
+	}
 	return (0);
 }
 
@@ -34,7 +37,7 @@ int
 	command_setup_external_redirects(const t_snode *redirect_list,
 			const int io[SH_STDIO_SIZE])
 {
-	sh_assert(redirect_list->type == sx_io_redirect_list);
+	SH_ASSERT(redirect_list->type == sx_io_redirect_list);
 	close_or_dup2_fd(io[SH_STDIN_INDEX], STDIN_FILENO);
 	close_or_dup2_fd(io[SH_STDOUT_INDEX], STDOUT_FILENO);
 	close_or_dup2_fd(io[SH_STDERR_INDEX], STDERR_FILENO);

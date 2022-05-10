@@ -83,24 +83,23 @@
  * errors for unclosed stuff
  * disable SIGINT and SIGQUIT ignoring for internal commands
  * ! in PS1
+ * return value of lex_main is rarely checked
+ * handle all the shell variables
+ * first argument of shell scripts
+ * shell flags (set -)
  */
 
 /* FOR SURE TODO:
- * handle all the shell variables
- * return value of lex_main is rarely checked
- * don't export invalid identifiers
- * shell flags (set -)
- * remove globals according to the subject/norminette
- * first argument of shell scripts
  */
+
 # define SH_ENV_EXPORT 1
 # define SH_ENV_READONLY 2
 
 # ifdef SH_DEBUG
 #  include <assert.h>
-#  define sh_assert assert
+#  define SH_ASSERT assert
 # else
-#  define sh_assert sh_assert_impl
+#  define SH_ASSERT SH_ASSERT_impl
 # endif
 
 typedef struct s_minishell		t_minishell;
@@ -126,8 +125,8 @@ typedef unsigned char			t_byte;
 # ifndef SH_INVALID_INTERNAL_PID
 #  define SH_INVALID_INTERNAL_PID 1
 # endif
-# ifndef SH_ERROR_INTERNAL_PID
-#  define SH_ERROR_INTERNAL_PID 2
+# ifndef SH_FAILURE_INTERNAL_PID
+#  define SH_FAILURE_INTERNAL_PID -1
 # endif
 
 # ifndef SH_CLOSED_FD
@@ -233,11 +232,12 @@ void				sh_env_init(char **env);
 void				sh_env_destroy(void);
 
 void				pr_debug(void);
-void				sh_assert_impl(int test);
+void				SH_ASSERT_impl(int test);
 void				sh_check(int test, const char *s);
 void				sh_abort(void);
 void				sh_nop(void *ptr);
 void				sh_nop1(void);
+int					sh_nop2(void);
 
 char				*sh_basename(char *str);
 
@@ -258,6 +258,7 @@ char				*sh_getcwd(void);
 
 int					sh_exists(const char *filen);
 void				sh_strlst_clear(char **strs);
+size_t				sh_strlst_strsize(char **strs, int delim);
 char				*sh_strlst_join(char **strs, int delim);
 char				**sh_strlst_new(char *str);
 char				**sh_strlst_empty(void);

@@ -98,7 +98,7 @@ int
 			io_index = SH_STDIN_INDEX;
 		return ((io[io_index] = _cm_open_file(filen,
 					fl(node->type), 0644 * (node->type == sx_clobber
-						|| node->type == sx_lessgreat)), 0) < 0);
+						|| node->type == sx_lessgreat))));
 	}
 	if (sh_exists(filen) && sh()->clobber)
 		return (sh_err1("cannot overwrite existing file"), -1);

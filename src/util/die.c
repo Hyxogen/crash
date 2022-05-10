@@ -26,7 +26,7 @@ void
 }
 
 void
-	sh_assert_impl(int test)
+	SH_ASSERT_impl(int test)
 {
 	if (!test)
 	{

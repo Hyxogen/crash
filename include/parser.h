@@ -108,6 +108,7 @@ struct s_snode
 
 const char	**pr_get_keywords(void);
 
+int			pr_is_name(const char *str, size_t size);
 int			pr_convert_reserved(t_parser *pr, t_token *token);
 int			pr_convert_keyword(t_parser *pr, t_token *token, t_token_id id);
 int			pr_error_convert_keyword(t_parser *pr, t_token *token,

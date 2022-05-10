@@ -1,3 +1,4 @@
+#include "minishell.h"
 #include "memory.h"
 #include "libft.h"
 #include <stdlib.h>
@@ -30,12 +31,7 @@ char
 	size_t	len;
 
 	tot_len = 0;
-	cpy = strs;
-	while (*cpy)
-	{
-		tot_len += ft_strlen(*cpy) + (delim != '\0' && cpy != strs);
-		cpy += 1;
-	}
+	tot_len = sh_strlst_strsize(strs, delim);
 	result = sh_safe_malloc(tot_len + 1);
 	cpy = strs;
 	while (*cpy)

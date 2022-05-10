@@ -68,7 +68,7 @@ int
 	pr_next_token(&pr);
 	node = snode(sx_none);
 	pr_complete_cmdlst(&pr, node);
-	sh_assert(node->childs_size == 1);
+	SH_ASSERT(node->childs_size == 1);
 	result = expand_command(exp, node->childs[0]);
 	node_destroy(node);
 	pr_destroy(&pr);

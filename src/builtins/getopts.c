@@ -1,10 +1,19 @@
 #include "minishell.h"
 #include "commander.h"
 #include "memory.h"
-
 #include <stdlib.h>
 
 // ODOT: this implementation is incomplete
+
+static void
+	sh_do(char buf[2], char *key, char **str, long *ind)
+{
+	buf[0] = *(*str);
+	buf[1] = '\0';
+	sh_setenv(key, buf, 0);
+	*str += 1;
+	*ind += 1;
+}
 
 static int
 	sh_getopt(char *str, char *key, long *ind, char **args)
@@ -14,39 +23,23 @@ static int
 	if (args[*ind] == NULL || args[*ind][0] != '-')
 		return (1);
 	if (args[*ind][1] == '-')
-	{
-		*ind += 1;
-		return (1);
-	}
+		return (*ind += 1, 1);
 	while (*str != '\0')
 	{
 		if (*str == args[*ind][1] && *str != ':')
 		{
-			buf[0] = *str;
-			buf[1] = '\0';
-			sh_setenv(key, buf, 0);
-			str += 1;
-			*ind += 1;
+			sh_do(buf, key, &str, ind);
 			if (*str != ':')
 				return (0);
 			if (args[*ind] == NULL)
-			{
-				sh_setenv(key, "?", 0);
-				sh_unset("OPTARG");
-				sh_err2("usage", "option requires an argument");
-				return (0);
-			}
-			sh_setenv("OPTARG", args[*ind], 0);
-			str += 1;
-			*ind += 1;
-			return (0);
+				return (sh_err2("usage", "option requires an argument"),
+					sh_setenv(key, "?", 0), sh_unset("OPTARG"), 0);
+			return (sh_setenv("OPTARG", args[*ind], 0), str += 1, *ind += 1, 0);
 		}
 		str += 1;
 	}
 	sh_setenv(key, "?", 0);
-	sh_unset("OPTARG");
-	sh_err2("usage", "illegal option");
-	return (0);
+	return (sh_unset("OPTARG"), sh_err2("usage", "illegal option"), 0);
 }
 
 int
