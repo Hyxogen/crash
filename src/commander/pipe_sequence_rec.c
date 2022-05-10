@@ -14,6 +14,9 @@
 
 #include <unistd.h>
 
+
+#include <stdio.h>
+
 static int
 	execute_commands_recursive_not_last(const t_snode *pipe_seq,
 			const int final_out_fd, int previous_out_fd, size_t index)
@@ -24,6 +27,7 @@ static int
 
 	current_out_fd = create_pipe_and_execute_command(pipe_seq->childs[index],
 			&command_pid, previous_out_fd);
+	fprintf(stderr, "gonna close %d\n", previous_out_fd);
 	close_nostd_fd(previous_out_fd);
 	last_return_code = execute_commands_recursive(pipe_seq,
 			final_out_fd, current_out_fd, index + 1);
@@ -43,6 +47,7 @@ static int
 	command_io[SH_STDOUT_INDEX] = final_out_fd;
 	command_io[SH_STDERR_INDEX] = STDERR_FILENO;
 	command_pid = execute_command_fork(pipe_seq->childs[index], command_io);
+	fprintf(stderr, "gonna close %d\n", previous_out_fd);
 	close_nostd_fd(previous_out_fd);
 	return_code = wait_and_get_return_code(command_pid);
 	return (return_code);

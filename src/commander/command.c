@@ -15,6 +15,9 @@
 #include <stdlib.h>
 #include <errno.h>
 
+
+#include <stdio.h>
+
 static pid_t
 	execute_external_command(const t_snode *command,
 		char **argv, const int io[SH_STDIO_SIZE]);
@@ -59,6 +62,7 @@ static pid_t
 		setup_and_try_execve_command(command, argv, io);
 		handle_execvp_error(argv[0], errno);
 	}
+	fprintf(stderr, "'%s' in:%d out:%d err:%d\n", argv[0], io[0], io[1], io[2]);
 	return (command_pid);
 }
 

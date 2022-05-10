@@ -18,6 +18,7 @@
 #include <ft_printf.h>
 #include <errno.h>
 #include <string.h>
+#include <stdio.h>
 
 int
 	sh_waitpid(pid_t pid, int *stat_loc, int options)
@@ -34,6 +35,7 @@ int
 {
 	int	ret;
 
+	fprintf(stderr, "closing %d\n", fildes);
 	ret = close(fildes);
 	sh_check(ret >= 0, "close");
 	sh_fdctl(fildes, SH_FD_FIOCLEX, 0);

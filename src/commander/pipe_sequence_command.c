@@ -15,6 +15,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+
+#include <stdio.h>
+
 static t_command
 	get_command_function(const t_snode *command)
 {
@@ -47,12 +50,17 @@ pid_t
 {
 	pid_t		fork_pid;
 	pid_t		command_pid;
+	int			return_code;
 
+	fprintf(stderr, "a '%s' with stdin:%d stdout:%d\n", command->token.str, io[SH_STDIN_INDEX], io[SH_STDOUT_INDEX]);
 	fork_pid = sh_fork();
 	if (fork_pid == 0)
 	{
 		command_pid = execute_command_nofork(command, io);
-		exit(wait_and_get_return_code(command_pid));
+		sh_close(3);
+		return_code = wait_and_get_return_code(command_pid);
+		fprintf(stderr, "done %d\n", getpid());
+		exit(return_code);
 	}
 	return (fork_pid);
 }
