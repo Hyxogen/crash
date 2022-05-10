@@ -20,7 +20,7 @@ int
 	}
 	if (sh_atol(argv[1], &ex_code) < 0)
 	{
-		sh_err2("exit", "numeric argument required");
+		sh_err3("exit", argv[1], "numeric argument required");
 		exit(0);
 	}
 	exit(ex_code);

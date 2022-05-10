@@ -58,7 +58,12 @@ int
 	int			fd;
 
 	sh_init(argv, envp);
-	if (argc >= 2)
+	if (argc >= 3 && !ft_strncmp(argv[1], "-c", 3))
+	{
+		sh()->interactive = 0;
+		input_new(&in, in_string, argv[2]);
+	}
+	else if (argc >= 2)
 	{
 		fd = open(argv[1], O_RDONLY);
 		sh_fdctl(fd, SH_FD_FIOCLEX, 1);

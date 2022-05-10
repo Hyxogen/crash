@@ -18,7 +18,6 @@ void
 	sh()->builtins = get_builtins();
 	sh()->builtins_size = get_builtins_count();
 	sh()->functions = NULL;
-	sh()->functions_size = 0;
 	sh()->utilities = get_utilities();
 	sh()->utilities_size = get_utilities_count();
 	sh()->args = sh_strlst_dup(argv);
@@ -27,8 +26,7 @@ void
 	sh()->io[SH_STDOUT_INDEX] = STDOUT_FILENO;
 	sh()->io[SH_STDERR_INDEX] = STDERR_FILENO;
 	sh()->last_bg_proc = -1;
-	sh()->is_subshell = 0;
-	sh()->clobber = 0;
+	sh()->functions_size = sh()->is_subshell = sh()->clobber = 0;
 	tmp = ft_strdup(argv[0]);
 	sh()->name = sh_basename(tmp);
 	free(tmp);

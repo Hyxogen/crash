@@ -76,6 +76,5 @@ int
 	optind_str = sh_safe_malloc(21);
 	sh_ltoa(optind, optind_str, 21);
 	sh_setenv("OPTIND", optind_str, 0);
-	free(optind_str);
-	return (result);
+	return (free(optind_str), result);
 }

@@ -22,7 +22,7 @@ int
 	}
 	else if (sh_atol(argv[1], &count) < 0)
 	{
-		sh_err2("break", "numeric argument required");
+		sh_err3("break", argv[1], "numeric argument required");
 		sh()->breaking = INT_MAX;
 		return (1);
 	}

@@ -23,7 +23,7 @@ int
 	}
 	else if (sh_atol(argv[1], &count) < 0)
 	{
-		sh_err2("continue", "numeric argument required");
+		sh_err3("continue", argv[1], "numeric argument required");
 		return (sh()->breaking = INT_MAX, 1);
 	}
 	if (count > sh()->loop_depth)

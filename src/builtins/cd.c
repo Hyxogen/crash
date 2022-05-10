@@ -17,7 +17,7 @@ int
 		path = sh_getenv("HOME", NULL);
 	if (path != NULL)
 		if (chdir(path) < 0)
-			sh_err2("cd", strerror(errno));
+			sh_err3("cd", argv[1], strerror(errno));
 	sh()->pwd = sh_getcwd();
 	return (0);
 }

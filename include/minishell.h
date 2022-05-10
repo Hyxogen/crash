@@ -81,17 +81,16 @@
 /* MAYBE ODOT:
  * break in pipe sequence
  * errors for unclosed stuff
+ * disable SIGINT and SIGQUIT ignoring for internal commands
  * ! in PS1
  */
 
 /* FOR SURE TODO:
  * handle all the shell variables
  * return value of lex_main is rarely checked
- * disable SIGINT and SIGQUIT ignoring for internal commands
  * don't export invalid identifiers
  * shell flags (set -)
  * remove globals according to the subject/norminette
- * "" permission denied
  */
 # define SH_ENV_EXPORT 1
 # define SH_ENV_READONLY 2

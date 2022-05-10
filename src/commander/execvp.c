@@ -74,7 +74,8 @@ int
 	int		ret;
 
 	strings[0] = sh_getenv("PATH", NULL);
-	if (ft_strchr(argv[0], '/') != NULL || strings[0] == NULL)
+	if (ft_strchr(argv[0], '/') != NULL || strings[0] == NULL
+		|| argv[0][0] == '\0')
 		return (sh_exec(argv[0], argv));
 	path = ft_split(strings[0], ':');
 	i = 0;
@@ -91,6 +92,5 @@ int
 		free(strings[1]);
 		i += 1;
 	}
-	sh_free_list(path);
-	return (-1);
+	return (sh_free_list(path), -1);
 }
