@@ -16,10 +16,16 @@
 #include <sys/wait.h>
 
 int
-	status_code_to_return_code(int status_code)
+	status_code_to_return_code(int status_code, int *signalled)
 {
+	if (signalled)
+		*signalled = 0;
 	if (WIFSIGNALED(status_code))
+	{
+		if (signalled)
+			*signalled = 1;
 		return (SH_RETCODE_SIGNALLED_OFFSET + WTERMSIG(status_code));
+	}
 	return (WEXITSTATUS(status_code));
 }
 

@@ -323,6 +323,7 @@ void				history_new_command(void);
 
 void				setup_default_signal_handlers(void);
 void				disable_kill_signals(void);
+void				ignore_kill_signals(void);
 
 void				sh_get_term_attr(t_mega_termios *attr);
 void				sh_set_term_attr(t_mega_termios *attr);

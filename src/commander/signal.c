@@ -70,6 +70,18 @@ void
 }
 
 void
+	ignore_kill_signals(void)
+{
+	struct sigaction	action;
+
+	sigemptyset(&action.sa_mask);
+	action.sa_handler = SIG_IGN;
+	action.sa_flags = SA_NODEFER | SA_RESTART;
+	sh_sigaction(SIGQUIT, &action, NULL);
+	sh_sigaction(SIGINT, &action, NULL);
+}
+
+void
 	disable_kill_signals(void)
 {
 	struct sigaction	action;

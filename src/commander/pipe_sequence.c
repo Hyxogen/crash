@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ft_printf.h>
 
 static int
 	pipe_seq_should_execute(const t_snode *pipe_seq)
@@ -52,7 +53,7 @@ static int
 		return_code = execute_pipe_seq_nofork(pipe_seq, io);
 		exit(return_code);
 	}
-	return_code = process_wait_and_get_return_code(pipe_pid);
+	return_code = process_wait_and_get_return_code(pipe_pid, NULL);
 	return (return_code);
 }
 
@@ -62,9 +63,12 @@ static int
 {
 	pid_t	command_pid;
 	int		return_code;
+	int		signalled;
 
 	command_pid = execute_command_nofork(pipe_seq->childs[0], io);
-	return_code = wait_and_get_return_code(command_pid);
+	return_code = wait_and_get_return_code(command_pid, &signalled);
+	if (signalled)
+		ft_fprintf(sh()->io[SH_STDOUT_INDEX], "\n");
 	return (return_code);
 }
 

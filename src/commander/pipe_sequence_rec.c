@@ -13,9 +13,7 @@
 #include "commander.h"
 
 #include <unistd.h>
-
-
-#include <stdio.h>
+#include <ft_printf.h>
 
 static int
 	execute_commands_recursive_not_last(const t_snode *pipe_seq,
@@ -27,11 +25,10 @@ static int
 
 	current_out_fd = create_pipe_and_execute_command(pipe_seq->childs[index],
 			&command_pid, previous_out_fd);
-	fprintf(stderr, "gonna close %d\n", previous_out_fd);
 	close_nostd_fd(previous_out_fd);
 	last_return_code = execute_commands_recursive(pipe_seq,
 			final_out_fd, current_out_fd, index + 1);
-	wait_and_get_return_code(command_pid);
+	wait_and_get_return_code(command_pid, NULL);
 	return (last_return_code);
 }
 
@@ -42,14 +39,20 @@ static int
 	pid_t	command_pid;
 	int		return_code;
 	int		command_io[SH_STDIO_SIZE];
+	int		fake_pipe[2];
+	int		signalled;
 
 	command_io[SH_STDIN_INDEX] = previous_out_fd;
 	command_io[SH_STDOUT_INDEX] = final_out_fd;
 	command_io[SH_STDERR_INDEX] = STDERR_FILENO;
-	command_pid = execute_command_fork(pipe_seq->childs[index], command_io);
-	fprintf(stderr, "gonna close %d\n", previous_out_fd);
+	fake_pipe[0] = previous_out_fd;
+	fake_pipe[1] = final_out_fd;
+	command_pid = execute_command_fork(pipe_seq->childs[index], command_io,
+				fake_pipe);
 	close_nostd_fd(previous_out_fd);
-	return_code = wait_and_get_return_code(command_pid);
+	return_code = wait_and_get_return_code(command_pid, &signalled);
+	if (signalled)
+		ft_fprintf(sh()->io[SH_STDOUT_INDEX], "\n");
 	return (return_code);
 }
 

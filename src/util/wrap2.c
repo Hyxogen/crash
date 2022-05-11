@@ -35,7 +35,6 @@ int
 {
 	int	ret;
 
-	fprintf(stderr, "closing %d\n", fildes);
 	ret = close(fildes);
 	sh_check(ret >= 0, "close");
 	sh_fdctl(fildes, SH_FD_FIOCLEX, 0);

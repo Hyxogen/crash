@@ -221,7 +221,7 @@ pid_t			cm_compound_list(const t_snode *node,
 pid_t			execute_command_nofork(const t_snode *command,
 					const int io[SH_STDIO_SIZE]);
 pid_t			execute_command_fork(const t_snode *command,
-					const int io[SH_STDIO_SIZE]);
+					const int io[SH_STDIO_SIZE], int pipe_io[2]);
 int				create_pipe_and_execute_command(const t_snode *command,
 					pid_t *command_pid, int input_fd);
 int				execute_commands_recursive(const t_snode *pipe_seq,
@@ -299,11 +299,15 @@ char			**cm_word_list_to_array(const t_snode *word_list);
 
 void			try_reap_all_childs(void);
 
-int				status_code_to_return_code(int status_code);
+int				command_is_internal(pid_t command_pid);
+int				status_code_to_return_code(int status_code,
+					int *signalled);
 int				internal_pid_to_return_code(pid_t command_pid);
 pid_t			return_code_to_internal_pid(int return_code);
-int				process_wait_and_get_return_code(pid_t pid);
-int				wait_and_get_return_code(pid_t command_pid);
+int				process_wait_and_get_return_code(pid_t pid,
+					int *signalled);
+int				wait_and_get_return_code(pid_t command_pid,
+					int *signalled);
 
 int				sh_cm_run(t_input *in);
 int				match_pattern(const char *str, const char *pattern,

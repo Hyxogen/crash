@@ -80,8 +80,10 @@ static void
 		node_destroy(node);
 		return ;
 	}
+	ignore_kill_signals();
 	if (node != NULL)
 		commandeer(node, sh()->io);
+	disable_kill_signals();
 	node_destroy(node);
 }
 

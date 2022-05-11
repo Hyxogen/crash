@@ -15,9 +15,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-
-#include <stdio.h>
-
 static t_command
 	get_command_function(const t_snode *command)
 {
@@ -46,20 +43,19 @@ pid_t
 }
 
 pid_t
-	execute_command_fork(const t_snode *command, const int io[SH_STDIO_SIZE])
+	execute_command_fork(const t_snode *command, const int io[SH_STDIO_SIZE], int pipe_io[2])
 {
 	pid_t		fork_pid;
 	pid_t		command_pid;
 	int			return_code;
 
-	fprintf(stderr, "a '%s' with stdin:%d stdout:%d\n", command->token.str, io[SH_STDIN_INDEX], io[SH_STDOUT_INDEX]);
 	fork_pid = sh_fork();
 	if (fork_pid == 0)
 	{
 		command_pid = execute_command_nofork(command, io);
-		sh_close(3);
-		return_code = wait_and_get_return_code(command_pid);
-		fprintf(stderr, "done %d\n", getpid());
+		sh_close(pipe_io[0]);
+		sh_close(pipe_io[1]);
+		return_code = wait_and_get_return_code(command_pid, NULL);
 		exit(return_code);
 	}
 	return (fork_pid);
@@ -78,7 +74,7 @@ int
 	command_io[SH_STDIN_INDEX] = input_fd;
 	command_io[SH_STDOUT_INDEX] = pipe_io[1];
 	command_io[SH_STDERR_INDEX] = STDERR_FILENO;
-	*command_pid = execute_command_fork(command, command_io);
+	*command_pid = execute_command_fork(command, command_io, pipe_io);
 	sh_close(pipe_io[1]);
 	return (pipe_io[0]);
 }
