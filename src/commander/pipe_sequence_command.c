@@ -6,7 +6,7 @@
 /*   By: csteenvo <csteenvo@student.codam.n>        .:-*#************#-       */
 /*                                                 :=+*+=+*********####+:     */
 /*   Created: 2022/05/10 12:02:06 by csteenvo     ..     +**=-=***-           */
-/*   Updated: 2022/05/10 12:02:08 by csteenvo            :      ..            */
+/*   Updated: 2022/05/13 12:37:22 by csteenvo            :      ..            */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,8 @@ pid_t
 }
 
 pid_t
-	execute_command_fork(const t_snode *command, const int io[SH_STDIO_SIZE], int pipe_io[2])
+	execute_command_fork(const t_snode *command, const int io[SH_STDIO_SIZE],
+		int pipe_io[2])
 {
 	pid_t		fork_pid;
 	pid_t		command_pid;

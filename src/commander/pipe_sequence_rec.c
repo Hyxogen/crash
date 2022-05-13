@@ -6,7 +6,7 @@
 /*   By: csteenvo <csteenvo@student.codam.n>        .:-*#************#-       */
 /*                                                 :=+*+=+*********####+:     */
 /*   Created: 2022/05/10 12:00:01 by csteenvo     ..     +**=-=***-           */
-/*   Updated: 2022/05/10 12:00:01 by csteenvo            :      ..            */
+/*   Updated: 2022/05/13 12:39:40 by csteenvo            :      ..            */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ static int
 	fake_pipe[0] = previous_out_fd;
 	fake_pipe[1] = final_out_fd;
 	command_pid = execute_command_fork(pipe_seq->childs[index], command_io,
-				fake_pipe);
+			fake_pipe);
 	close_nostd_fd(previous_out_fd);
 	return_code = wait_and_get_return_code(command_pid, &signalled);
 	if (signalled)
