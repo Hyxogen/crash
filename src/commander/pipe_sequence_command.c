@@ -55,7 +55,6 @@ pid_t
 	{
 		command_pid = execute_command_nofork(command, io);
 		sh_close(pipe_io[0]);
-		sh_close(pipe_io[1]);
 		return_code = wait_and_get_return_code(command_pid, NULL);
 		exit(return_code);
 	}
