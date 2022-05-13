@@ -157,7 +157,7 @@ $(FT_PRINTF_LIB):
 	$(SILENT)${MAKE} -C $(FT_PRINTF_DIR) bonus
 
 crash: $(NAME)
-	$(SILENT)#ln -s $(NAME) $@
+	$(SILENT)ln -s $(NAME) $@
 
 clean:
 	@printf $(CLEAN_COLOR)Cleaning\ object\ files\ and\ dependencies$(RESET)\\n
