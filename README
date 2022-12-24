@@ -97,4 +97,4 @@ faq
 ============
 Q:why so many files with so little amount of functions
 A:the subject requires you to work in a specific format, which limits you to
-  max 25 lines per functions, and max 5 functions per file
+  max 25 lines per function, and max 5 functions per file
