@@ -1,0 +1,100 @@
+crash
+============
+crash is our implementation of the 42 common core project "minishell". However
+unlike what the subject requires, we've built a fully posix compliant shell.
+
+crash stands for Can't Rest Again SHell which we (kind of derived) out of the
+pain it is to implement a standard compliant shell.
+
+using our shell
+============
+To compile crash, you'll need to have readline headers and the readline shared
+library. Which you can install with your favorite package manager if not
+already installed.
+
+Once you have readline, using crash is as easy as just cloning the repo and
+calling "make" in the root repo directory. As far as we know, it should work
+on any unix system, but your milage may vary. It has been tested to work on
+MacOSX 11 and Linux. After the sources are compiled, you should be able to
+start the shell with ./crash
+
+If you're wondering what this shell can do, you can take a look at the
+test/scripts/ directory for some examples. In theory all posix compliant shell
+scripts should work with crash.
+
+Our shell also supports a rc file called .crashrc, which you have to place in
+your user's home directory
+
+what the project required us to do
+============
+x Display a promt when waiting for a new command
+x Have a working history
+x Search and launch the right executable (based on PATH etc.)
+x Cannot use more than one global variable
+x Handle single qoutes ''
+x Handle double quotes ""
+x Implement basic redirections <,>,<<,>>
+x Implement pipes
+x Handle enviroment variables
+x Handle $?
+x Handle ctrl-c, ctrl-d and ctrl-\
+x Implement the following builtins
+  x echo with option -n
+  x cd with only a relative or absolute path
+  x pwd with no options
+  x export with no options
+  x unset with no options
+  x env with no options or arguments
+  x exit with no options
+x && and || with parenthesis for priorities
+x Wildcards * should work for the current directory
+
+what we actually did
+============
+x everything in the mandatory part
+x while/until loops
+x if statements
+x functions
+x subshell
+x case clause
+x command substitution
+x background commands
+x all io redirect
+x bang symbol
+x proper expansion
+x arithmetic expansion
+x script files support
+x rc file
+x shift
+x set/unset
+x getopts
+and much much more...
+
+all according to the X/Open XSI Shell Command Language (Issue 4, Version 2)
+
+what we learned
+============
+Shells are poorly standardized, multiple times when we were implementing
+something, we read something along the lines of "some shells do it like this,
+and other shell do it like that. So for maximum portability do both"... Which
+we then did.
+
+Also there are times when the standard (at least the one we used) is just plain
+unclear about what something should do, making us check with multiple other
+shells what their behaviour is. And learning that even the big shells like bash
+and zsh do not have the same behaviour is some cases.
+
+Jokes aside, we definitely learned a great deal about annoying parsing.
+Resulting in the parser calling the lexer, and that lexer again calling the
+parser and on and on and on... And how to properly manage child processes and
+managing signalls.
+
+And perhaps most of all, we know pretty much understand all (standard) shell
+language. Knowing what to expect with what syntax. And also knowing the small
+things like how spaces (do not) expand.
+
+faq
+============
+Q:why so many files with so little amount of functions
+A:the subject requires you to work in a specific format, which limits you to
+  max 25 lines per functions, and max 5 functions per file
