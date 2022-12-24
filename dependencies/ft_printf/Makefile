@@ -8,7 +8,7 @@ SRC=\
 INC=\
 	ft_printf.h
 OBJ=$(SRC:.c=.o)
-CFLAGS=-Wall -Wextra -Werror -ansi -pedantic
+CFLAGS=-Wall -Wextra -ansi -pedantic
 NAME=libftprintf.a
 
 BLACK			:="\033[0;30m"

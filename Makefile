@@ -127,8 +127,8 @@ else ifeq ($(config), release)
 	CFLAGS		+= -g3 -O2
 	LFLAGS		+=
 else ifeq ($(config), distr)
-	CFLAGS		+= -Werror -g0 -Ofast -flto
-	LFLAGS		+= -Werror -g0 -Ofast -flto
+	CFLAGS		+= -g0 -Ofast -flto
+	LFLAGS		+= -g0 -Ofast -flto
 else
 $(error "invalid config $(config"))
 endif
